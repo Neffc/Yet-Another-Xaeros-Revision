@@ -10,7 +10,7 @@
 	},
 	"icon": "assets/xaerominimap/icon.png",
 	"description": "The most vanilla-looking minimap for Minecraft.",
-	"version": "23.9.0",
+	"version": "23.9.1",
 	"license": "All rights reserved",
 	"suggests": {
 		"flamingo": "*"
