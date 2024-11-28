@@ -15,13 +15,13 @@ import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_3675.class_307;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.widget.WidgetScreen;
 import xaero.common.misc.KeySortableByOther;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public abstract class GuiSettings extends ScreenBase implements WidgetScreen {
    protected int entriesPerPage = 12;

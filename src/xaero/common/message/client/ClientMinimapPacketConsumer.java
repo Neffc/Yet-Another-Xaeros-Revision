@@ -7,7 +7,7 @@ import net.minecraft.class_310;
 import net.minecraft.class_634;
 import xaero.common.message.MinimapMessage;
 import xaero.common.message.MinimapMessageHandlerFabric;
-import xaero.common.message.MinimapMessageType;
+import xaero.common.message.type.MinimapMessageType;
 
 public class ClientMinimapPacketConsumer implements PlayChannelHandler {
    private final MinimapMessageHandlerFabric messageHandler;

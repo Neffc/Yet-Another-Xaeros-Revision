@@ -1,8 +1,8 @@
 package xaero.common.platform;
 
 import java.util.ServiceLoader;
-import xaero.common.MinimapLogs;
 import xaero.common.platform.services.IPlatformHelper;
+import xaero.hud.minimap.MinimapLogs;
 
 public class Services {
    public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);

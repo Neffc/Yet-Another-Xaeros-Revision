@@ -20,9 +20,9 @@ import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_742;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.patreon.decrypt.DecryptInputStream;
 import xaero.common.platform.Services;
+import xaero.hud.minimap.MinimapLogs;
 
 public class Patreon {
    private static boolean hasAutoUpdates;

@@ -8,9 +8,9 @@ import net.minecraft.class_342;
 import net.minecraft.class_437;
 import org.apache.commons.lang3.StringUtils;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.settings.ModOptions;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiSlimeSeed extends GuiSettings {
    public class_342 seedTextField;

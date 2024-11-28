@@ -6,7 +6,7 @@ import net.minecraft.class_156;
 import net.minecraft.class_310;
 import net.minecraft.class_407;
 import net.minecraft.class_437;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WidgetUrlClickHandler implements WidgetClickHandler {
    private class_437 clickedScreen;

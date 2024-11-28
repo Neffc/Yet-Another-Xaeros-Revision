@@ -2,12 +2,12 @@ package xaero.minimap;
 
 import java.io.IOException;
 import net.minecraft.class_634;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.XaeroMinimapSession;
 import xaero.minimap.controls.MinimapControlsHandler;
 
 public class XaeroMinimapStandaloneSession extends XaeroMinimapSession {
-   public XaeroMinimapStandaloneSession(IXaeroMinimap modMain) {
+   public XaeroMinimapStandaloneSession(HudMod modMain) {
       super(modMain);
    }
 

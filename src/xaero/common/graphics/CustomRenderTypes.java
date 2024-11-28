@@ -24,7 +24,7 @@ import net.minecraft.class_4668.class_4686;
 import net.minecraft.class_4668.class_5939;
 import net.minecraft.class_4668.class_5942;
 import xaero.common.graphics.shader.MinimapShaders;
-import xaero.common.interfaces.render.InterfaceRenderer;
+import xaero.hud.render.TextureLocations;
 
 public class CustomRenderTypes extends class_1921 {
    private static final class_4678 KEEP_TARGET = new class_4678("xaero_keep_target", () -> {
@@ -113,7 +113,7 @@ public class CustomRenderTypes extends class_1921 {
 
    static {
       ImmutableList<class_4668> multiPhaseParameters = new CustomRenderTypes.MultiPhaseBuilder()
-         .texture(new class_4683(InterfaceRenderer.guiTextures, false, false))
+         .texture(new class_4683(TextureLocations.GUI_TEXTURES, false, false))
          .transparency(TRANSLUCENT_TRANSPARENCY)
          .shader(new class_5942(() -> MinimapShaders.POSITION_COLOR_TEX))
          .cull(field_21345)
@@ -123,7 +123,7 @@ public class CustomRenderTypes extends class_1921 {
          "xaero_gui_nearest", class_290.field_20887, class_5596.field_27382, 256, false, false, multiPhaseParameters
       );
       multiPhaseParameters = new CustomRenderTypes.MultiPhaseBuilder()
-         .texture(new class_4683(InterfaceRenderer.guiTextures, true, false))
+         .texture(new class_4683(TextureLocations.GUI_TEXTURES, true, false))
          .transparency(TRANSLUCENT_TRANSPARENCY)
          .shader(new class_5942(() -> MinimapShaders.POSITION_COLOR_TEX))
          .cull(field_21345)
@@ -133,7 +133,7 @@ public class CustomRenderTypes extends class_1921 {
          "xaero_gui_bilinear", class_290.field_20887, class_5596.field_27382, 256, false, false, multiPhaseParameters
       );
       multiPhaseParameters = new CustomRenderTypes.MultiPhaseBuilder()
-         .texture(new class_4683(InterfaceRenderer.guiTextures, true, false))
+         .texture(new class_4683(TextureLocations.GUI_TEXTURES, true, false))
          .transparency(PREMULTIPLIED_TRANSPARENCY)
          .shader(new class_5942(() -> MinimapShaders.POSITION_COLOR_TEX_PRE))
          .cull(field_21345)

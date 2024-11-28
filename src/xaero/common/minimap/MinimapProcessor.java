@@ -8,7 +8,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_638;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.anim.OldAnimation;
+import xaero.common.anim.MultiplyAnimationHelper;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.minimap.mcworld.MinimapClientWorldData;
 import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
@@ -115,7 +115,7 @@ public class MinimapProcessor {
       if (!(off > 0.01) && !(off < -0.01)) {
          off = 0.0;
       } else {
-         off = (double)((float)OldAnimation.animate(off, 0.8));
+         off = (double)((float)MultiplyAnimationHelper.animate(off, 0.8));
       }
 
       this.minimapZoom = target - off;

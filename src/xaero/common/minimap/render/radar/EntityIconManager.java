@@ -18,7 +18,6 @@ import net.minecraft.class_897;
 import net.minecraft.class_898;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.icon.XaeroIcon;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.armor.EntityIconArmor;
@@ -27,6 +26,7 @@ import xaero.common.minimap.render.radar.resource.EntityIconDefinition;
 import xaero.common.minimap.render.radar.resource.EntityIconDefinitionManager;
 import xaero.common.minimap.render.radar.resource.EntityIconModelConfig;
 import xaero.common.minimap.render.radar.variant.EntityIconVariantHandler;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconManager {
    public static final XaeroIcon FAILED = new XaeroIcon(null, 0, 0);

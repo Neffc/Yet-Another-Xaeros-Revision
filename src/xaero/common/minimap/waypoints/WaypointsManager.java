@@ -30,12 +30,12 @@ import net.minecraft.class_7924;
 import net.minecraft.class_2558.class_2559;
 import net.minecraft.class_2568.class_5247;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.mcworld.MinimapClientWorldData;
 import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WaypointsManager {
    private IXaeroMinimap modMain;
@@ -130,16 +130,7 @@ public class WaypointsManager {
          return class_1937.field_25180;
       } else {
          String[] idArgs = dimIdPart.split("\\$");
-         if (idArgs.length == 1) {
-            return null;
-         } else {
-            try {
-               Integer.parseInt(dimIdPart);
-               return null;
-            } catch (NumberFormatException var5) {
-               return class_5321.method_29179(class_7924.field_41223, new class_2960(idArgs[0], idArgs[1].replace('%', '/')));
-            }
-         }
+         return idArgs.length < 2 ? null : class_5321.method_29179(class_7924.field_41223, new class_2960(idArgs[0], idArgs[1].replace('%', '/')));
       }
    }
 

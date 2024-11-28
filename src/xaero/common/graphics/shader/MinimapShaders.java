@@ -5,7 +5,7 @@ import net.minecraft.class_290;
 import net.minecraft.class_310;
 import net.minecraft.class_3300;
 import net.minecraft.class_5944;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class MinimapShaders {
    public static FramebufferLinesShader FRAMEBUFFER_LINES = null;

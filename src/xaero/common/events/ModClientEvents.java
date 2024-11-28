@@ -6,7 +6,7 @@ import net.minecraft.class_310;
 import net.minecraft.class_332;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.anim.OldAnimation;
+import xaero.common.anim.MultiplyAnimationHelper;
 import xaero.common.interfaces.InterfaceManager;
 
 public abstract class ModClientEvents {
@@ -33,19 +33,18 @@ public abstract class ModClientEvents {
    }
 
    public void handleRenderModOverlay(class_332 guiGraphics, float partialTicks) {
+      MultiplyAnimationHelper.tick();
       RenderSystem.clear(256, class_310.field_1703);
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
       if (minimapSession != null) {
-         this.modMain.getInterfaceRenderer().renderInterfaces(minimapSession, guiGraphics, partialTicks);
+         this.modMain.getHudRenderer().render(this.modMain.getHud(), guiGraphics, partialTicks);
          this.modMain
             .getInterfaces()
             .getMinimapInterface()
             .getWaypointsGuiRenderer()
             .drawSetChange(minimapSession.getWaypointsManager(), guiGraphics, class_310.method_1551().method_22683());
       }
-
-      OldAnimation.tick();
    }
 
    protected void handleTextureStitchEventPost_onReset() {

@@ -8,7 +8,6 @@ import net.minecraft.class_5218;
 import net.minecraft.server.MinecraftServer;
 import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.config.CommonConfig;
 import xaero.common.message.basic.ClientboundRulesPacket;
 import xaero.common.message.basic.HandshakePacket;
@@ -18,6 +17,7 @@ import xaero.common.server.MineraftServerDataInitializer;
 import xaero.common.server.level.LevelMapProperties;
 import xaero.common.server.player.IServerPlayer;
 import xaero.common.server.player.ServerPlayerData;
+import xaero.hud.minimap.MinimapLogs;
 
 public abstract class CommonEvents {
    private final IXaeroMinimap modMain;

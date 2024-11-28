@@ -1,7 +1,7 @@
 package xaero.common.mods;
 
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class SupportModsFabric extends SupportMods {
    public SupportAmecs amecs = null;

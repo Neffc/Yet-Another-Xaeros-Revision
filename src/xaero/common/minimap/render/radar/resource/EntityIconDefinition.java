@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import net.minecraft.class_1297;
 import net.minecraft.class_2960;
 import net.minecraft.class_897;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconDefinition {
    public static final class_2960 MODEL_TYPE = new class_2960("xaerominimap", "entity/icon/model");

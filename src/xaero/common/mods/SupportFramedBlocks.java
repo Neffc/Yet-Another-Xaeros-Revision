@@ -10,8 +10,8 @@ import net.minecraft.class_2586;
 import net.minecraft.class_2680;
 import net.minecraft.class_5321;
 import net.minecraft.class_7924;
-import xaero.common.MinimapLogs;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.MinimapLogs;
 
 public class SupportFramedBlocks {
    private Class<?> framedTileBlockClass;

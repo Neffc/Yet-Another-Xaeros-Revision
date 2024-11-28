@@ -15,8 +15,8 @@ import net.minecraft.class_310;
 import net.minecraft.class_3419;
 import net.minecraft.class_4019;
 import net.minecraft.class_4836;
-import xaero.common.MinimapLogs;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.MinimapLogs;
 
 public class RadarUtils {
    private static class_2940<Optional<UUID>> FOX_TRUSTED_UUID_SECONDARY;

@@ -6,7 +6,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_342;
 import net.minecraft.class_437;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiDefaultTpCommand extends ScreenBase {
    private MySmallButton confirmButton;

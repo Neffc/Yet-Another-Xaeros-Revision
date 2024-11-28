@@ -9,8 +9,8 @@ import java.util.function.BiFunction;
 import net.minecraft.class_4592;
 import net.minecraft.class_4595;
 import net.minecraft.class_583;
-import xaero.common.MinimapLogs;
 import xaero.common.misc.SeparatedKeysParser;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconModelFieldResolver {
    public static final SeparatedKeysParser KEYS_PARSER = new SeparatedKeysParser(c -> c == ',' || c == ';');

@@ -11,10 +11,10 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.patreon.Patreon;
 import xaero.common.patreon.decrypt.DecryptInputStream;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public class Internet {
    public static Cipher cipher = null;

@@ -1,10 +1,8 @@
 package xaero.common.core;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import net.minecraft.class_1041;
 import net.minecraft.class_1657;
 import net.minecraft.class_1937;
 import net.minecraft.class_2561;
@@ -17,6 +15,7 @@ import net.minecraft.class_2678;
 import net.minecraft.class_2759;
 import net.minecraft.class_2818;
 import net.minecraft.class_310;
+import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_5218;
@@ -24,25 +23,25 @@ import net.minecraft.class_583;
 import net.minecraft.class_630;
 import net.minecraft.class_634;
 import net.minecraft.class_6603;
-import net.minecraft.class_8251;
 import net.minecraft.class_2556.class_7602;
 import net.minecraft.class_32.class_5143;
 import org.joml.Matrix4f;
 import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.interfaces.pushbox.IBossHealthPushBox;
-import xaero.common.interfaces.pushbox.IPotionEffectsPushBox;
 import xaero.common.minimap.render.radar.EntityIconPrerenderer;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.pushbox.BuiltInPushBoxes;
+import xaero.hud.pushbox.boss.IBossHealthPushBox;
+import xaero.hud.pushbox.effect.IPotionEffectsPushBox;
 
 public class XaeroMinimapCore {
    public static IXaeroMinimap modMain;
    public static Field chunkCleanField = null;
    public static XaeroMinimapSession currentSession;
-   private static Matrix4f waypointsProjection = new Matrix4f();
-   private static Matrix4f waypointModelView = new Matrix4f();
+   public static Matrix4f waypointsProjection = new Matrix4f();
+   public static Matrix4f waypointModelView = new Matrix4f();
 
    public static void ensureField() {
       if (chunkCleanField == null) {
@@ -138,7 +137,7 @@ public class XaeroMinimapCore {
 
    private static void cleanupCurrentSession() {
       try {
-         currentSession.cleanup();
+         currentSession.tryCleanup();
       } catch (Throwable var4) {
          MinimapLogs.LOGGER.error("suppressed exception", var4);
       } finally {
@@ -155,7 +154,7 @@ public class XaeroMinimapCore {
             }
 
             try {
-               netHandlerSession.cleanup();
+               netHandlerSession.tryCleanup();
             } finally {
                if (netHandlerSession == currentSession) {
                   currentSession = null;
@@ -189,32 +188,21 @@ public class XaeroMinimapCore {
       waypointModelView.mul(matrixStack.method_23760().method_23761());
    }
 
-   public static void beforeIngameGuiRender(float partialTicks) {
+   public static void beforeIngameGuiRender(class_332 guiGraphics, float partialTicks) {
       if (isModLoaded()) {
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-         if (minimapSession != null) {
-            class_1041 mainwindow = class_310.method_1551().method_22683();
-            Matrix4f projectionMatrixBU = RenderSystem.getProjectionMatrix();
-            class_8251 vertexSortingBU = RenderSystem.getVertexSorting();
-            Matrix4f ortho = new Matrix4f().setOrtho(0.0F, (float)mainwindow.method_4489(), (float)mainwindow.method_4506(), 0.0F, 1000.0F, 3000.0F);
-            RenderSystem.setProjectionMatrix(ortho, class_8251.field_43361);
-            RenderSystem.getModelViewStack().method_22903();
-            RenderSystem.getModelViewStack().method_34426();
-            RenderSystem.applyModelViewMatrix();
-            modMain.getInterfaces()
-               .getMinimapInterface()
-               .getWaypointsIngameRenderer()
-               .render(minimapSession, partialTicks, minimapSession.getMinimapProcessor(), waypointsProjection, waypointModelView);
-            RenderSystem.getModelViewStack().method_22909();
-            RenderSystem.applyModelViewMatrix();
-            RenderSystem.setProjectionMatrix(projectionMatrixBU, vertexSortingBU);
-         }
+         HudMod.INSTANCE.getEvents().handleRenderGameOverlayEventPre(guiGraphics, partialTicks);
       }
    }
 
-   public static void onPotionEffectsRender() {
+   public static void afterIngameGuiRender(class_332 guiGraphics, float partialTicks) {
       if (isModLoaded()) {
-         IPotionEffectsPushBox potionEffectsPushBox = modMain.getInterfaces().getPotionEffectPushBox();
+         HudMod.INSTANCE.getEvents().handleRenderGameOverlayEventPost();
+      }
+   }
+
+   public static void onRenderStatusEffectOverlayPost(class_332 guiGraphics) {
+      if (isModLoaded()) {
+         IPotionEffectsPushBox potionEffectsPushBox = BuiltInPushBoxes.getPotionEffectPushBox(modMain);
          if (potionEffectsPushBox != null) {
             potionEffectsPushBox.setActive(true);
          }
@@ -223,7 +211,7 @@ public class XaeroMinimapCore {
 
    public static void onBossHealthRender(int h) {
       if (isModLoaded()) {
-         IBossHealthPushBox bossHealthPushBox = modMain.getInterfaces().getBossHealthPushBox();
+         IBossHealthPushBox bossHealthPushBox = BuiltInPushBoxes.getBossHealthPushBox(modMain);
          if (bossHealthPushBox != null) {
             bossHealthPushBox.setActive(true);
             bossHealthPushBox.setLastBossHealthHeight(h);
@@ -283,5 +271,19 @@ public class XaeroMinimapCore {
 
    public static boolean isModLoaded() {
       return modMain != null && modMain.isLoadedClient();
+   }
+
+   public static boolean onRenderStatusEffectOverlay(class_332 guiGraphics) {
+      return !isModLoaded() ? false : modMain.getEvents().handleRenderStatusEffectOverlay(guiGraphics);
+   }
+
+   public static boolean onRenderCrosshair(class_332 guiGraphics) {
+      return !isModLoaded() ? false : modMain.getEvents().handleRenderCrosshairOverlay(guiGraphics);
+   }
+
+   public static void handleRenderModOverlay(class_332 guiGraphics, float partialTicks) {
+      if (isModLoaded()) {
+         modMain.getModClientEvents().handleRenderModOverlay(guiGraphics, partialTicks);
+      }
    }
 }

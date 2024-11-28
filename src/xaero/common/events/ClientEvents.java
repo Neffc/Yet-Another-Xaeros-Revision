@@ -1,8 +1,10 @@
 package xaero.common.events;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import net.minecraft.class_1041;
 import net.minecraft.class_1074;
 import net.minecraft.class_1657;
 import net.minecraft.class_1936;
@@ -11,7 +13,6 @@ import net.minecraft.class_2338;
 import net.minecraft.class_2561;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
-import net.minecraft.class_3675;
 import net.minecraft.class_429;
 import net.minecraft.class_437;
 import net.minecraft.class_4398;
@@ -20,14 +21,15 @@ import net.minecraft.class_4439;
 import net.minecraft.class_4877;
 import net.minecraft.class_500;
 import net.minecraft.class_638;
+import net.minecraft.class_8251;
 import net.minecraft.class_2556.class_7602;
 import org.apache.commons.lang3.StringUtils;
+import org.joml.Matrix4f;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.core.XaeroMinimapCore;
 import xaero.common.effect.Effects;
 import xaero.common.gui.GuiAddWaypoint;
-import xaero.common.gui.GuiEditMode;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.GuiWidgetUpdateAll;
 import xaero.common.minimap.MinimapProcessor;
@@ -35,6 +37,7 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.patreon.Patreon;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public class ClientEvents {
    protected IXaeroMinimap modMain;
@@ -99,13 +102,33 @@ public class ClientEvents {
    }
 
    public void handleRenderGameOverlayEventPre(class_332 guiGraphics, float partialTicks) {
-      if (class_3675.method_15987(class_310.method_1551().method_22683().method_4490(), 256)) {
-         GuiEditMode.cancel(this.modMain.getInterfaces());
+      if (!class_310.method_1551().field_1690.field_1842) {
+         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+         if (minimapSession != null) {
+            class_1041 mainwindow = class_310.method_1551().method_22683();
+            Matrix4f projectionMatrixBU = RenderSystem.getProjectionMatrix();
+            class_8251 vertexSortingBU = RenderSystem.getVertexSorting();
+            Matrix4f ortho = new Matrix4f().setOrtho(0.0F, (float)mainwindow.method_4489(), (float)mainwindow.method_4506(), 0.0F, 1000.0F, 3000.0F);
+            RenderSystem.setProjectionMatrix(ortho, class_8251.field_43361);
+            RenderSystem.getModelViewStack().method_22903();
+            RenderSystem.getModelViewStack().method_34426();
+            RenderSystem.applyModelViewMatrix();
+            this.modMain
+               .getInterfaces()
+               .getMinimapInterface()
+               .getWaypointsIngameRenderer()
+               .render(
+                  minimapSession, partialTicks, minimapSession.getMinimapProcessor(), XaeroMinimapCore.waypointsProjection, XaeroMinimapCore.waypointModelView
+               );
+            RenderSystem.getModelViewStack().method_22909();
+            RenderSystem.applyModelViewMatrix();
+            RenderSystem.setProjectionMatrix(projectionMatrixBU, vertexSortingBU);
+         }
       }
    }
 
    public void handleRenderGameOverlayEventPost() {
-      this.modMain.getInterfaces().onPostGameOverlay();
+      this.modMain.getHud().getEventHandler().handleRenderGameOverlayEventPost();
    }
 
    public boolean handleClientSendChatEvent(String message) {
@@ -247,7 +270,7 @@ public class ClientEvents {
       return this.modMain.getForgeEventHandlerListener().handleRenderStatusEffectOverlay(guiGraphics);
    }
 
-   protected boolean handleRenderCrosshairOverlay(class_332 guiGraphics) {
+   public boolean handleRenderCrosshairOverlay(class_332 guiGraphics) {
       XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
       return minimapSession == null ? false : minimapSession.getMinimapProcessor().isEnlargedMap() && this.modMain.getSettings().centeredEnlarged;
    }

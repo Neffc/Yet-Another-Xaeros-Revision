@@ -27,8 +27,6 @@ import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.GuiHelper;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.interfaces.render.InterfaceRenderer;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
@@ -37,13 +35,15 @@ import xaero.common.minimap.waypoints.render.CompassRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
+import xaero.hud.render.TextureLocations;
 
 public abstract class MinimapRenderer {
    public static final int black = -16777216;
    public static final int slime = -2142047936;
    protected IXaeroMinimap modMain;
    protected class_310 mc;
-   protected MinimapInterface minimapInterface;
+   protected Minimap minimap;
    protected MinimapRendererHelper helper;
    protected WaypointsGuiRenderer waypointsGuiRenderer;
    private int lastMinimapSize;
@@ -53,13 +53,11 @@ public abstract class MinimapRenderer {
    private double lastMapDimensionScale = 1.0;
    private double lastPlayerDimDiv = 1.0;
 
-   public MinimapRenderer(
-      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
-   ) {
+   public MinimapRenderer(IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimap, CompassRenderer compassRenderer) {
       this.modMain = modMain;
       this.mc = mc;
       this.waypointsGuiRenderer = waypointsGuiRenderer;
-      this.minimapInterface = minimapInterface;
+      this.minimap = minimap;
       this.helper = new MinimapRendererHelper();
       this.mutableBlockPos = new class_2339();
       this.compassRenderer = compassRenderer;
@@ -121,7 +119,7 @@ public abstract class MinimapRenderer {
       minimap.getEntityRadar().setLastRenderViewEntity(this.mc.method_1560());
       int mapSize = minimapSession.getMinimapProcessor().getMinimapSize();
       int bufferSize = minimapSession.getMinimapProcessor().getMinimapBufferSize(mapSize);
-      if (this.minimapInterface.usingFBO()) {
+      if (this.minimap.usingFBO()) {
          bufferSize = minimap.getFBOBufferSize();
       }
 
@@ -193,7 +191,7 @@ public abstract class MinimapRenderer {
          settings,
          cvc
       );
-      if (this.minimapInterface.usingFBO()) {
+      if (this.minimap.usingFBO()) {
          sizeFix = 1.0F;
       }
 
@@ -238,7 +236,7 @@ public abstract class MinimapRenderer {
             );
       }
 
-      if (!this.minimapInterface.usingFBO()) {
+      if (!this.minimap.usingFBO()) {
          matrixStack.method_22905(1.0F / sizeFix, 1.0F / sizeFix, 1.0F);
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       }
@@ -254,7 +252,7 @@ public abstract class MinimapRenderer {
 
       MinimapRendererHelper helper = this.getHelper();
       if (renderFrame) {
-         RenderSystem.setShaderTexture(0, InterfaceRenderer.minimapFrameTextures);
+         RenderSystem.setShaderTexture(0, TextureLocations.MINIMAP_FRAME_TEXTURES);
       }
 
       if (renderFrame && !circleShape) {
@@ -393,7 +391,7 @@ public abstract class MinimapRenderer {
          );
       }
 
-      RenderSystem.setShaderTexture(0, InterfaceRenderer.guiTextures);
+      RenderSystem.setShaderTexture(0, TextureLocations.GUI_TEXTURES);
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       matrixStack.method_22903();
       matrixStack.method_46416((float)(scaledX + 9), (float)(scaledY + 9), 0.0F);
@@ -402,14 +400,14 @@ public abstract class MinimapRenderer {
       matrixStack.method_46416((float)halfFrame, (float)halfFrame, 0.0F);
       int specW = halfFrame + (int)(3.0F * minimapScale);
       boolean safeMode = this instanceof MinimapSafeModeRenderer;
-      class_4598 renderTypeBuffers = this.modMain.getInterfaceRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
+      class_4598 renderTypeBuffers = this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers = minimapSession.getMultiTextureRenderTypeRenderers();
       double scaledZoom = this.zoom * (double)minimapScale / 2.0;
       if (!this.modMain.getSettings().compassOverEverything) {
          this.renderCompass(matrixStack, settings, renderTypeBuffers, specW, specW, halfFrame, ps, pc, circleShape, minimapScale);
       }
 
-      this.minimapInterface
+      this.minimap
          .getOverMapRendererHandler()
          .render(
             guiGraphics,
@@ -491,13 +489,13 @@ public abstract class MinimapRenderer {
       matrixStack.method_22903();
       matrixStack.method_22905(0.5F, 0.5F, 1.0F);
       matrixStack.method_22904(centerX, centerY, 0.0);
-      this.mc.method_1531().method_22813(InterfaceRenderer.guiTextures);
+      this.mc.method_1531().method_22813(TextureLocations.GUI_TEXTURES);
       GL11.glTexParameteri(3553, 10240, 9729);
       GL11.glTexParameteri(3553, 10241, 9729);
       class_1297 mainEntity = this.mc.method_1560();
       if (!safeMode && !crosshairDisplayed) {
          MinimapRadar radar = minimap.getEntityRadar();
-         this.minimapInterface
+         this.minimap
             .getMinimapFBORenderer()
             .renderMainEntityDot(
                guiGraphics,
@@ -522,7 +520,7 @@ public abstract class MinimapRenderer {
             );
       }
 
-      RenderSystem.setShaderTexture(0, InterfaceRenderer.guiTextures);
+      RenderSystem.setShaderTexture(0, TextureLocations.GUI_TEXTURES);
       RenderSystem.enableBlend();
       if (lockedNorth || settings.mainEntityAs == 2) {
          float arrowAngle = lockedNorth ? mainEntity.method_5705(partial) : 180.0F;
@@ -570,20 +568,20 @@ public abstract class MinimapRenderer {
          CustomRenderTypes.DEPTH_CLEAR, depthClearerX, depthClearerY, depthClearerX + depthClearerW, depthClearerY + depthClearerW, -16777216
       );
       matrixStack.method_46416(0.0F, 0.0F, 9999.0F);
-      this.mc.method_1531().method_22813(InterfaceRenderer.guiTextures);
+      this.mc.method_1531().method_22813(TextureLocations.GUI_TEXTURES);
       GL11.glTexParameteri(3553, 10240, 9728);
       GL11.glTexParameteri(3553, 10241, 9728);
       int playerBlockX = OptimizedMath.myFloor(mainEntity.method_23317());
       int playerBlockY = OptimizedMath.myFloor(mainEntity.method_23318());
       int playerBlockZ = OptimizedMath.myFloor(mainEntity.method_23321());
       class_2338 pos = this.mutableBlockPos.method_10103(playerBlockX, playerBlockY, playerBlockZ);
-      this.minimapInterface
+      this.minimap
          .getInfoDisplayRenderer()
          .render(
             guiGraphics,
             minimapSession,
             minimap,
-            this.minimapInterface,
+            this.minimap,
             helper,
             x,
             y,

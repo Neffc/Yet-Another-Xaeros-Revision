@@ -27,11 +27,11 @@ import org.apache.commons.codec.binary.Hex;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import xaero.common.MinimapLogs;
 import xaero.common.gui.widget.ImageWidgetBuilder;
 import xaero.common.gui.widget.Widget;
 import xaero.common.misc.Misc;
 import xaero.common.platform.Services;
+import xaero.hud.minimap.MinimapLogs;
 
 public class ImageWidgetLoader extends ScalableWidgetLoader {
    @Override

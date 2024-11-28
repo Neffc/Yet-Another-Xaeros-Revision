@@ -34,13 +34,11 @@ import net.minecraft.class_634;
 import net.minecraft.class_7923;
 import net.minecraft.server.MinecraftServer;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.category.setting.ObjectCategorySetting;
 import xaero.common.file.SimpleBackup;
 import xaero.common.gui.GuiSettings;
 import xaero.common.gui.GuiSlimeSeed;
-import xaero.common.interfaces.Interface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.highlight.DimensionHighlighterHandler;
 import xaero.common.minimap.info.BuiltInInfoDisplays;
@@ -56,6 +54,8 @@ import xaero.common.minimap.waypoints.WaypointWorldContainer;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.MinimapLogs;
 
 public class ModSettings {
    public static int defaultSettings;
@@ -109,7 +109,6 @@ public class ModSettings {
    @Deprecated
    public static class_304 keyTogglePacPlayers = keyToggleTrackedPlayers;
    public static class_304 keyTogglePacChunkClaims = new class_304("gui.xaero_toggle_pac_chunk_claims", -1, "Xaero's Minimap");
-   private boolean minimap = true;
    public static String minimapItemId = null;
    public static class_1792 minimapItem = null;
    public int zoom = 0;
@@ -302,7 +301,7 @@ public class ModSettings {
    }
 
    public boolean getMinimap() {
-      return this.minimap
+      return BuiltInHudModules.MINIMAP.isActive()
          && !this.minimapDisabled()
          && (minimapItem == null || class_310.method_1551().field_1724 == null || MinimapProcessor.hasMinimapItem(class_310.method_1551().field_1724));
    }
@@ -1174,7 +1173,7 @@ public class ModSettings {
       writer.println("allowInternetAccess:" + this.allowInternetAccess);
       writer.println("#INGAME SETTINGS (DO NOT EDIT!)");
       writer.println("updateNotification:" + updateNotification);
-      writer.println("minimap:" + this.minimap);
+      writer.println("minimap:" + BuiltInHudModules.MINIMAP.isActive());
       writer.println("caveMaps:" + this.caveMaps);
       writer.println("caveZoom:" + this.caveZoom);
       writer.println("showWaypoints:" + this.showWaypoints);
@@ -1292,29 +1291,7 @@ public class ModSettings {
             writer.println("seed:" + keys[i] + ":" + values[i]);
          }
 
-         Iterator<Interface> iter = this.modMain.getInterfaces().getInterfaceIterator();
-
-         while (iter.hasNext()) {
-            Interface l = iter.next();
-            writer.println(
-               "interface:"
-                  + l.getIname()
-                  + ":"
-                  + l.getActualx()
-                  + ":"
-                  + l.getActualy()
-                  + ":"
-                  + l.isCentered()
-                  + ":"
-                  + l.isFlipped()
-                  + ":"
-                  + l.isFromRight()
-                  + ":"
-                  + l.isFromBottom()
-            );
-         }
-
-         writer.println("#WAYPOINTS HAVE BEEN MOVED TO /XaeroWaypoints");
+         this.modMain.getHudIO().save(writer);
       } finally {
          if (writer != null) {
             writer.close();
@@ -1347,7 +1324,7 @@ public class ModSettings {
       } else if (args[0].equalsIgnoreCase("allowInternetAccess")) {
          this.allowInternetAccess = valueString.equals("true");
       } else if (args[0].equalsIgnoreCase("minimap")) {
-         this.minimap = valueString.equals("true");
+         BuiltInHudModules.MINIMAP.setActive(valueString.equals("true"));
       } else if (args[0].equalsIgnoreCase("caveMaps")) {
          this.caveMaps = valueString.equals("true") ? 1 : (valueString.equals("false") ? 0 : Integer.parseInt(valueString));
       } else if (args[0].equalsIgnoreCase("caveZoom")) {
@@ -1675,39 +1652,22 @@ public class ModSettings {
 
          String s;
          while ((s = reader.readLine()) != null) {
-            String[] args = s.split(":");
+            if (!this.modMain.getHudIO().load(s)) {
+               String[] args = s.split(":");
 
-            try {
-               if (args[0].equalsIgnoreCase("interface")) {
-                  Iterator<Interface> iter = this.modMain.getInterfaces().getInterfaceIterator();
-
-                  while (iter.hasNext()) {
-                     Interface l = iter.next();
-                     if (args[1].equals(l.getIname())) {
-                        l.setX(Integer.parseInt(args[2]));
-                        l.setY(Integer.parseInt(args[3]));
-                        l.setActualx(l.getX());
-                        l.setActualy(l.getY());
-                        l.setCentered(args[4].equals("true"));
-                        l.setFlipped(args[5].equals("true"));
-                        l.setFromRight(args[6].equals("true"));
-                        if (args.length > 7) {
-                           l.setFromBottom(args[7].equals("true"));
-                        }
-
-                        l.backup();
-                        break;
-                     }
+               try {
+                  if (args[0].equalsIgnoreCase("interface") && args[1].equals("gui.xaero_minimap")) {
+                     BuiltInHudModules.MINIMAP.setTransform(this.modMain.getHud().getOldSystemCompatibility().loadOldTransform(args));
+                  } else if (args[0].equals("infoDisplayOrder")) {
+                     infoDisplayIO.loadInfoDisplayOrderLine(args);
+                  } else if (args[0].equals("infoDisplay")) {
+                     infoDisplayIO.loadInfoDisplayLine(args);
+                  } else {
+                     this.readSetting(args);
                   }
-               } else if (args[0].equals("infoDisplayOrder")) {
-                  infoDisplayIO.loadInfoDisplayOrderLine(args);
-               } else if (args[0].equals("infoDisplay")) {
-                  infoDisplayIO.loadInfoDisplayLine(args);
-               } else {
-                  this.readSetting(args);
+               } catch (Exception var10) {
+                  MinimapLogs.LOGGER.info("Skipping setting:" + args[0]);
                }
-            } catch (Exception var11) {
-               MinimapLogs.LOGGER.info("Skipping setting:" + args[0]);
             }
          }
       } finally {
@@ -2143,7 +2103,7 @@ public class ModSettings {
       } else if (o == ModOptions.IGNORE_HEIGHTMAPS) {
          return this.isIgnoreHeightmaps();
       } else if (o == ModOptions.MINIMAP) {
-         return this.minimap;
+         return BuiltInHudModules.MINIMAP.isActive();
       } else if (o == ModOptions.WAYPOINTS) {
          return this.showWaypoints;
       } else if (o == ModOptions.DEATHPOINTS) {
@@ -2279,7 +2239,7 @@ public class ModSettings {
                this.changeZoom((Integer)value - this.zoom);
                this.refreshScreen();
             } else if (par1EnumOptions == ModOptions.MINIMAP) {
-               this.minimap = (Boolean)value;
+               BuiltInHudModules.MINIMAP.setActive((Boolean)value);
             } else if (par1EnumOptions == ModOptions.CAVE_MAPS) {
                this.caveMaps = (Integer)value;
             } else if (par1EnumOptions == ModOptions.CAVE_ZOOM) {

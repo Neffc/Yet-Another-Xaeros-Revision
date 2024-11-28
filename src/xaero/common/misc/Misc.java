@@ -31,10 +31,10 @@ import net.minecraft.class_3675.class_307;
 import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.controls.IKeyBindingHelper;
 import xaero.common.gui.IScreenBase;
 import xaero.common.platform.Services;
+import xaero.hud.minimap.MinimapLogs;
 
 public class Misc {
    public static double getMouseX(class_310 mc, boolean raw) {

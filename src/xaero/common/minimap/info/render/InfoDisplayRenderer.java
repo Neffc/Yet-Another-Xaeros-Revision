@@ -11,13 +11,13 @@ import net.minecraft.class_4588;
 import net.minecraft.class_4597.class_4598;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomRenderTypes;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.info.InfoDisplay;
 import xaero.common.minimap.info.render.compile.InfoDisplayCompiler;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
 
 public final class InfoDisplayRenderer {
    private final InfoDisplayCompiler compiler = new InfoDisplayCompiler();
@@ -26,7 +26,7 @@ public final class InfoDisplayRenderer {
       class_332 guiGraphics,
       XaeroMinimapSession session,
       MinimapProcessor processor,
-      MinimapInterface minimapInterface,
+      Minimap minimap,
       MinimapRendererHelper helper,
       int x,
       int y,
@@ -45,7 +45,7 @@ public final class InfoDisplayRenderer {
       class_4598 renderTypeBuffer
    ) {
       class_4587 matrixStack = guiGraphics.method_51448();
-      Iterator<InfoDisplay<?>> iterator = minimapInterface.getInfoDisplayManager().getStream().iterator();
+      Iterator<InfoDisplay<?>> iterator = minimap.getInfoDisplayManager().getStream().iterator();
       int interfaceSize = size;
       int scaledHeight = (int)((float)height * mapScale);
       int align = settings.minimapTextAlign;

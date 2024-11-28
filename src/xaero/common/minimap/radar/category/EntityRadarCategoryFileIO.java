@@ -11,9 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import javax.annotation.Nonnull;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.radar.category.serialization.EntityRadarCategorySerializationHandler;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.MinimapLogs;
 
 public final class EntityRadarCategoryFileIO {
    private final IXaeroMinimap modMain;

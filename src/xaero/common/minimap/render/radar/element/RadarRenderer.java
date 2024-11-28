@@ -18,8 +18,6 @@ import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.icon.XaeroIcon;
-import xaero.common.interfaces.render.InterfaceRenderer;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
 import xaero.common.minimap.radar.MinimapRadar;
@@ -28,16 +26,18 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.EntityIconManager;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
+import xaero.hud.render.TextureLocations;
 
 public final class RadarRenderer extends MinimapElementRenderer<class_1297, RadarRenderContext> {
    private final IXaeroMinimap modMain;
    private final EntityIconManager entityIconManager;
-   private final MinimapInterface minimapInterface;
+   private final Minimap minimap;
 
    private RadarRenderer(
       IXaeroMinimap modMain,
       EntityIconManager entityIconManager,
-      MinimapInterface minimapInterface,
+      Minimap minimap,
       RadarElementReader elementReader,
       RadarRenderProvider provider,
       RadarRenderContext context
@@ -45,7 +45,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       super(elementReader, provider, context);
       this.modMain = modMain;
       this.entityIconManager = entityIconManager;
-      this.minimapInterface = minimapInterface;
+      this.minimap = minimap;
    }
 
    @Override
@@ -62,8 +62,8 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
    ) {
       ModSettings settings = modMain.getSettings();
       this.entityIconManager.allowPrerender();
-      RenderSystem.setShaderTexture(0, InterfaceRenderer.guiTextures);
-      class_310.method_1551().method_1531().method_22813(InterfaceRenderer.guiTextures);
+      RenderSystem.setShaderTexture(0, TextureLocations.GUI_TEXTURES);
+      class_310.method_1551().method_1531().method_22813(TextureLocations.GUI_TEXTURES);
       if (settings.getSmoothDots()) {
          GL11.glTexParameteri(3553, 10240, 9729);
          GL11.glTexParameteri(3553, 10241, 9729);
@@ -116,8 +116,8 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       renderTypeBuffers.method_22993();
       this.context.renderEntity = null;
       this.context.iconsRenderer = null;
-      RenderSystem.setShaderTexture(0, InterfaceRenderer.guiTextures);
-      class_310.method_1551().method_1531().method_22813(InterfaceRenderer.guiTextures);
+      RenderSystem.setShaderTexture(0, TextureLocations.GUI_TEXTURES);
+      class_310.method_1551().method_1531().method_22813(TextureLocations.GUI_TEXTURES);
       GL11.glTexParameteri(3553, 10240, 9728);
       GL11.glTexParameteri(3553, 10241, 9728);
    }
@@ -460,13 +460,13 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
 
    @Override
    public boolean shouldRender(int location) {
-      return this.minimapInterface.usingFBO() && (location == 3 || location == 4 || this.modMain.getSettings().getEntityRadar());
+      return this.minimap.usingFBO() && (location == 3 || location == 4 || this.modMain.getSettings().getEntityRadar());
    }
 
    public static final class Builder {
       private IXaeroMinimap modMain;
       private EntityIconManager entityIconManager;
-      private MinimapInterface minimapInterface;
+      private Minimap minimap;
 
       private Builder() {
       }
@@ -486,17 +486,17 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
          return this;
       }
 
-      public RadarRenderer.Builder setMinimapInterface(MinimapInterface minimapInterface) {
-         this.minimapInterface = minimapInterface;
+      public RadarRenderer.Builder setMinimap(Minimap minimap) {
+         this.minimap = minimap;
          return this;
       }
 
       public RadarRenderer build() {
-         if (this.modMain != null && this.entityIconManager != null && this.minimapInterface != null) {
+         if (this.modMain != null && this.entityIconManager != null && this.minimap != null) {
             RadarElementReader elementReader = new RadarElementReader();
             RadarRenderProvider provider = new RadarRenderProvider();
             RadarRenderContext context = new RadarRenderContext();
-            return new RadarRenderer(this.modMain, this.entityIconManager, this.minimapInterface, elementReader, provider, context);
+            return new RadarRenderer(this.modMain, this.entityIconManager, this.minimap, elementReader, provider, context);
          } else {
             throw new IllegalStateException();
          }

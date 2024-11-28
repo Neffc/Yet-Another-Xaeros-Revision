@@ -215,4 +215,13 @@ public class ScreenBase extends class_437 implements IScreenBase {
       this.dropdowns.remove(current);
       super.method_37066(current);
    }
+
+   @Override
+   public class_437 getEscape() {
+      return this.escape;
+   }
+
+   public static class_437 tryToGetEscape(class_437 screen) {
+      return screen instanceof IScreenBase screenBase ? screenBase.getEscape() : null;
+   }
 }

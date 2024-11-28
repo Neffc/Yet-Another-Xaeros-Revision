@@ -15,7 +15,6 @@ import net.minecraft.class_4587.class_4665;
 import net.minecraft.class_4597.class_4598;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
@@ -24,7 +23,6 @@ import xaero.common.graphics.ImprovedFramebuffer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.graphics.shader.MinimapShaders;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.element.render.map.MinimapElementMapRendererHandler;
 import xaero.common.minimap.radar.MinimapRadar;
@@ -39,6 +37,8 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.MinimapLogs;
 
 public class MinimapFBORenderer extends MinimapRenderer {
    private ImprovedFramebuffer scalingFramebuffer;
@@ -49,10 +49,8 @@ public class MinimapFBORenderer extends MinimapRenderer {
    private boolean triedFBO;
    private boolean loadedFBO;
 
-   public MinimapFBORenderer(
-      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
-   ) {
-      super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
+   public MinimapFBORenderer(IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimap, CompassRenderer compassRenderer) {
+      super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
    }
 
    public void loadFrameBuffer(MinimapProcessor minimapProcessor) {
@@ -68,10 +66,10 @@ public class MinimapFBORenderer extends MinimapRenderer {
          this.radarRenderer = RadarRenderer.Builder.begin()
             .setModMain(this.modMain)
             .setEntityIconManager(this.entityIconManager)
-            .setMinimapInterface(this.minimapInterface)
+            .setMinimap(this.minimap)
             .build();
          this.minimapElementMapRendererHandler.add(this.radarRenderer);
-         this.minimapInterface.getOverMapRendererHandler().add(this.radarRenderer);
+         this.minimap.getOverMapRendererHandler().add(this.radarRenderer);
          if (this.modMain.getSupportMods().worldmap()) {
             this.modMain.getSupportMods().worldmapSupport.createRadarRenderWrapper(this.radarRenderer);
          }

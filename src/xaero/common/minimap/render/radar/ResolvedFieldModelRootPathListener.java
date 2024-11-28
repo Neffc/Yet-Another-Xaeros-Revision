@@ -1,7 +1,7 @@
 package xaero.common.minimap.render.radar;
 
 import java.lang.reflect.Field;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class ResolvedFieldModelRootPathListener implements EntityIconModelFieldResolver.Listener {
    private Object resolvedObject;

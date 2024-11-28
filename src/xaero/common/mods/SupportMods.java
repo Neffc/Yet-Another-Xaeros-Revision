@@ -3,9 +3,9 @@ package xaero.common.mods;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.effect.Effects;
 import xaero.common.mods.pac.SupportOpenPartiesAndClaims;
+import xaero.hud.minimap.MinimapLogs;
 
 public abstract class SupportMods {
    public SupportXaeroWorldmap worldmapSupport = null;

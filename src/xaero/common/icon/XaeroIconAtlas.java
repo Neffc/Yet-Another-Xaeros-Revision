@@ -3,8 +3,8 @@ package xaero.common.icon;
 import com.mojang.blaze3d.platform.GlStateManager;
 import java.nio.IntBuffer;
 import org.lwjgl.opengl.GL11;
-import xaero.common.MinimapLogs;
 import xaero.common.exception.OpenGLException;
+import xaero.hud.minimap.MinimapLogs;
 
 public final class XaeroIconAtlas {
    private final int textureId;

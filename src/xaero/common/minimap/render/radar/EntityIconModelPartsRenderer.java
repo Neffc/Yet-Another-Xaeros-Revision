@@ -17,9 +17,9 @@ import net.minecraft.class_630;
 import net.minecraft.class_630.class_628;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconModelPartsRenderer {
    public Method ageableModelHeadPartsMethod;
@@ -94,7 +94,7 @@ public class EntityIconModelPartsRenderer {
                         class_4587 testMatrix = new class_4587();
                         testMatrix.method_46416(0.0F, 0.0F, -2500.0F);
                         class_4588 actualVertexConsumer = this.modMain
-                           .getInterfaceRenderer()
+                           .getHudRenderer()
                            .getCustomVertexConsumers()
                            .getBetterPVPRenderTypeBuffers()
                            .getBuffer(CustomRenderTypes.entityIconRenderType(mrde.renderTexture, mrde.layerPhases));

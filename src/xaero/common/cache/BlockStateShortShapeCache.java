@@ -10,8 +10,8 @@ import net.minecraft.class_2680;
 import net.minecraft.class_310;
 import net.minecraft.class_2350.class_2351;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.cache.placeholder.PlaceholderBlockGetter;
+import xaero.hud.minimap.MinimapLogs;
 
 public class BlockStateShortShapeCache {
    private IXaeroMinimap modMain;

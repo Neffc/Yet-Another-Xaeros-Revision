@@ -16,7 +16,6 @@ import xaero.common.core.IXaeroMinimapMinecraftClient;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.MinimapTexture;
-import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.radar.MinimapRadarList;
@@ -30,6 +29,7 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.Minimap;
 
 public class MinimapSafeModeRenderer extends MinimapRenderer {
    private static final class_2960 mapTextures = new class_2960("xaeromaptexture");
@@ -39,9 +39,9 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
    private MinimapTexture mapTexture = new MinimapTexture(mapTextures);
 
    public MinimapSafeModeRenderer(
-      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
+      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimap, CompassRenderer compassRenderer
    ) throws IOException {
-      super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
+      super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
    }
 
    public void updateMapFrameSafeMode(
@@ -358,7 +358,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
          this.getHelper().bindTextureBuffer(this.mapTexture.buffer, bufferSize, bufferSize, this.mapTexture.method_4624());
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
       } catch (Throwable var30) {
-         this.minimapInterface.setCrashedWith(var30);
+         this.minimap.setCrashedWith(var30);
       }
    }
 

@@ -8,7 +8,7 @@ import net.minecraft.class_3244;
 import net.minecraft.server.MinecraftServer;
 import xaero.common.message.MinimapMessage;
 import xaero.common.message.MinimapMessageHandlerFabric;
-import xaero.common.message.MinimapMessageType;
+import xaero.common.message.type.MinimapMessageType;
 
 public class ServerMinimapPacketConsumer implements PlayChannelHandler {
    private final MinimapMessageHandlerFabric messageHandler;

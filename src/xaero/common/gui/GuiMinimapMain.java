@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.class_1074;
 import net.minecraft.class_2561;
 import net.minecraft.class_437;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.settings.ModOptions;
@@ -16,10 +17,19 @@ public class GuiMinimapMain extends GuiMinimapSettings {
    private ISettingEntry[] mainEntries;
    private ISettingEntry[] searchableEntries;
 
+   public GuiMinimapMain(class_437 current) {
+      this(HudMod.INSTANCE, current, ScreenBase.tryToGetEscape(current));
+   }
+
    public GuiMinimapMain(IXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escScreen) {
       super(modMain, class_2561.method_43471("gui.xaero_minimap_settings"), par1GuiScreen, escScreen);
       ScreenSwitchSettingEntry changePositionEntry = new ScreenSwitchSettingEntry(
-         "gui.xaero_change_position", (current, escape) -> new GuiEditMode(modMain, current, escape, "gui.xaero_minimap_guide", false), null, true
+         "gui.xaero_change_position",
+         (current, escape) -> (class_437)(par1GuiScreen instanceof GuiEditMode
+               ? par1GuiScreen
+               : new GuiEditMode(modMain, current, escape, false, class_2561.method_43471("gui.xaero_minimap_guide"))),
+         null,
+         true
       );
       ScreenSwitchSettingEntry viewSettingsEntry = new ScreenSwitchSettingEntry(
          "gui.xaero_minimap_view_settings", (current, escape) -> new GuiMinimapViewSettings(modMain, current, escape), null, true

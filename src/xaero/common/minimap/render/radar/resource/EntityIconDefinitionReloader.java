@@ -14,7 +14,7 @@ import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_3298;
 import net.minecraft.class_7923;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconDefinitionReloader {
    private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();

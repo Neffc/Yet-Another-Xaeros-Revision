@@ -9,7 +9,6 @@ import net.minecraft.class_437;
 import net.minecraft.class_3675.class_307;
 import org.lwjgl.glfw.GLFW;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.gui.GuiAddWaypoint;
@@ -24,6 +23,7 @@ import xaero.common.misc.OptimizedMath;
 import xaero.common.platform.Services;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public class ControlsHandler {
    protected IXaeroMinimap modMain;

@@ -5,9 +5,9 @@ import net.minecraft.class_1297;
 import net.minecraft.class_1299;
 import net.minecraft.class_2960;
 import net.minecraft.class_897;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.render.radar.EntityIconDefinitions;
 import xaero.common.minimap.render.radar.resource.EntityIconDefinition;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconVariantHandler {
    private final StringBuilder legacyEntityStringBuilder = new StringBuilder();

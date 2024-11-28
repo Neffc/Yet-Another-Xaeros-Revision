@@ -10,9 +10,9 @@ import net.minecraft.class_1937;
 import net.minecraft.class_2960;
 import net.minecraft.class_5321;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.file.SimpleBackup;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WaypointWorldContainer {
    private IXaeroMinimap modMain;

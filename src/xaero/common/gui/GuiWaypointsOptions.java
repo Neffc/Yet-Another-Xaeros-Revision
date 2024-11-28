@@ -22,7 +22,6 @@ import net.minecraft.class_437;
 import net.minecraft.class_4587;
 import org.apache.commons.io.FileUtils;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CursorBox;
 import xaero.common.minimap.waypoints.Waypoint;
@@ -32,6 +31,7 @@ import xaero.common.minimap.waypoints.WaypointWorldContainer;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiWaypointsOptions extends ScreenBase {
    private XaeroMinimapSession minimapSession;

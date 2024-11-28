@@ -6,7 +6,6 @@ import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_437;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.gui.dropdown.IDropDownWidgetCallback;
@@ -14,6 +13,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
    private MySmallButton transferButton;

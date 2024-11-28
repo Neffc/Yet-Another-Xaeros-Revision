@@ -64,7 +64,6 @@ import net.minecraft.class_2338.class_2339;
 import net.minecraft.class_2902.class_2903;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.cache.BlockStateShortShapeCache;
 import xaero.common.core.XaeroMinimapCore;
@@ -85,6 +84,7 @@ import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.mods.SupportMods;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public abstract class MinimapWriter {
    private static final int VOID_COLOR = -16121833;

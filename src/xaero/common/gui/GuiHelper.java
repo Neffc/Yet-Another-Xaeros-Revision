@@ -23,8 +23,6 @@ public abstract class GuiHelper {
       class_310.method_1551().method_1507(new GuiMinimapMain(this.modMain, parent, escScreen));
    }
 
-   public abstract void openInterfaceSettings(int var1);
-
    public abstract GuiSettings getMainSettingsScreen(class_437 var1);
 
    public abstract void onResetCancel(class_437 var1, class_437 var2);

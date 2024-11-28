@@ -26,6 +26,10 @@ import xaero.common.server.mods.SupportServerMods;
 import xaero.common.server.player.ServerPlayerTickHandler;
 import xaero.common.settings.ModSettings;
 import xaero.common.validator.FieldValidatorHolder;
+import xaero.hud.Hud;
+import xaero.hud.io.HudIO;
+import xaero.hud.minimap.Minimap;
+import xaero.hud.render.HudRenderer;
 
 public interface IXaeroMinimap {
    File old_waypointsFile = Services.PLATFORM.getGameDir().resolve("xaerowaypoints.txt").toFile();
@@ -147,4 +151,12 @@ public interface IXaeroMinimap {
    boolean isLoadedClient();
 
    boolean isLoadedServer();
+
+   Hud getHud();
+
+   HudRenderer getHudRenderer();
+
+   HudIO getHudIO();
+
+   Minimap getMinimap();
 }

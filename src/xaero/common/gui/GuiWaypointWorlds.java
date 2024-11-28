@@ -3,12 +3,12 @@ package xaero.common.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldContainer;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.KeySortableByOther;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiWaypointWorlds extends GuiDropdownHelper {
    public GuiWaypointWorlds(WaypointWorldContainer wc, WaypointsManager waypointsManager, String currentWorld, String autoContainer, String autoWorld) {

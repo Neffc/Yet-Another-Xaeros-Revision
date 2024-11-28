@@ -17,9 +17,9 @@ import net.minecraft.class_5321;
 import net.minecraft.class_2558.class_2559;
 import net.minecraft.class_2568.class_5247;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.GuiAddWaypoint;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WaypointSharingHandler {
    public static final String WAYPOINT_OLD_SHARE_PREFIX = "xaero_waypoint:";

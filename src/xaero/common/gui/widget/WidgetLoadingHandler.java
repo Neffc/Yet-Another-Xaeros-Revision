@@ -2,9 +2,9 @@ package xaero.common.gui.widget;
 
 import java.util.HashMap;
 import java.util.Map;
-import xaero.common.MinimapLogs;
 import xaero.common.gui.widget.loader.WidgetLoader;
 import xaero.common.patreon.Patreon;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WidgetLoadingHandler {
    private static int CURRENT_VERSION = 1;

@@ -17,7 +17,6 @@ import net.minecraft.class_3675.class_307;
 import net.minecraft.class_4280.class_4281;
 import net.minecraft.class_4597.class_4598;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.core.IAbstractSelectionList;
 import xaero.common.graphics.CustomRenderTypes;
@@ -30,6 +29,7 @@ import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback {
    private static final int FRAME_TOP_SIZE = 58;
@@ -726,7 +726,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                guiGraphics.method_25300(GuiWaypoints.this.field_22793, "*", rectX - 25, rectY - 3, 16777215);
             }
 
-            class_4598 renderTypeBuffers = GuiWaypoints.this.modMain.getInterfaceRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
+            class_4598 renderTypeBuffers = GuiWaypoints.this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
             GuiWaypoints.this.modMain
                .getInterfaces()
                .getMinimapInterface()

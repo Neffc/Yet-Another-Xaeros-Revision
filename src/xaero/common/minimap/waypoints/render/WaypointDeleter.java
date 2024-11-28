@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WaypointDeleter {
    private final IXaeroMinimap modMain;

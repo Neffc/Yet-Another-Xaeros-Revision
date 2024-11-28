@@ -3,8 +3,8 @@ package xaero.common.minimap.render.radar;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.class_1299;
-import xaero.common.MinimapLogs;
 import xaero.common.icon.XaeroIcon;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconCache {
    private final class_1299<?> entityType;

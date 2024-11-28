@@ -73,7 +73,6 @@ import net.minecraft.class_963;
 import net.minecraft.class_969;
 import net.minecraft.class_971;
 import net.minecraft.class_895.class_625;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.render.radar.custom.EntityIconCustomRenderer;
 import xaero.common.minimap.render.radar.variant.HorseVariant;
 import xaero.common.minimap.render.radar.variant.IronGolemVariant;
@@ -83,6 +82,7 @@ import xaero.common.minimap.render.radar.variant.TamableVariant;
 import xaero.common.minimap.render.radar.variant.TropicalFishVariant;
 import xaero.common.minimap.render.radar.variant.VillagerVariant;
 import xaero.common.misc.OptimizedMath;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconDefinitions {
    static float slimeSquishBU;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xaero.common.category.setting.ObjectCategoryDefaultSettingsSetter;
 import xaero.common.config.CommonConfig;
@@ -20,10 +21,10 @@ import xaero.common.file.SimpleBackup;
 import xaero.common.gui.GuiHelper;
 import xaero.common.gui.widget.WidgetLoadingHandler;
 import xaero.common.gui.widget.WidgetScreenHandler;
-import xaero.common.interfaces.IInterfaceLoader;
 import xaero.common.interfaces.InterfaceManager;
 import xaero.common.interfaces.render.InterfaceRenderer;
 import xaero.common.message.MinimapMessageHandler;
+import xaero.common.minimap.MinimapInterface;
 import xaero.common.minimap.radar.category.EntityRadarCategoryManager;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.minimap.radar.tracker.PlayerTrackerMinimapElementRenderer;
@@ -43,8 +44,13 @@ import xaero.common.settings.ModSettings;
 import xaero.common.validator.FieldValidatorHolder;
 import xaero.common.validator.NumericFieldValidator;
 import xaero.common.validator.WaypointCoordinateFieldValidator;
+import xaero.hud.Hud;
+import xaero.hud.io.HudIO;
+import xaero.hud.minimap.Minimap;
+import xaero.hud.render.HudRenderer;
 
 public abstract class HudMod implements IXaeroMinimap {
+   public static final Logger LOGGER = LogManager.getLogger();
    public static final boolean FAIRPLAY = false;
    public static HudMod INSTANCE;
    protected PlatformContext platformContext;
@@ -79,6 +85,11 @@ public abstract class HudMod implements IXaeroMinimap {
    private CommonConfigIO commonConfigIO;
    private CommonConfig commonConfig;
    private ClientEventsListener clientEventsListener;
+   protected Hud hud;
+   protected HudRenderer hudRenderer;
+   protected HudIO hudIO;
+   private HudClientOnlyBase clientOnlyBase;
+   private MinimapInterface minimapInterface;
    private File modJAR = null;
    private File configFile;
    public File waypointsFile;
@@ -123,10 +134,6 @@ public abstract class HudMod implements IXaeroMinimap {
 
    protected abstract GuiHelper createGuiHelper();
 
-   protected abstract IInterfaceLoader createInterfaceLoader();
-
-   protected abstract InterfaceManager createInterfaceManager(IInterfaceLoader var1) throws IOException;
-
    protected abstract String getOldConfigFileName();
 
    protected abstract HudClientOnlyBase createClientOnly();
@@ -145,7 +152,7 @@ public abstract class HudMod implements IXaeroMinimap {
       ModOptions.init(this);
       String modId = this.getModId();
       Path modFile = Services.PLATFORM.getModFile(modId);
-      this.createClientOnly().preInit(modId, this);
+      (this.clientOnlyBase = this.createClientOnly()).preInit(modId, this);
       String fileName = modFile.getFileName().toString();
       if (fileName.endsWith(".jar")) {
          this.modJAR = modFile.toFile();
@@ -201,8 +208,8 @@ public abstract class HudMod implements IXaeroMinimap {
       this.guiHelper = this.createGuiHelper();
       this.fieldValidators = new FieldValidatorHolder(new NumericFieldValidator(), new WaypointCoordinateFieldValidator());
       this.interfaceRenderer = new InterfaceRenderer(this);
-      IInterfaceLoader interfaceLoader = this.createInterfaceLoader();
-      this.interfaces = this.createInterfaceManager(interfaceLoader);
+      this.interfaces = new InterfaceManager(this);
+      this.minimapInterface = new MinimapInterface(this);
       File old_optionsFile = gameDir.resolve(this.getOldConfigFileName()).toFile();
       if (old_optionsFile.exists() && !this.configFile.exists()) {
          this.configFile.getParentFile().mkdirs();
@@ -223,6 +230,7 @@ public abstract class HudMod implements IXaeroMinimap {
       LOGGER.info("Loading {} - Stage 2/2", this.getModName());
 
       try {
+         this.clientOnlyBase.preLoadLater(this);
          this.controlsRegister.onStage2();
          this.settings.loadSettings();
          this.entityRadarCategoryManager = EntityRadarCategoryManager.Builder.getDefault().setModMain(this).build();
@@ -542,5 +550,25 @@ public abstract class HudMod implements IXaeroMinimap {
    @Override
    public String getVersionID() {
       return this.versionID;
+   }
+
+   @Override
+   public Hud getHud() {
+      return this.hud;
+   }
+
+   @Override
+   public HudRenderer getHudRenderer() {
+      return this.hudRenderer;
+   }
+
+   @Override
+   public HudIO getHudIO() {
+      return this.hudIO;
+   }
+
+   @Override
+   public Minimap getMinimap() {
+      return this.minimapInterface;
    }
 }

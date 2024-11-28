@@ -189,7 +189,7 @@ public class WaypointsIngameRenderer {
                   settings.dimensionScaledMaxWaypointDistance
                );
             Stream<Waypoint> waypointStream = sortingList.stream().filter(this.filter).sorted();
-            class_4598 cvcRenderTypeBuffer = this.modMain.getInterfaceRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
+            class_4598 cvcRenderTypeBuffer = this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
             class_4588 waypointBackgroundConsumer = cvcRenderTypeBuffer.getBuffer(CustomRenderTypes.COLORED_WAYPOINTS_BGS);
             double minDistance = settings.waypointsDistanceMin;
             this.renderWaypointsIterator(

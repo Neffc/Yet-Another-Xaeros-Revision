@@ -17,7 +17,6 @@ import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_5481;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.graphics.CursorBox;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.gui.dropdown.IDropDownWidgetCallback;
@@ -30,6 +29,7 @@ import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.common.validator.NumericFieldValidator;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallback {
    private static final CursorBox VISIBILITY_TYPE_TOOLTIP = new CursorBox("gui.xaero_box_visibility_type");
@@ -559,8 +559,6 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             );
       }
 
-      this.modMain.getInterfaces().setSelectedId(-1);
-      this.modMain.getInterfaces().setDraggingId(-1);
       this.nameTextField = this.applyEditBoxResponder(
          new class_342(this.field_22793, this.field_22789 / 2 - 100, 104, 200, 20, class_2561.method_43471("gui.xaero_waypoint_name"))
       );

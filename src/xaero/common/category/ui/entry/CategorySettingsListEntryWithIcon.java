@@ -6,7 +6,7 @@ import net.minecraft.class_332;
 import xaero.common.category.ui.GuiCategorySettings;
 import xaero.common.category.ui.data.GuiCategoryUIEditorExpandableData;
 import xaero.common.graphics.CursorBox;
-import xaero.common.interfaces.render.InterfaceRenderer;
+import xaero.hud.render.TextureLocations;
 
 public class CategorySettingsListEntryWithIcon<D extends GuiCategoryUIEditorExpandableData<?>> extends CategorySettingsListEntryWithRootReference<D> {
    private final int iconU;
@@ -82,7 +82,7 @@ public class CategorySettingsListEntryWithIcon<D extends GuiCategoryUIEditorExpa
          includesSelected,
          isRoot
       );
-      guiGraphics.method_25302(InterfaceRenderer.guiTextures, 0, 0, this.iconU, this.iconV, this.iconW, this.iconH);
+      guiGraphics.method_25302(TextureLocations.GUI_TEXTURES, 0, 0, this.iconU, this.iconV, this.iconW, this.iconH);
       return result;
    }
 

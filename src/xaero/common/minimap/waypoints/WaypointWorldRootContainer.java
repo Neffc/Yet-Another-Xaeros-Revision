@@ -24,8 +24,8 @@ import net.minecraft.class_638;
 import net.minecraft.class_7134;
 import net.minecraft.class_7924;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
+import xaero.hud.minimap.MinimapLogs;
 
 public class WaypointWorldRootContainer extends WaypointWorldContainer {
    public boolean configLoaded = false;

@@ -7,10 +7,10 @@ import net.minecraft.class_342;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiNewSet extends ScreenBase {
    private class_342 nameTextField;

@@ -23,8 +23,8 @@ import net.minecraft.class_364;
 import net.minecraft.class_410;
 import net.minecraft.class_4185;
 import org.apache.commons.codec.binary.Hex;
-import xaero.common.MinimapLogs;
 import xaero.common.platform.Services;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiUpdateAll extends class_410 {
    public GuiUpdateAll() {

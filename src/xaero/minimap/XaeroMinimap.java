@@ -9,14 +9,11 @@ import xaero.common.XaeroMinimapSession;
 import xaero.common.controls.ControlsRegister;
 import xaero.common.events.ClientEventsListener;
 import xaero.common.gui.GuiHelper;
-import xaero.common.interfaces.IInterfaceLoader;
-import xaero.common.interfaces.InterfaceManager;
 import xaero.common.mods.SupportMods;
 import xaero.common.patreon.Patreon;
 import xaero.common.settings.ModSettings;
 import xaero.minimap.controls.MinimapControlsRegister;
 import xaero.minimap.gui.MinimapGuiHelper;
-import xaero.minimap.interfaces.MinimapInterfaceLoader;
 
 public abstract class XaeroMinimap extends HudMod {
    public static final Logger LOGGER = LogManager.getLogger();
@@ -56,16 +53,6 @@ public abstract class XaeroMinimap extends HudMod {
    @Override
    protected GuiHelper createGuiHelper() {
       return new MinimapGuiHelper(this);
-   }
-
-   @Override
-   protected IInterfaceLoader createInterfaceLoader() {
-      return new MinimapInterfaceLoader();
-   }
-
-   @Override
-   protected InterfaceManager createInterfaceManager(IInterfaceLoader loader) throws IOException {
-      return new InterfaceManager(this, loader);
    }
 
    @Override

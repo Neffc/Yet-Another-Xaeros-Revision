@@ -7,9 +7,9 @@ import net.minecraft.class_310;
 import net.minecraft.class_410;
 import net.minecraft.class_437;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.WaypointSet;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiClearSet extends class_410 {
    public GuiClearSet(

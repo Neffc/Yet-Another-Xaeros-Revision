@@ -3,9 +3,9 @@ package xaero.common.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.KeySortableByOther;
+import xaero.hud.minimap.MinimapLogs;
 
 public class GuiWaypointContainers extends GuiDropdownHelper {
    public GuiWaypointContainers(IXaeroMinimap modMain, WaypointsManager waypointsManager, String currentContainer, String autoContainer) {
@@ -36,7 +36,7 @@ public class GuiWaypointContainers extends GuiDropdownHelper {
                if (o < dotSplit.length - 2) {
                   builder.append("-.");
                } else if (o < dotSplit.length - 1) {
-                  builder.append(dotSplit[o].charAt(0) + "-.");
+                  builder.append((dotSplit[o].isEmpty() ? "" : dotSplit[o].charAt(0)) + "-.");
                } else {
                   builder.append(dotSplit[o]);
                }

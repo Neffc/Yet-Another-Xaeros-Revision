@@ -2,7 +2,7 @@ package xaero.common.server.radar.tracker;
 
 import java.util.HashMap;
 import java.util.Map;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class SyncedPlayerTrackerSystemManager {
    private final Map<String, ISyncedPlayerTrackerSystem> systems = new HashMap<>();

@@ -46,7 +46,6 @@ import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.MinimapLogs;
 import xaero.common.exception.OpenGLException;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.ImprovedFramebuffer;
@@ -58,6 +57,7 @@ import xaero.common.minimap.render.radar.custom.EntityIconCustomRenderer;
 import xaero.common.minimap.render.radar.resource.EntityIconModelConfig;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
+import xaero.hud.minimap.MinimapLogs;
 
 public class EntityIconPrerenderer {
    private static final int PREFERRED_ATLAS_WIDTH = 1024;

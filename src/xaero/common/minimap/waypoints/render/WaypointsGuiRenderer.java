@@ -23,7 +23,6 @@ import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.GuiHelper;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.interfaces.render.InterfaceRenderer;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
@@ -32,6 +31,7 @@ import xaero.common.minimap.waypoints.WaypointUtil;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.render.TextureLocations;
 
 public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint, WaypointGuiRenderContext> {
    private final IXaeroMinimap modMain;
@@ -221,7 +221,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
          Misc.drawNormalText(matrixStack, w.getSymbol(), (float)(drawX + 1 - initialsWidth / 2), (float)(drawY - 3), -1, true, renderTypeBuffer);
       } else {
          RenderSystem.enableDepthTest();
-         RenderSystem.setShaderTexture(0, InterfaceRenderer.guiTextures);
+         RenderSystem.setShaderTexture(0, TextureLocations.GUI_TEXTURES);
          RenderSystem.setShaderColor(0.2431F, 0.2431F, 0.2431F, 1.0F);
          GuiHelper.blit(matrixStack, rectX1 + 1, rectY1 + 1, 0.0F, 78.0F, 9, 9);
          RenderSystem.setShaderColor(0.9882F, 0.9882F, 0.9882F, 1.0F);
@@ -238,7 +238,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
             boolean fading = passed > 1500 - fadeTime;
             int alpha = 3 + (int)(252.0F * (fading ? (float)(1500 - passed) / (float)fadeTime : 1.0F));
             int c = 16777215 | alpha << 24;
-            class_4598 textRenderTypeBuffers = this.modMain.getInterfaceRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
+            class_4598 textRenderTypeBuffers = this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
             Misc.drawCenteredPiercingText(
                guiGraphics.method_51448(),
                class_1074.method_4662(waypointsManager.getWaypoints().getName(), new Object[0]),

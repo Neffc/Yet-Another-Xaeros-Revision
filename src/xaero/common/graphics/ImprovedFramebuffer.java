@@ -8,7 +8,7 @@ import net.minecraft.class_310;
 import net.minecraft.class_6367;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import xaero.common.MinimapLogs;
+import xaero.hud.minimap.MinimapLogs;
 
 public class ImprovedFramebuffer extends class_6367 {
    private int type;
