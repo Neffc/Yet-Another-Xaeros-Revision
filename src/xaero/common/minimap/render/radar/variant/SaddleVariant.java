@@ -23,7 +23,7 @@ public class SaddleVariant {
          return true;
       } else if (o != null && this.getClass() == o.getClass()) {
          SaddleVariant that = (SaddleVariant)o;
-         return this.saddled == that.saddled && this.texture.equals(that.texture);
+         return this.saddled == that.saddled && Objects.equals(this.texture, that.texture);
       } else {
          return false;
       }

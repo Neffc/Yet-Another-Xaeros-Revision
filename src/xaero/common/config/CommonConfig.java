@@ -5,6 +5,7 @@ public final class CommonConfig {
    public boolean allowCaveModeOnServer;
    public boolean allowNetherCaveModeOnServer;
    public boolean allowRadarOnServer;
+   public boolean everyoneTracksEveryone;
 
    private CommonConfig(boolean registerStatusEffects) {
       this.registerStatusEffects = registerStatusEffects;
@@ -15,6 +16,7 @@ public final class CommonConfig {
       public boolean allowCaveModeOnServer;
       public boolean allowNetherCaveModeOnServer;
       public boolean allowRadarOnServer;
+      public boolean everyoneTracksEveryone;
 
       private Builder() {
       }
@@ -47,11 +49,17 @@ public final class CommonConfig {
          return this;
       }
 
+      public CommonConfig.Builder setEveryoneTracksEveryone(boolean everyoneTracksEveryone) {
+         this.everyoneTracksEveryone = everyoneTracksEveryone;
+         return this;
+      }
+
       public CommonConfig build() {
          CommonConfig result = new CommonConfig(this.registerStatusEffects);
          result.allowCaveModeOnServer = this.allowCaveModeOnServer;
          result.allowNetherCaveModeOnServer = this.allowNetherCaveModeOnServer;
          result.allowRadarOnServer = this.allowRadarOnServer;
+         result.everyoneTracksEveryone = this.everyoneTracksEveryone;
          return result;
       }
 

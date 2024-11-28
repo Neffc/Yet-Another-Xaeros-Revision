@@ -99,8 +99,11 @@ public class Internet {
             }
 
             reader.close();
-         } catch (Throwable var11) {
-            MinimapLogs.LOGGER.error("suppressed exception", var11);
+         } catch (IOException var11) {
+            MinimapLogs.LOGGER.warn("io exception while checking versions: {}", var11.getMessage());
+            modMain.setOutdated(false);
+         } catch (Throwable var12) {
+            MinimapLogs.LOGGER.error("suppressed exception", var12);
             modMain.setOutdated(false);
          }
       }

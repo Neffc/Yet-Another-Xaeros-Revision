@@ -33,42 +33,50 @@ public abstract class CommonEvents {
    }
 
    public void onServerStarting(MinecraftServer server) {
-      new MineraftServerDataInitializer().init(server, this.modMain);
+      if (this.modMain.isFirstStageLoaded()) {
+         new MineraftServerDataInitializer().init(server, this.modMain);
+      }
    }
 
    public void onServerStopped(MinecraftServer server) {
    }
 
    public void onPlayerLogIn(class_1657 player) {
-      if (player instanceof class_3222 serverPlayer) {
-         this.modMain.getMessageHandler().sendToPlayer(serverPlayer, new ClientboundPlayerTrackerResetPacket());
+      if (this.modMain.isFirstStageLoaded()) {
+         if (player instanceof class_3222 serverPlayer) {
+            this.modMain.getMessageHandler().sendToPlayer(serverPlayer, new ClientboundPlayerTrackerResetPacket());
+         }
       }
    }
 
    public void onPlayerWorldJoin(class_3222 player) {
-      this.modMain.getMessageHandler().sendToPlayer(player, new HandshakePacket());
-      CommonConfig config = this.modMain.getCommonConfig();
-      this.modMain
-         .getMessageHandler()
-         .sendToPlayer(player, new ClientboundRulesPacket(config.allowCaveModeOnServer, config.allowNetherCaveModeOnServer, config.allowRadarOnServer));
-      Path propertiesPath = player.method_37908().method_8503().method_27050(class_5218.field_24184).getParent().resolve("xaeromap.txt");
+      if (this.modMain.isFirstStageLoaded()) {
+         this.modMain.getMessageHandler().sendToPlayer(player, new HandshakePacket());
+         CommonConfig config = this.modMain.getCommonConfig();
+         this.modMain
+            .getMessageHandler()
+            .sendToPlayer(player, new ClientboundRulesPacket(config.allowCaveModeOnServer, config.allowNetherCaveModeOnServer, config.allowRadarOnServer));
+         Path propertiesPath = player.method_37908().method_8503().method_27050(class_5218.field_24184).getParent().resolve("xaeromap.txt");
 
-      try {
-         MinecraftServerData serverData = MinecraftServerData.get(player.method_5682());
-         LevelMapProperties properties = serverData.getLevelProperties(propertiesPath);
-         this.modMain.getMessageHandler().sendToPlayer(player, properties);
-      } catch (Throwable var6) {
-         MinimapLogs.LOGGER.error("suppressed exception", var6);
-         player.field_13987.method_14367(class_2561.method_43471("gui.xaero_error_loading_properties"));
+         try {
+            MinecraftServerData serverData = MinecraftServerData.get(player.method_5682());
+            LevelMapProperties properties = serverData.getLevelProperties(propertiesPath);
+            this.modMain.getMessageHandler().sendToPlayer(player, properties);
+         } catch (Throwable var6) {
+            MinimapLogs.LOGGER.error("suppressed exception", var6);
+            player.field_13987.method_14367(class_2561.method_43471("gui.xaero_error_loading_properties"));
+         }
       }
    }
 
    public void handlePlayerTickStart(class_1657 player) {
-      if (player instanceof class_3222) {
-         this.modMain.getServerPlayerTickHandler().tick((class_3222)player);
-      } else {
-         if (HudMod.INSTANCE.getEvents() != null) {
-            HudMod.INSTANCE.getEvents().handlePlayerTickStart(player);
+      if (this.modMain.isFirstStageLoaded()) {
+         if (player instanceof class_3222) {
+            this.modMain.getServerPlayerTickHandler().tick((class_3222)player);
+         } else {
+            if (HudMod.INSTANCE.getEvents() != null) {
+               HudMod.INSTANCE.getEvents().handlePlayerTickStart(player);
+            }
          }
       }
    }

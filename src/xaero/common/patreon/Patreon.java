@@ -78,7 +78,7 @@ public class Patreon {
                                  if (keyAndValue.length >= 2 && keyAndValue[0].equals("widget_level")) {
                                     try {
                                        onlineWidgetLevel = Integer.parseInt(keyAndValue[1]);
-                                    } catch (NumberFormatException var20) {
+                                    } catch (NumberFormatException var21) {
                                     }
                                  }
                               }
@@ -95,8 +95,11 @@ public class Patreon {
                   }
 
                   reader.close();
-               } catch (Throwable var21) {
-                  MinimapLogs.LOGGER.error("suppressed exception", var21);
+               } catch (IOException var22) {
+                  MinimapLogs.LOGGER.warn("io exception while checking patreon: {}", var22.getMessage());
+                  mods.clear();
+               } catch (Throwable var23) {
+                  MinimapLogs.LOGGER.error("suppressed exception", var23);
                   mods.clear();
                } finally {
                   loaded = true;

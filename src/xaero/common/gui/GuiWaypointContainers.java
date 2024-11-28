@@ -25,7 +25,13 @@ public class GuiWaypointContainers extends GuiDropdownHelper {
          if (details.length > 1 && details[0].equals("Realms")) {
             containerKeyx = "Realm ID " + details[1].substring(details[1].indexOf(".") + 1);
          } else {
-            containerKeyx = details[details.length - 1].replace("%us%", "_").replace("%fs%", "/").replace("%bs%", "\\").replace("§", ":");
+            containerKeyx = details[details.length - 1]
+               .replace("%us%", "_")
+               .replace("%fs%", "/")
+               .replace("%bs%", "\\")
+               .replace("§", ":")
+               .replace("%lb%", "[")
+               .replace("%rb%", "]");
          }
 
          if (modMain.getSettings().hideWorldNames == 1 && details.length > 1 && details[0].equals("Multiplayer")) {

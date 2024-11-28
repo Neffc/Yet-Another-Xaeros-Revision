@@ -57,7 +57,9 @@ import xaero.common.minimap.render.radar.custom.EntityIconCustomRenderer;
 import xaero.common.minimap.render.radar.resource.EntityIconModelConfig;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
+import xaero.hud.compat.mods.ImmediatelyFastHelper;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.render.util.DirectRender;
 
 public class EntityIconPrerenderer {
    private static final int PREFERRED_ATLAS_WIDTH = 1024;
@@ -293,6 +295,7 @@ public class EntityIconPrerenderer {
       ImprovedFramebuffer iconRenderFramebuffer = this.iconRenderFramebuffer;
       OpenGLException.checkGLError();
       class_4587 matrixStack = guiGraphics.method_51448();
+      ImmediatelyFastHelper.triggerBatchingBuffersFlush(guiGraphics);
       modelRenderFramebuffer.method_1235(true);
       this.setupMatrices(matrixStack, 64, 500);
       OpenGLException.checkGLError();
@@ -357,7 +360,7 @@ public class EntityIconPrerenderer {
             matrixStack.method_22903();
             matrixStack.method_46416(0.0F, 10.0F, -10.0F);
             matrixStack.method_22905(1.0F, -1.0F, 1.0F);
-            guiGraphics.method_25294(0, 0, 9, 9, -65536);
+            DirectRender.coloredRectangle(matrixStack, 0.0F, 0.0F, 9.0F, 9.0F, -65536);
             matrixStack.method_22909();
             GlStateManager._enableBlend();
             RenderSystem.blendFuncSeparate(770, 771, 1, 771);
@@ -400,7 +403,7 @@ public class EntityIconPrerenderer {
             matrixStack.method_22903();
             matrixStack.method_46416(9.0F, 10.0F, -10.0F);
             matrixStack.method_22905(1.0F, -1.0F, 1.0F);
-            guiGraphics.method_25294(0, 0, 9, 9, -16711936);
+            DirectRender.coloredRectangle(matrixStack, 0.0F, 0.0F, 9.0F, 9.0F, -16711936);
             matrixStack.method_22909();
             RenderSystem.blendFuncSeparate(770, 771, 1, 771);
          }
@@ -441,7 +444,7 @@ public class EntityIconPrerenderer {
             matrixStack.method_22903();
             matrixStack.method_46416(18.0F, 10.0F, -10.0F);
             matrixStack.method_22905(1.0F, -1.0F, 1.0F);
-            guiGraphics.method_25294(0, 0, 9, 9, -16776961);
+            DirectRender.coloredRectangle(matrixStack, 0.0F, 0.0F, 9.0F, 9.0F, -16776961);
             matrixStack.method_22909();
             RenderSystem.blendFuncSeparate(770, 771, 1, 771);
          }
@@ -468,7 +471,7 @@ public class EntityIconPrerenderer {
             matrixStack.method_22903();
             matrixStack.method_46416(27.0F, 10.0F, -10.0F);
             matrixStack.method_22905(1.0F, -1.0F, 1.0F);
-            guiGraphics.method_25294(0, 0, 9, 9, -16711681);
+            DirectRender.coloredRectangle(matrixStack, 0.0F, 0.0F, 9.0F, 9.0F, -16711681);
             matrixStack.method_22909();
             RenderSystem.blendFuncSeparate(770, 771, 1, 771);
          }
@@ -498,7 +501,7 @@ public class EntityIconPrerenderer {
                matrixStack.method_22903();
                matrixStack.method_46416(36.0F, 10.0F, -10.0F);
                matrixStack.method_22905(1.0F, -1.0F, 1.0F);
-               guiGraphics.method_25294(0, 0, 9, 9, -256);
+               DirectRender.coloredRectangle(matrixStack, 0.0F, 0.0F, 9.0F, 9.0F, -256);
                matrixStack.method_22909();
                RenderSystem.blendFuncSeparate(770, 771, 1, 771);
             }
@@ -804,9 +807,13 @@ public class EntityIconPrerenderer {
       if (this.modelRenderDetectionEntityModelClass == null) {
          class_583 currentMainModel = this.getEntityRendererModel(this.modelRenderDetectionEntityRenderer);
          this.modelRenderDetectionEntityModelClass = currentMainModel == null ? null : currentMainModel.getClass();
+         if (this.modelRenderDetectionEntityModelClass == null) {
+            return;
+         }
       }
 
-      if (this.modelRenderDetectionEntityModelClass == model.getClass()) {
+      if (model.getClass().isAssignableFrom(this.modelRenderDetectionEntityModelClass)
+         || this.modelRenderDetectionEntityModelClass.isAssignableFrom(model.getClass())) {
          class_1921 lastRenderType = this.getLastRenderType(this.modelRenderDetectionRenderTypeBuffer);
          if (lastRenderType == null && this.modelRenderDetectionList.isEmpty()) {
             class_2960 textureLocation = null;

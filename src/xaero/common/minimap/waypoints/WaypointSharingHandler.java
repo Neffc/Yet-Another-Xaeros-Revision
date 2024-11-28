@@ -49,18 +49,18 @@ public class WaypointSharingHandler {
       boolean newFormat = text.contains("xaero-waypoint:");
       String sharePrefix = newFormat ? "xaero-waypoint:" : "xaero_waypoint:";
       String[] args = text.substring(text.indexOf(sharePrefix)).split(":");
-      if (newFormat) {
-         args[1] = this.restoreFormatting(args[1]);
-         args[2] = this.restoreFormatting(args[2]);
-         if (args.length > 9) {
-            args[9] = this.restoreFormatting(args[9]);
-         }
-      }
-
       class_5250 component = null;
       if (args.length < 9) {
          MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 0");
       } else {
+         if (newFormat) {
+            args[1] = this.restoreFormatting(args[1]);
+            args[2] = this.restoreFormatting(args[2]);
+            if (args.length > 9) {
+               args[9] = this.restoreFormatting(args[9]);
+            }
+         }
+
          String waypointName = class_1074.method_4662(Waypoint.getStringFromStringSafe(args[1], "^col^"), new Object[0]);
          String dimensionName = null;
          if (args.length > 9 && args[9].startsWith("Internal_")) {

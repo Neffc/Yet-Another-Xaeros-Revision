@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
 Specification-Title: xaerohud
 Specification-Vendor: xaero96
-Specification-Version: 24.2.0
+Specification-Version: 24.3.0
 Implementation-Title: fabric_minimap
-Implementation-Version: 24.2.0
+Implementation-Version: 24.3.0
 Implementation-Vendor: xaero96
-Implementation-Timestamp: 2024-06-01T12:08:56+0300
-Timestamp: 1717232936968
+Implementation-Timestamp: 2024-08-16T14:00:09+0300
+Timestamp: 1723806009857
 Built-On-Java: 17.0.9+9 (Eclipse Adoptium)
 Built-On-Minecraft: 1.20.1
 Fabric-Jar-Type: classes
 Fabric-Loom-Mixin-Remap-Type: mixin
 Fabric-Gradle-Version: 8.7
-Fabric-Loom-Version: 1.6.11
+Fabric-Loom-Version: 1.6.12
 Fabric-Mixin-Compile-Extensions-Version: 0.6.0
 Fabric-Minecraft-Version: 1.20.1
-Fabric-Tiny-Remapper-Version: 0.10.1
+Fabric-Tiny-Remapper-Version: 0.10.3
 Fabric-Loader-Version: 0.15.6
 Fabric-Mixin-Version: 0.12.5+mixin.0.8.5
 Fabric-Mixin-Group: net.fabricmc

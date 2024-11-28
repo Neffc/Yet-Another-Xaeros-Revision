@@ -68,6 +68,7 @@ public class CommonConfigIO {
       writer.println("allowNetherCaveModeOnServer:" + config.allowNetherCaveModeOnServer);
       writer.println("allowRadarOnServer:" + config.allowRadarOnServer);
       writer.println("registerStatusEffects:" + config.registerStatusEffects);
+      writer.println("everyoneTracksEveryone:" + config.everyoneTracksEveryone);
    }
 
    private boolean readLine(CommonConfig.Builder configBuilder, String[] args) {
@@ -82,6 +83,9 @@ public class CommonConfigIO {
          return true;
       } else if (args[0].equals("registerStatusEffects")) {
          configBuilder.setRegisterStatusEffects(args[1].equals("true"));
+         return true;
+      } else if (args[0].equals("everyoneTracksEveryone")) {
+         configBuilder.setEveryoneTracksEveryone(args[1].equals("true"));
          return true;
       } else {
          return false;

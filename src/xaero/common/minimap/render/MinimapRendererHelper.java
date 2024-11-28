@@ -96,7 +96,7 @@ public class MinimapRendererHelper {
       MultiTextureRenderTypeRenderer renderer
    ) {
       float f = 1.0F / factor;
-      class_287 vertexBuffer = renderer.begin(class_5596.field_27382, class_290.field_20887, textureId);
+      class_287 vertexBuffer = renderer.begin(textureId);
       vertexBuffer.method_22918(matrix, x + 0.0F, y + height, 0.0F)
          .method_22915(r, g, b, a)
          .method_22913((float)(textureX + 0) * f, (float)(textureY + 0) * f)
@@ -129,7 +129,7 @@ public class MinimapRendererHelper {
       MultiTextureRenderTypeRenderer renderer
    ) {
       float f = 1.0F / factor;
-      class_287 vertexBuffer = renderer.begin(class_5596.field_27382, class_290.field_1585, textureId);
+      class_287 vertexBuffer = renderer.begin(textureId);
       vertexBuffer.method_22918(matrix, x + 0.0F, y + height, 0.0F).method_22913((float)(textureX + 0) * f, (float)(textureY + 0) * f).method_1344();
       vertexBuffer.method_22918(matrix, x + width, y + height, 0.0F).method_22913(((float)textureX + width) * f, (float)(textureY + 0) * f).method_1344();
       vertexBuffer.method_22918(matrix, x + width, y + 0.0F, 0.0F).method_22913(((float)textureX + width) * f, ((float)textureY + theight) * f).method_1344();

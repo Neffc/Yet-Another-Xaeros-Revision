@@ -29,7 +29,10 @@ public class TropicalFishVariant {
          return true;
       } else if (o != null && this.getClass() == o.getClass()) {
          TropicalFishVariant that = (TropicalFishVariant)o;
-         return this.texture.equals(that.texture) && this.pattern == that.pattern && this.baseColor == that.baseColor && this.patternColor == that.patternColor;
+         return Objects.equals(this.texture, that.texture)
+            && this.pattern == that.pattern
+            && this.baseColor == that.baseColor
+            && this.patternColor == that.patternColor;
       } else {
          return false;
       }

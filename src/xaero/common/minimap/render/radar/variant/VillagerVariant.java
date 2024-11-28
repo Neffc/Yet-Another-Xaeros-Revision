@@ -33,7 +33,7 @@ public class VillagerVariant {
          VillagerVariant that = (VillagerVariant)o;
          return this.baby == that.baby
             && this.level == that.level
-            && this.texture.equals(that.texture)
+            && Objects.equals(this.texture, that.texture)
             && this.type.equals(that.type)
             && this.profession.equals(that.profession);
       } else {

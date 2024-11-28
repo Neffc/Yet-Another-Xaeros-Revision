@@ -56,6 +56,7 @@ public abstract class HudMod implements IXaeroMinimap {
    protected PlatformContext platformContext;
    protected boolean loadedClient;
    protected boolean loadedServer;
+   protected boolean firstStageLoaded;
    protected static final String versionID_minecraft = "1.20";
    private String versionID;
    private int newestUpdateID;
@@ -171,7 +172,17 @@ public abstract class HudMod implements IXaeroMinimap {
 
       Path wrongWaypointsFolder4 = new File(config.toFile().getCanonicalPath()).toPath().getParent().resolve("XaeroWaypoints");
       Path wrongWaypointsFolder5 = config.getParent().resolve("XaeroWaypoints");
-      this.waypointsFolder = gameDir.resolve("XaeroWaypoints").toFile();
+      File preMinimapWorldsFolder = gameDir.resolve("XaeroWaypoints").toFile();
+      Path xaeroFolder = gameDir.resolve("xaero");
+      if (!Files.exists(xaeroFolder)) {
+         Files.createDirectories(xaeroFolder);
+      }
+
+      this.waypointsFolder = xaeroFolder.resolve("minimap").toFile();
+      if (preMinimapWorldsFolder.exists() && !this.waypointsFolder.exists()) {
+         Files.move(preMinimapWorldsFolder.toPath(), this.waypointsFolder.toPath());
+      }
+
       if (wrongWaypointsFile.exists() && !this.waypointsFile.exists()) {
          Files.move(wrongWaypointsFile.toPath(), this.waypointsFile.toPath());
       }
@@ -188,11 +199,11 @@ public abstract class HudMod implements IXaeroMinimap {
          Files.move(wrongWaypointsFolder5, this.waypointsFolder.toPath());
       }
 
-      Path waypointsFolderBackup062020 = this.waypointsFolder.toPath().resolveSibling(this.waypointsFolder.getName() + "_BACKUP032021");
-      if (!Files.exists(waypointsFolderBackup062020) && this.waypointsFolder.exists()) {
-         LOGGER.info("Backing up XaeroWaypoints...");
-         SimpleBackup.copyDirectoryWithContents(this.waypointsFolder.toPath(), waypointsFolderBackup062020, 32);
-         LOGGER.info("Done backing up XaeroWaypoints!");
+      Path waypointsFolderBackup = gameDir.resolve("XaeroWaypoints_BACKUP240807");
+      if (!Files.exists(waypointsFolderBackup) && this.waypointsFolder.exists()) {
+         LOGGER.info("Backing up Xaero's minimap data...");
+         SimpleBackup.copyDirectoryWithContents(this.waypointsFolder.toPath(), waypointsFolderBackup, 32);
+         LOGGER.info("Done backing up Xaero's minimap data!");
       }
 
       this.configFile = config.resolve(this.getConfigFileName()).toFile();
@@ -223,6 +234,7 @@ public abstract class HudMod implements IXaeroMinimap {
 
       this.trackedPlayerRenderer = PlayerTrackerMinimapElementRenderer.Builder.begin(this).build();
       XaeroMinimapCore.modMain = this;
+      this.firstStageLoaded = true;
    }
 
    public void loadLater() {
@@ -273,6 +285,7 @@ public abstract class HudMod implements IXaeroMinimap {
       LOGGER.info("Loading {} - Stage 1/2 (Server)", this.getModName());
       this.minimapServer = new XaeroMinimapServer(this);
       this.minimapServer.load();
+      this.firstStageLoaded = true;
    }
 
    protected void loadCommon() {
@@ -570,5 +583,10 @@ public abstract class HudMod implements IXaeroMinimap {
    @Override
    public Minimap getMinimap() {
       return this.minimapInterface;
+   }
+
+   @Override
+   public boolean isFirstStageLoaded() {
+      return this.firstStageLoaded;
    }
 }

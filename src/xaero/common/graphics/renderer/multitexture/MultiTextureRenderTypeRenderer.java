@@ -4,15 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.IntConsumer;
 import net.minecraft.class_1921;
 import net.minecraft.class_285;
 import net.minecraft.class_286;
 import net.minecraft.class_287;
-import net.minecraft.class_293;
 import net.minecraft.class_287.class_7433;
-import net.minecraft.class_293.class_5596;
 
 public class MultiTextureRenderTypeRenderer {
    private boolean used;
@@ -23,7 +20,6 @@ public class MultiTextureRenderTypeRenderer {
    private IntConsumer textureBinder;
    private Runnable textureFinalizer;
    private int prevTextureId;
-   private class_293 prevFormat;
    private class_1921 renderType;
 
    MultiTextureRenderTypeRenderer() {
@@ -100,20 +96,19 @@ public class MultiTextureRenderTypeRenderer {
       this.buffersForDrawCalls.add(builder.method_1326());
    }
 
-   public class_287 begin(class_5596 mode, class_293 format, int textureId) {
+   public class_287 begin(int textureId) {
       if (!this.used) {
          throw new IllegalStateException("Multi-texture renderer is not in use!");
       } else if (textureId == -1) {
          throw new IllegalStateException("Attempted to use the multi-texture renderer with texture id -1!");
       } else {
-         if (textureId != this.prevTextureId || !Objects.equals(this.prevFormat, format)) {
+         if (textureId != this.prevTextureId) {
             if (this.prevTextureId != -1) {
                this.endBuffer(this.bufferBuilder);
             }
 
-            this.bufferBuilder.method_1328(mode, format);
+            this.bufferBuilder.method_1328(this.renderType.method_23033(), this.renderType.method_23031());
             this.prevTextureId = textureId;
-            this.prevFormat = format;
             this.texturesForDrawCalls.add(textureId);
          }
 

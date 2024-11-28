@@ -32,7 +32,7 @@ public class EntityIconVariantHandler {
          Method variantMethod = iconDefinition.getVariantMethod();
          if (variantMethod != null) {
             try {
-               variantMethod.invoke(null, entityTexture, entityRenderer, entity);
+               variant = variantMethod.invoke(null, entityTexture, entityRenderer, entity);
             } catch (Throwable var9) {
                class_2960 entityId = class_1299.method_5890(entity.method_5864());
                MinimapLogs.LOGGER.error("Exception while using the variant ID method " + iconDefinition.getVariantMethodString() + " defined for " + entityId);

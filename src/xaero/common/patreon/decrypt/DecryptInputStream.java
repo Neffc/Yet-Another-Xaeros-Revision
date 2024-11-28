@@ -34,10 +34,10 @@ public class DecryptInputStream extends InputStream {
                if (read == -1) {
                   this.endReached = true;
                   if (offset == 0) {
-                     throw new RuntimeException("Online mod data missing confirmation block!");
+                     throw new IOException("Online mod data missing confirmation block!");
                   }
 
-                  throw new RuntimeException("Encrypted block too short!");
+                  throw new IOException("Encrypted block too short!");
                }
 
                offset += read;
@@ -59,19 +59,19 @@ public class DecryptInputStream extends InputStream {
 
                if (System.currentTimeMillis() > expirationTime) {
                   this.endReached = true;
-                  throw new RuntimeException("Online mod data expired! Date: " + new Date(expirationTime));
+                  throw new IOException("Online mod data expired! Date: " + new Date(expirationTime));
                }
 
                if (this.prevExpirationTime != -1L && expirationTime != this.prevExpirationTime) {
                   this.endReached = true;
-                  throw new RuntimeException(
+                  throw new IOException(
                      "Online mod data expiration date mismatch! Dates: " + new Date(expirationTime) + " VS " + new Date(this.prevExpirationTime)
                   );
                }
 
                if (blockIndex != this.blockCount) {
                   this.endReached = true;
-                  throw new RuntimeException("Online mod data block index mismatch! " + blockIndex + " VS " + this.blockCount);
+                  throw new IOException("Online mod data block index mismatch! " + blockIndex + " VS " + this.blockCount);
                }
 
                this.prevExpirationTime = expirationTime;

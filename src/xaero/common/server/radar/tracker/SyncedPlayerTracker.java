@@ -33,6 +33,8 @@ public class SyncedPlayerTracker {
             toSync.update(player);
          }
 
+         boolean everyoneIsTracked = this.modMain.getCommonConfig().everyoneTracksEveryone;
+
          for (class_3222 otherPlayer : server.method_3760().method_14571()) {
             if (otherPlayer != player) {
                leftoverPlayers.remove(otherPlayer.method_5667());
@@ -45,18 +47,20 @@ public class SyncedPlayerTracker {
                }
 
                if (shouldSyncToPlayer) {
-                  boolean tracked = false;
-                  boolean opacConfigsAllowPartySync = !this.modMain.getSupportServerMods().hasOpac()
-                     || this.modMain.getSupportServerMods().getOpac().isPositionSyncAllowed(2, player, otherPlayer);
-                  boolean opacConfigsAllowAllySync = !this.modMain.getSupportServerMods().hasOpac()
-                     || this.modMain.getSupportServerMods().getOpac().isPositionSyncAllowed(1, player, otherPlayer);
+                  boolean tracked = everyoneIsTracked;
+                  if (!everyoneIsTracked) {
+                     boolean opacConfigsAllowPartySync = !this.modMain.getSupportServerMods().hasOpac()
+                        || this.modMain.getSupportServerMods().getOpac().isPositionSyncAllowed(2, player, otherPlayer);
+                     boolean opacConfigsAllowAllySync = !this.modMain.getSupportServerMods().hasOpac()
+                        || this.modMain.getSupportServerMods().getOpac().isPositionSyncAllowed(1, player, otherPlayer);
 
-                  for (ISyncedPlayerTrackerSystem system : playerTrackerSystems) {
-                     int trackingLevel = system.getTrackingLevel(player, otherPlayer);
-                     if (trackingLevel > 0
-                        && (!system.isPartySystem() || trackingLevel == 1 && opacConfigsAllowAllySync || trackingLevel > 1 && opacConfigsAllowPartySync)) {
-                        tracked = true;
-                        break;
+                     for (ISyncedPlayerTrackerSystem system : playerTrackerSystems) {
+                        int trackingLevel = system.getTrackingLevel(player, otherPlayer);
+                        if (trackingLevel > 0
+                           && (!system.isPartySystem() || trackingLevel == 1 && opacConfigsAllowAllySync || trackingLevel > 1 && opacConfigsAllowPartySync)) {
+                           tracked = true;
+                           break;
+                        }
                      }
                   }
 

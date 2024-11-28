@@ -38,6 +38,7 @@ import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.MinimapLogs;
 
 public class WaypointsManager {
+   private final int ROOT_CONTAINER_FORMAT = 2;
    private IXaeroMinimap modMain;
    private XaeroMinimapSession minimapSession;
    private class_310 mc;
@@ -64,8 +65,8 @@ public class WaypointsManager {
    }
 
    public void onLoad(class_634 connection) throws IOException {
-      this.mainContainerID = this.getMainContainer(false, connection);
-      this.fixIPv6Folder(connection);
+      this.mainContainerID = this.getMainContainer(2, connection);
+      this.fixOldRootFolder(connection);
    }
 
    @Deprecated
@@ -134,7 +135,12 @@ public class WaypointsManager {
       }
    }
 
-   private String getMainContainer(boolean preIP6Fix, class_634 connection) {
+   @Deprecated
+   private String getMainContainer(boolean preIPv6Fix, class_634 connection) {
+      return this.getMainContainer(preIPv6Fix ? 0 : 1, connection);
+   }
+
+   private String getMainContainer(int version, class_634 connection) {
       String potentialContainerID;
       if (this.mc.method_1576() != null) {
          potentialContainerID = this.mc
@@ -146,12 +152,15 @@ public class WaypointsManager {
             .replace("_", "%us%")
             .replace("/", "%fs%")
             .replace("\\", "%bs%");
+         if (version >= 2) {
+            potentialContainerID = potentialContainerID.replace("[", "%lb%").replace("]", "%rb%");
+         }
       } else if (this.mc.method_1589() && this.modMain.getEvents().latestRealm != null) {
          potentialContainerID = "Realms_" + this.modMain.getEvents().latestRealm.field_22605 + "." + this.modMain.getEvents().latestRealm.field_22599;
       } else if (connection.method_45734() != null) {
          String serverIP = this.modMain.getSettings().differentiateByServerAddress ? connection.method_45734().field_3761 : "Any Address";
          int portDivider;
-         if (!preIP6Fix && serverIP.indexOf(":") != serverIP.lastIndexOf(":")) {
+         if (version >= 1 && serverIP.indexOf(":") != serverIP.lastIndexOf(":")) {
             portDivider = serverIP.lastIndexOf("]:") + 1;
          } else {
             portDivider = serverIP.indexOf(":");
@@ -163,6 +172,10 @@ public class WaypointsManager {
 
          while (serverIP.endsWith(".")) {
             serverIP = serverIP.substring(0, serverIP.length() - 1);
+         }
+
+         if (version >= 2) {
+            serverIP = serverIP.replace("[", "").replace("]", "");
          }
 
          potentialContainerID = "Multiplayer_" + serverIP.replace(":", "§").replace("_", "%us%").replace("/", "%fs%").replace("\\", "%bs%");
@@ -784,16 +797,19 @@ public class WaypointsManager {
       MinimapLogs.LOGGER.info("Minimap updated server level id: " + id + " for world " + class_310.method_1551().field_1687.method_27983());
    }
 
-   private void fixIPv6Folder(class_634 connection) throws IOException {
-      if (this.mainContainerID.startsWith("Multiplayer_")) {
-         String preIP6FixMainContainerID = this.getMainContainer(true, connection);
-         if (!this.mainContainerID.equals(preIP6FixMainContainerID)) {
-            Path preFixFolder = new File(this.modMain.getWaypointsFolder(), preIP6FixMainContainerID).toPath();
-            if (Files.exists(preFixFolder)) {
-               Path fixedFolder = new File(this.modMain.getWaypointsFolder(), this.mainContainerID).toPath();
-               if (!Files.exists(fixedFolder)) {
-                  Files.move(preFixFolder, fixedFolder);
-               }
+   private void fixOldRootFolder(class_634 connection) throws IOException {
+      for (int format = 1; format >= 0; format--) {
+         this.fixOldRootFolder(this.getMainContainer(format, connection));
+      }
+   }
+
+   private void fixOldRootFolder(String oldRootContainerID) throws IOException {
+      if (!this.mainContainerID.equals(oldRootContainerID)) {
+         Path oldFormatRootFolder = new File(this.modMain.getWaypointsFolder(), oldRootContainerID).toPath();
+         if (Files.exists(oldFormatRootFolder)) {
+            Path fixedFolder = new File(this.modMain.getWaypointsFolder(), this.mainContainerID).toPath();
+            if (!Files.exists(fixedFolder)) {
+               Files.move(oldFormatRootFolder, fixedFolder);
             }
          }
       }

@@ -17,15 +17,12 @@ import xaero.common.misc.TextSplitter;
 import xaero.common.settings.ModSettings;
 import xaero.pac.client.claims.api.IClientClaimsManagerAPI;
 import xaero.pac.client.claims.api.IClientDimensionClaimsManagerAPI;
-import xaero.pac.client.claims.api.IClientRegionClaimsAPI;
 import xaero.pac.client.claims.player.api.IClientPlayerClaimInfoAPI;
 import xaero.pac.common.claims.player.api.IPlayerChunkClaimAPI;
-import xaero.pac.common.claims.player.api.IPlayerClaimPosListAPI;
-import xaero.pac.common.claims.player.api.IPlayerDimensionClaimsAPI;
 import xaero.pac.common.server.player.config.PlayerConfig;
 
 public class ClaimsHighlighter extends ChunkHighlighter {
-   private final IClientClaimsManagerAPI<IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>>, IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI>> claimsManager;
+   private final IClientClaimsManagerAPI claimsManager;
    private final IXaeroMinimap modMain;
    private final ModSettings settings;
    private List<class_2561> cachedTooltip;
@@ -34,10 +31,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
    private String cachedForCustomName;
    private int cachedForClaimsColor;
 
-   public ClaimsHighlighter(
-      IXaeroMinimap modMain,
-      IClientClaimsManagerAPI<IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>>, IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI>> claimsManager
-   ) {
+   public ClaimsHighlighter(IXaeroMinimap modMain, IClientClaimsManagerAPI claimsManager) {
       super(true);
       this.modMain = modMain;
       this.settings = modMain.getSettings();
@@ -46,7 +40,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
 
    @Override
    public boolean regionHasHighlights(class_5321<class_1937> dimension, int regionX, int regionZ) {
-      IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI> claimsDimension = this.claimsManager.getDimension(dimension.method_29177());
+      IClientDimensionClaimsManagerAPI claimsDimension = this.claimsManager.getDimension(dimension.method_29177());
       return claimsDimension == null ? false : claimsDimension.getRegion(regionX, regionZ) != null;
    }
 
@@ -63,8 +57,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
             IPlayerChunkClaimAPI rightClaim = this.claimsManager.get(dimension.method_29177(), chunkX + 1, chunkZ);
             IPlayerChunkClaimAPI bottomClaim = this.claimsManager.get(dimension.method_29177(), chunkX, chunkZ + 1);
             IPlayerChunkClaimAPI leftClaim = this.claimsManager.get(dimension.method_29177(), chunkX - 1, chunkZ);
-            IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>> claimInfo = this.claimsManager
-               .getPlayerInfo(currentClaim.getPlayerId());
+            IClientPlayerClaimInfoAPI claimInfo = this.claimsManager.getPlayerInfo(currentClaim.getPlayerId());
             int claimColor = this.getClaimsColor(currentClaim, claimInfo);
             int claimColorFormatted = (claimColor & 0xFF) << 24 | (claimColor >> 8 & 0xFF) << 16 | (claimColor >> 16 & 0xFF) << 8;
             int borderOpacity = this.settings.getClaimsBorderOpacity();
@@ -92,7 +85,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
          IPlayerChunkClaimAPI currentClaim = this.claimsManager.get(dimension.method_29177(), chunkX, chunkZ);
          if (currentClaim != null) {
             UUID currentClaimId = currentClaim.getPlayerId();
-            IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>> claimInfo = this.claimsManager.getPlayerInfo(currentClaimId);
+            IClientPlayerClaimInfoAPI claimInfo = this.claimsManager.getPlayerInfo(currentClaimId);
             String customName = this.getClaimsName(currentClaim, claimInfo);
             int actualClaimsColor = this.getClaimsColor(currentClaim, claimInfo);
             int claimsColor = actualClaimsColor | 0xFF000000;
@@ -153,7 +146,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
       }
    }
 
-   private String getClaimsName(IPlayerChunkClaimAPI currentClaim, IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>> claimInfo) {
+   private String getClaimsName(IPlayerChunkClaimAPI currentClaim, IClientPlayerClaimInfoAPI claimInfo) {
       int subConfigIndex = currentClaim.getSubConfigIndex();
       String customName = claimInfo.getClaimsName(subConfigIndex);
       if (subConfigIndex != -1 && customName == null) {
@@ -163,7 +156,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
       return customName;
    }
 
-   private int getClaimsColor(IPlayerChunkClaimAPI currentClaim, IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>> claimInfo) {
+   private int getClaimsColor(IPlayerChunkClaimAPI currentClaim, IClientPlayerClaimInfoAPI claimInfo) {
       int subConfigIndex = currentClaim.getSubConfigIndex();
       Integer actualClaimsColor = claimInfo.getClaimsColor(subConfigIndex);
       if (subConfigIndex != -1 && actualClaimsColor == null) {

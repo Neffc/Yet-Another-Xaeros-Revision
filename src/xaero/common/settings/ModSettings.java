@@ -2211,10 +2211,15 @@ public class ModSettings {
       XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
       if (minimapSession != null) {
          double targetBefore = minimapSession.getMinimapProcessor().getTargetZoom();
+         int attempts = 0;
 
          do {
             this.changeZoomUnchecked(direction);
-         } while (targetBefore == minimapSession.getMinimapProcessor().getTargetZoom());
+         } while (++attempts < zooms.length && targetBefore == minimapSession.getMinimapProcessor().getTargetZoom());
+
+         if (attempts == zooms.length) {
+            this.changeZoomUnchecked(direction);
+         }
       } else {
          this.changeZoomUnchecked(direction);
       }
@@ -2236,7 +2241,7 @@ public class ModSettings {
             this.modMain.getSupportMods().worldmapSupport.openScreenForOption(par1EnumOptions);
          } else {
             if (par1EnumOptions == ModOptions.ZOOM) {
-               this.changeZoom((Integer)value - this.zoom);
+               this.changeZoomUnchecked((Integer)value - this.zoom);
                this.refreshScreen();
             } else if (par1EnumOptions == ModOptions.MINIMAP) {
                BuiltInHudModules.MINIMAP.setActive((Boolean)value);

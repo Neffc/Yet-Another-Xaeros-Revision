@@ -11,29 +11,18 @@ import xaero.common.mods.pac.highlight.ClaimsHighlighter;
 import xaero.common.mods.pac.party.OPACPlayerTrackerSystem;
 import xaero.pac.client.api.OpenPACClientAPI;
 import xaero.pac.client.claims.api.IClientClaimsManagerAPI;
-import xaero.pac.client.claims.api.IClientDimensionClaimsManagerAPI;
-import xaero.pac.client.claims.api.IClientRegionClaimsAPI;
-import xaero.pac.client.claims.player.api.IClientPlayerClaimInfoAPI;
 import xaero.pac.client.parties.party.api.IClientPartyAPI;
-import xaero.pac.client.parties.party.api.IClientPartyMemberDynamicInfoSyncableStorageAPI;
 import xaero.pac.client.parties.party.api.IClientPartyStorageAPI;
-import xaero.pac.client.player.config.api.IPlayerConfigClientStorageAPI;
 import xaero.pac.client.player.config.api.IPlayerConfigClientStorageManagerAPI;
-import xaero.pac.client.player.config.api.IPlayerConfigStringableOptionClientStorageAPI;
 import xaero.pac.common.claims.player.api.IPlayerChunkClaimAPI;
-import xaero.pac.common.claims.player.api.IPlayerClaimPosListAPI;
-import xaero.pac.common.claims.player.api.IPlayerDimensionClaimsAPI;
-import xaero.pac.common.parties.party.ally.api.IPartyAllyAPI;
 import xaero.pac.common.parties.party.api.IPartyMemberDynamicInfoSyncableAPI;
-import xaero.pac.common.parties.party.api.IPartyPlayerInfoAPI;
-import xaero.pac.common.parties.party.member.api.IPartyMemberAPI;
 
 public class SupportOpenPartiesAndClaims {
    private final IXaeroMinimap modMain;
    private final OpenPACClientAPI api;
-   private final IClientClaimsManagerAPI<IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>>, IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI>> claimsManager;
-   private final IClientPartyStorageAPI<IClientPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI>, IClientPartyMemberDynamicInfoSyncableStorageAPI<IPartyMemberDynamicInfoSyncableAPI>> partyStorage;
-   private final IPlayerConfigClientStorageManagerAPI<IPlayerConfigClientStorageAPI<IPlayerConfigStringableOptionClientStorageAPI<?>>> playerConfigs;
+   private final IClientClaimsManagerAPI claimsManager;
+   private final IClientPartyStorageAPI partyStorage;
+   private final IPlayerConfigClientStorageManagerAPI playerConfigs;
 
    public SupportOpenPartiesAndClaims(IXaeroMinimap modMain) {
       this.modMain = modMain;
@@ -65,7 +54,7 @@ public class SupportOpenPartiesAndClaims {
    }
 
    public boolean isFromParty(UUID playerId) {
-      IClientPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI> party = this.partyStorage.getParty();
+      IClientPartyAPI party = this.partyStorage.getParty();
       return party == null ? false : this.partyStorage.getParty().getMemberInfo(playerId) != null;
    }
 

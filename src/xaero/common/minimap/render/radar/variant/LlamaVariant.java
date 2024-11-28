@@ -26,7 +26,7 @@ public class LlamaVariant {
          return true;
       } else if (o != null && this.getClass() == o.getClass()) {
          LlamaVariant that = (LlamaVariant)o;
-         return this.trader == that.trader && this.texture.equals(that.texture) && this.swag == that.swag;
+         return this.trader == that.trader && Objects.equals(this.texture, that.texture) && this.swag == that.swag;
       } else {
          return false;
       }

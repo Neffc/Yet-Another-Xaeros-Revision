@@ -36,7 +36,7 @@ public class HorseVariant {
          return true;
       } else if (o != null && this.getClass() == o.getClass()) {
          HorseVariant that = (HorseVariant)o;
-         return this.texture.equals(that.texture) && this.markings == that.markings;
+         return Objects.equals(this.texture, that.texture) && this.markings == that.markings;
       } else {
          return false;
       }

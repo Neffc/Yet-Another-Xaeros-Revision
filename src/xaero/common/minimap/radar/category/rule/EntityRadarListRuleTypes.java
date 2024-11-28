@@ -2,9 +2,13 @@ package xaero.common.minimap.radar.category.rule;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import net.minecraft.class_1297;
 import net.minecraft.class_1299;
 import net.minecraft.class_1542;
@@ -51,10 +55,36 @@ public class EntityRadarListRuleTypes {
       () -> (Iterable<String>)(class_310.method_1551().method_1562() == null
             ? new ArrayList<>()
             : class_310.method_1551().method_1562().method_2880().stream().map(pi -> pi.method_2966().getName())::iterator),
-      s -> Lists.newArrayList(new String[]{s}),
+      xva$0 -> Lists.newArrayList(new String[]{xva$0}),
       Function.identity(),
       EntityRadarCategoryConstants.PLAYER_NAME_VALIDATOR_FIXER,
       EntityRadarCategoryConstants.PLAYER_NAME_VALIDATOR,
+      TYPE_LIST,
+      TYPE_MAP
+   );
+   public static final ObjectCategoryListRuleType<class_1297, class_1657, String> CUSTOM_NAME = new ObjectCategoryListRuleType<>(
+      "custom-name",
+      (e, p) -> EntityCustomNameHelper.getCustomName(e, false),
+      () -> {
+         if (class_310.method_1551().field_1687 == null) {
+            return Lists.newArrayList(new String[]{"example"});
+         } else {
+            Iterable<class_1297> entities = class_310.method_1551().field_1687.method_18112();
+            if (entities == null) {
+               return Lists.newArrayList(new String[]{"example"});
+            } else {
+               Stream<String> nameStream = StreamSupport.stream(entities.spliterator(), false)
+                  .map(e -> EntityCustomNameHelper.getCustomName(e, true))
+                  .filter(Objects::nonNull);
+               Iterator<String> iterator = nameStream.iterator();
+               return (Iterable<String>)(!iterator.hasNext() ? Lists.newArrayList(new String[]{"example"}) : () -> iterator);
+            }
+         }
+      },
+      xva$0 -> Lists.newArrayList(new String[]{xva$0}),
+      Function.identity(),
+      s -> s,
+      s -> true,
       TYPE_LIST,
       TYPE_MAP
    );
@@ -85,7 +115,7 @@ public class EntityRadarListRuleTypes {
    public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> LIT = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(
       EntityRadarCategoryHardRules.IS_LIT, TYPE_LIST, TYPE_MAP
    );
-   public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> CUSTOM_NAME = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(
+   public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> HAS_CUSTOM_NAME = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(
       EntityRadarCategoryHardRules.HAS_CUSTOM_NAME, TYPE_LIST, TYPE_MAP
    );
    public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> IN_TEAM = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(

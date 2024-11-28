@@ -12,6 +12,7 @@ import net.minecraft.class_1452;
 import net.minecraft.class_1474;
 import net.minecraft.class_1498;
 import net.minecraft.class_1501;
+import net.minecraft.class_1560;
 import net.minecraft.class_1621;
 import net.minecraft.class_2960;
 import net.minecraft.class_3850;
@@ -62,6 +63,7 @@ import net.minecraft.class_7280;
 import net.minecraft.class_7751;
 import net.minecraft.class_8185;
 import net.minecraft.class_889;
+import net.minecraft.class_894;
 import net.minecraft.class_897;
 import net.minecraft.class_910;
 import net.minecraft.class_913;
@@ -74,6 +76,7 @@ import net.minecraft.class_969;
 import net.minecraft.class_971;
 import net.minecraft.class_895.class_625;
 import xaero.common.minimap.render.radar.custom.EntityIconCustomRenderer;
+import xaero.common.minimap.render.radar.variant.EndermanVariant;
 import xaero.common.minimap.render.radar.variant.HorseVariant;
 import xaero.common.minimap.render.radar.variant.IronGolemVariant;
 import xaero.common.minimap.render.radar.variant.LlamaVariant;
@@ -312,6 +315,9 @@ public class EntityIconDefinitions {
       } else if (entityRenderer instanceof class_959) {
          class_1474 fish = (class_1474)entity;
          return new TropicalFishVariant(entityTexture, fish.method_47862(), fish.method_6658(), fish.method_6655());
+      } else if (entityRenderer instanceof class_894) {
+         class_1560 enderman = (class_1560)entity;
+         return new EndermanVariant(entityTexture, enderman.method_7028());
       } else {
          return entityTexture;
       }

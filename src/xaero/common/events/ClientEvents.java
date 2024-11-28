@@ -51,54 +51,58 @@ public class ClientEvents {
    }
 
    public class_437 handleGuiOpen(class_437 gui) {
-      if (gui != null && gui.getClass() == class_429.class) {
-         if (!ModSettings.settingsButton) {
-            return gui;
-         }
-
-         gui = this.modMain.getGuiHelper().getMyOptions();
-
-         try {
-            this.modMain.getSettings().saveSettings();
-         } catch (IOException var7) {
-            MinimapLogs.LOGGER.error("suppressed exception", var7);
-         }
-      }
-
-      if (gui instanceof class_442 || gui instanceof class_500) {
-         this.modMain.getSettings().resetServerSettings();
-      }
-
-      class_310 mc = class_310.method_1551();
-      if (gui instanceof class_4398) {
-         try {
-            if (this.realmsTaskField == null) {
-               this.realmsTaskField = Misc.getFieldReflection(class_4398.class, "queuedTasks", "field_19919", "Lnet/minecraft/class_4358;", "f_88773_");
-               this.realmsTaskField.setAccessible(true);
+      if (!this.modMain.isFirstStageLoaded()) {
+         return gui;
+      } else {
+         if (gui != null && gui.getClass() == class_429.class) {
+            if (!ModSettings.settingsButton) {
+               return gui;
             }
 
-            if (this.realmsTaskServerField == null) {
-               this.realmsTaskServerField = Misc.getFieldReflection(class_4439.class, "server", "field_20224", "Lnet/minecraft/class_4877;", "f_90327_");
-               this.realmsTaskServerField.setAccessible(true);
-            }
+            gui = this.modMain.getGuiHelper().getMyOptions();
 
-            class_4398 realmsTaskScreen = (class_4398)gui;
-            if (this.realmsTaskField.get(realmsTaskScreen) instanceof class_4439 realmsTask) {
-               class_4877 realm = (class_4877)this.realmsTaskServerField.get(realmsTask);
-               if (realm != null && (this.latestRealm == null || realm.field_22599 != this.latestRealm.field_22599)) {
-                  this.latestRealm = realm;
+            try {
+               this.modMain.getSettings().saveSettings();
+            } catch (IOException var7) {
+               MinimapLogs.LOGGER.error("suppressed exception", var7);
+            }
+         }
+
+         if (gui instanceof class_442 || gui instanceof class_500) {
+            this.modMain.getSettings().resetServerSettings();
+         }
+
+         class_310 mc = class_310.method_1551();
+         if (gui instanceof class_4398) {
+            try {
+               if (this.realmsTaskField == null) {
+                  this.realmsTaskField = Misc.getFieldReflection(class_4398.class, "queuedTasks", "field_19919", "Lnet/minecraft/class_4358;", "f_88773_");
+                  this.realmsTaskField.setAccessible(true);
                }
-            }
-         } catch (Exception var8) {
-            MinimapLogs.LOGGER.error("suppressed exception", var8);
-         }
-      } else if ((gui instanceof GuiAddWaypoint || gui instanceof GuiWaypoints)
-         && (mc.field_1724.method_6059(Effects.NO_WAYPOINTS) || mc.field_1724.method_6059(Effects.NO_WAYPOINTS_HARMFUL))) {
-         gui = null;
-      }
 
-      this.lastGuiOpen = gui;
-      return gui;
+               if (this.realmsTaskServerField == null) {
+                  this.realmsTaskServerField = Misc.getFieldReflection(class_4439.class, "server", "field_20224", "Lnet/minecraft/class_4877;", "f_90327_");
+                  this.realmsTaskServerField.setAccessible(true);
+               }
+
+               class_4398 realmsTaskScreen = (class_4398)gui;
+               if (this.realmsTaskField.get(realmsTaskScreen) instanceof class_4439 realmsTask) {
+                  class_4877 realm = (class_4877)this.realmsTaskServerField.get(realmsTask);
+                  if (realm != null && (this.latestRealm == null || realm.field_22599 != this.latestRealm.field_22599)) {
+                     this.latestRealm = realm;
+                  }
+               }
+            } catch (Exception var8) {
+               MinimapLogs.LOGGER.error("suppressed exception", var8);
+            }
+         } else if ((gui instanceof GuiAddWaypoint || gui instanceof GuiWaypoints)
+            && (mc.field_1724.method_6059(Effects.NO_WAYPOINTS) || mc.field_1724.method_6059(Effects.NO_WAYPOINTS_HARMFUL))) {
+            gui = null;
+         }
+
+         this.lastGuiOpen = gui;
+         return gui;
+      }
    }
 
    public void handleRenderGameOverlayEventPre(class_332 guiGraphics, float partialTicks) {
@@ -128,7 +132,9 @@ public class ClientEvents {
    }
 
    public void handleRenderGameOverlayEventPost() {
-      this.modMain.getHud().getEventHandler().handleRenderGameOverlayEventPost();
+      if (this.modMain.isLoadedClient()) {
+         this.modMain.getHud().getEventHandler().handleRenderGameOverlayEventPost();
+      }
    }
 
    public boolean handleClientSendChatEvent(String message) {
@@ -237,19 +243,21 @@ public class ClientEvents {
 
    public void handlePlayerTickStart(class_1657 player) {
       if (player == class_310.method_1551().field_1724) {
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-         if (minimapSession != null) {
-            try {
-               MinimapProcessor minimap = minimapSession.getMinimapProcessor();
-               WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-               waypointsManager.updateWorldIds();
-               minimap.onPlayerTick();
-               waypointsManager.updateWaypoints();
-               class_310 mc = class_310.method_1551();
-               minimapSession.getKeyEventHandler().handleEvents(mc, minimapSession);
-               this.modMain.getForgeEventHandlerListener().playerTickPost(minimapSession);
-            } catch (Throwable var6) {
-               this.modMain.getInterfaces().getMinimapInterface().setCrashedWith(var6);
+         if (this.modMain.isLoadedClient()) {
+            XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+            if (minimapSession != null) {
+               try {
+                  MinimapProcessor minimap = minimapSession.getMinimapProcessor();
+                  WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
+                  waypointsManager.updateWorldIds();
+                  minimap.onPlayerTick();
+                  waypointsManager.updateWaypoints();
+                  class_310 mc = class_310.method_1551();
+                  minimapSession.getKeyEventHandler().handleEvents(mc, minimapSession);
+                  this.modMain.getForgeEventHandlerListener().playerTickPost(minimapSession);
+               } catch (Throwable var6) {
+                  this.modMain.getInterfaces().getMinimapInterface().setCrashedWith(var6);
+               }
             }
          }
       }
@@ -257,6 +265,10 @@ public class ClientEvents {
 
    public void handleRenderTickStart() {
       if (class_310.method_1551().field_1724 != null) {
+         if (!this.modMain.isLoadedClient()) {
+            return;
+         }
+
          this.modMain.getInterfaces().getMinimapInterface().checkCrashes();
          XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
          if (minimapSession != null) {
@@ -267,7 +279,7 @@ public class ClientEvents {
    }
 
    public boolean handleRenderStatusEffectOverlay(class_332 guiGraphics) {
-      return this.modMain.getForgeEventHandlerListener().handleRenderStatusEffectOverlay(guiGraphics);
+      return !this.modMain.isLoadedClient() ? false : this.modMain.getForgeEventHandlerListener().handleRenderStatusEffectOverlay(guiGraphics);
    }
 
    public boolean handleRenderCrosshairOverlay(class_332 guiGraphics) {

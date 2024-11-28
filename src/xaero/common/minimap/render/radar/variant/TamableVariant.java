@@ -23,7 +23,7 @@ public class TamableVariant {
          return true;
       } else if (o != null && this.getClass() == o.getClass()) {
          TamableVariant that = (TamableVariant)o;
-         return this.tame == that.tame && this.texture.equals(that.texture);
+         return this.tame == that.tame && Objects.equals(this.texture, that.texture);
       } else {
          return false;
       }

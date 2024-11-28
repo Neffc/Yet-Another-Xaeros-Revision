@@ -159,4 +159,6 @@ public interface IXaeroMinimap {
    HudIO getHudIO();
 
    Minimap getMinimap();
+
+   boolean isFirstStageLoaded();
 }
