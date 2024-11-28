@@ -1,6 +1,7 @@
 package xaero.common.minimap.render.radar;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class EntityIconManager {
       this.prerenderer = prerenderer;
       this.iconDefinitions = new HashMap<>();
       this.cachedTextures = new HashMap<>();
-      this.gson = new Gson();
+      this.gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
       this.resetResources();
       this.entityStringBuilder = new StringBuilder();
       this.defaultModelConfig = new EntityIconModelConfig();
