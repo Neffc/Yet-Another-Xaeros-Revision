@@ -3,44 +3,39 @@ package xaero.common.minimap.element.render;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
 import net.minecraft.class_276;
+import net.minecraft.class_310;
 import net.minecraft.class_327;
 import net.minecraft.class_332;
 import net.minecraft.class_4597.class_4598;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.render.MinimapRendererHelper;
+import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 
-public abstract class MinimapElementRenderer<E, RC> implements Comparable<MinimapElementRenderer<?, ?>> {
-   protected final MinimapElementReader<E, RC> elementReader;
-   protected final RC context;
-   protected final MinimapElementRenderProvider<E, RC> provider;
+@Deprecated
+public abstract class MinimapElementRenderer<E, RC> extends xaero.hud.minimap.element.render.MinimapElementRenderer<E, RC> {
+   @Deprecated
+   protected final MinimapElementReader<E, RC> elementReader = this.getElementReader();
+   @Deprecated
+   protected final MinimapElementRenderProvider<E, RC> provider = this.getProvider();
 
+   @Deprecated
    public MinimapElementRenderer(MinimapElementReader<E, RC> elementReader, MinimapElementRenderProvider<E, RC> provider, RC context) {
-      this.elementReader = elementReader;
-      this.context = context;
-      this.provider = provider;
+      super(elementReader, provider, context);
    }
 
-   public int getOrder() {
-      return 0;
-   }
-
-   public int compareTo(MinimapElementRenderer<?, ?> o) {
-      return Integer.compare(this.getOrder(), o.getOrder());
-   }
-
-   public RC getContext() {
-      return this.context;
-   }
-
+   @Deprecated
    public MinimapElementRenderProvider<E, RC> getProvider() {
-      return this.provider;
+      return (MinimapElementRenderProvider<E, RC>)super.getProvider();
    }
 
+   @Deprecated
    public MinimapElementReader<E, RC> getElementReader() {
-      return this.elementReader;
+      return (MinimapElementReader<E, RC>)super.getElementReader();
    }
 
+   @Deprecated
    public abstract boolean renderElement(
       int var1,
       boolean var2,
@@ -65,6 +60,7 @@ public abstract class MinimapElementRenderer<E, RC> implements Comparable<Minima
       float var27
    );
 
+   @Deprecated
    public abstract void preRender(
       int var1,
       class_1297 var2,
@@ -77,6 +73,7 @@ public abstract class MinimapElementRenderer<E, RC> implements Comparable<Minima
       MultiTextureRenderTypeRendererProvider var12
    );
 
+   @Deprecated
    public abstract void postRender(
       int var1,
       class_1297 var2,
@@ -89,5 +86,83 @@ public abstract class MinimapElementRenderer<E, RC> implements Comparable<Minima
       MultiTextureRenderTypeRendererProvider var12
    );
 
+   @Deprecated
    public abstract boolean shouldRender(int var1);
+
+   @Override
+   public boolean renderElement(
+      E element,
+      boolean highlit,
+      boolean outOfBounds,
+      double optionalDepth,
+      float optionalScale,
+      double partialX,
+      double partialY,
+      MinimapElementRenderInfo renderInfo,
+      class_332 guiGraphics,
+      class_4598 renderTypeBuffers
+   ) {
+      return this.renderElement(
+         renderInfo.location.getIndex(),
+         highlit,
+         outOfBounds,
+         guiGraphics,
+         renderTypeBuffers,
+         class_310.method_1551().field_1772,
+         renderInfo.framebuffer,
+         HudMod.INSTANCE.getMinimap().getMinimapFBORenderer().getHelper(),
+         renderInfo.renderEntity,
+         renderInfo.player,
+         renderInfo.renderPos.field_1352,
+         renderInfo.renderPos.field_1351,
+         renderInfo.renderPos.field_1350,
+         0,
+         optionalDepth,
+         optionalScale,
+         element,
+         partialX,
+         partialY,
+         renderInfo.cave,
+         renderInfo.partialTicks
+      );
+   }
+
+   @Override
+   public void preRender(
+      MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+   ) {
+      this.preRender(
+         renderInfo.location.getIndex(),
+         renderInfo.renderEntity,
+         renderInfo.player,
+         renderInfo.renderPos.field_1352,
+         renderInfo.renderPos.field_1351,
+         renderInfo.renderPos.field_1350,
+         HudMod.INSTANCE,
+         renderTypeBuffers,
+         multiTextureRenderTypeRenderers
+      );
+   }
+
+   @Override
+   public void postRender(
+      MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+   ) {
+      this.postRender(
+         renderInfo.location.getIndex(),
+         renderInfo.renderEntity,
+         renderInfo.player,
+         renderInfo.renderPos.field_1352,
+         renderInfo.renderPos.field_1351,
+         renderInfo.renderPos.field_1350,
+         HudMod.INSTANCE,
+         renderTypeBuffers,
+         multiTextureRenderTypeRenderers
+      );
+   }
+
+   @Override
+   public boolean shouldRender(xaero.hud.minimap.element.render.MinimapElementRenderLocation location) {
+      return this.shouldRender(location.getIndex());
+   }
 }

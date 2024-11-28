@@ -12,6 +12,7 @@ import xaero.common.minimap.radar.MinimapRadarList;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 
 public final class RadarRenderProvider extends MinimapElementRenderProvider<class_1297, RadarRenderContext> {
    private double maxDistanceSquared;
@@ -22,6 +23,26 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
    private boolean playerListDown;
 
    public void begin(int location, RadarRenderContext context) {
+      this.begin(MinimapElementRenderLocation.fromIndex(location), context);
+   }
+
+   public boolean hasNext(int location, RadarRenderContext context) {
+      return this.hasNext(MinimapElementRenderLocation.fromIndex(location), context);
+   }
+
+   public class_1297 setupContextAndGetNext(int location, RadarRenderContext context) {
+      return this.setupContextAndGetNext(MinimapElementRenderLocation.fromIndex(location), context);
+   }
+
+   public class_1297 getNext(int location, RadarRenderContext context) {
+      return this.getNext(MinimapElementRenderLocation.fromIndex(location), context);
+   }
+
+   public void end(int location, RadarRenderContext context) {
+      this.end(MinimapElementRenderLocation.fromIndex(location), context);
+   }
+
+   public void begin(MinimapElementRenderLocation location, RadarRenderContext context) {
       XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
       MinimapProcessor minimap = minimapSession.getMinimapProcessor();
       context.minimapRadar = minimap.getEntityRadar();
@@ -40,12 +61,14 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
       this.currentListIndex = 0;
    }
 
-   private void ensureList(int location, RadarRenderContext context) {
+   private void ensureList(MinimapElementRenderLocation location, RadarRenderContext context) {
       while (this.currentList == null || this.currentListIndex >= this.currentList.getEntities().size() || this.currentListIndex < 0) {
          while (this.entityLists.hasNext()) {
             this.currentList = this.entityLists.next();
             this.currentListIndex = context.reversedOrder ? this.currentList.getEntities().size() - 1 : 0;
-            if (this.currentList == null || location != 0 && location != 1 || location == 0 != this.shouldRenderOverMinimap(this.currentList.getCategory())) {
+            if (this.currentList == null
+               || location != MinimapElementRenderLocation.IN_MINIMAP && location != MinimapElementRenderLocation.OVER_MINIMAP
+               || location == MinimapElementRenderLocation.IN_MINIMAP != this.shouldRenderOverMinimap(this.currentList.getCategory())) {
             }
          }
 
@@ -60,13 +83,13 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
       return settingValue == 2 || settingValue == 1 && this.playerListDown;
    }
 
-   public boolean hasNext(int location, RadarRenderContext context) {
+   public boolean hasNext(MinimapElementRenderLocation location, RadarRenderContext context) {
       this.ensureList(location, context);
       return this.currentList != null
          && (!context.reversedOrder && this.currentListIndex < this.currentList.getEntities().size() || context.reversedOrder && this.currentListIndex >= 0);
    }
 
-   public class_1297 setupContextAndGetNext(int location, RadarRenderContext context) {
+   public class_1297 setupContextAndGetNext(MinimapElementRenderLocation location, RadarRenderContext context) {
       if (this.listForContext != this.currentList) {
          EntityRadarCategory entityCategory = this.currentList.getCategory();
          context.entityCategory = entityCategory;
@@ -90,7 +113,7 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
       if (result == null) {
          return null;
       } else {
-         if (location == 0) {
+         if (location == MinimapElementRenderLocation.IN_MINIMAP) {
             double offx = result.method_23317() - context.renderEntity.method_23317();
             double offx2 = offx * offx;
             if (offx2 > this.maxDistanceSquared) {
@@ -116,14 +139,14 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
       }
    }
 
-   public class_1297 getNext(int location, RadarRenderContext context) {
+   public class_1297 getNext(MinimapElementRenderLocation location, RadarRenderContext context) {
       class_1297 result = null;
       result = this.currentList.getEntities().get(this.currentListIndex);
       this.currentListIndex = this.currentListIndex + (context.reversedOrder ? -1 : 1);
       return context.renderEntity == result ? null : result;
    }
 
-   public void end(int location, RadarRenderContext context) {
+   public void end(MinimapElementRenderLocation location, RadarRenderContext context) {
       context.minimapRadar = null;
    }
 }

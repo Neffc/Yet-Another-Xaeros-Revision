@@ -37,10 +37,10 @@ public abstract class MinimapSession extends ModuleSession<MinimapSession> {
       super(modMain, module);
       this.worldManager = new MinimapWorldManager(modMain, this);
       this.worldState = new MinimapWorldState();
-      this.worldStateUpdater = new MinimapWorldStateUpdater(modMain);
+      this.worldStateUpdater = new MinimapWorldStateUpdater(modMain, this, connection);
       this.dimensionHelper = new MinimapDimensionHelper();
       this.worldManagerIO = new MinimapWorldManagerIO(modMain);
-      this.worldStateUpdater.init(this, connection);
+      this.worldStateUpdater.init();
 
       try {
          this.worldManagerIO.loadWorldsFromAllSources(this, connection);

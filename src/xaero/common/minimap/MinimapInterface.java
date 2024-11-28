@@ -3,15 +3,14 @@ package xaero.common.minimap;
 import java.io.IOException;
 import xaero.common.HudMod;
 import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
-import xaero.common.minimap.info.InfoDisplayIO;
 import xaero.common.minimap.info.InfoDisplayManager;
 import xaero.common.minimap.info.render.InfoDisplayRenderer;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapSafeModeRenderer;
-import xaero.common.minimap.waypoints.render.CompassRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.compass.render.CompassRenderer;
 
 @Deprecated
 public class MinimapInterface extends Minimap {
@@ -44,9 +43,8 @@ public class MinimapInterface extends Minimap {
    }
 
    @Deprecated
-   @Override
    public MinimapElementOverMapRendererHandler getOverMapRendererHandler() {
-      return super.getOverMapRendererHandler();
+      return (MinimapElementOverMapRendererHandler)super.getOverMapRendererHandler();
    }
 
    @Deprecated
@@ -71,11 +69,5 @@ public class MinimapInterface extends Minimap {
    @Override
    public InfoDisplayManager getInfoDisplayManager() {
       return super.getInfoDisplayManager();
-   }
-
-   @Deprecated
-   @Override
-   public InfoDisplayIO getInfoDisplayIO() {
-      return super.getInfoDisplayIO();
    }
 }

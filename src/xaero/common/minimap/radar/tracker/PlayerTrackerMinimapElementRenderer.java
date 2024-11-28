@@ -2,12 +2,9 @@ package xaero.common.minimap.radar.tracker;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.class_1068;
-import net.minecraft.class_1297;
 import net.minecraft.class_1657;
-import net.minecraft.class_276;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
-import net.minecraft.class_327;
 import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import net.minecraft.class_640;
@@ -16,8 +13,9 @@ import net.minecraft.class_4597.class_4598;
 import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
-import xaero.common.minimap.element.render.MinimapElementRenderer;
-import xaero.common.minimap.render.MinimapRendererHelper;
+import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
+import xaero.hud.minimap.element.render.MinimapElementRenderer;
 
 public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRenderer<PlayerTrackerMinimapElement<?>, PlayerTrackerMinimapElementRenderContext> {
    private final PlayerTrackerMinimapElementCollector elementCollector;
@@ -48,69 +46,40 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
    }
 
    @Override
-   public void preRender(
-      int location,
-      class_1297 renderEntity,
-      class_1657 player,
-      double renderX,
-      double renderY,
-      double renderZ,
-      IXaeroMinimap modMain,
-      class_4598 renderTypeBuffers,
-      MultiTextureRenderTypeRendererProvider rendererProvider
-   ) {
+   public void preRender(MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider) {
       this.context.outlineConsumer = renderTypeBuffers.getBuffer(CustomRenderTypes.COLORED_WAYPOINTS_BGS);
       this.context.uniqueTextureUIObjectRenderer = rendererProvider.getRenderer(
          t -> RenderSystem.setShaderTexture(0, t), MultiTextureRenderTypeRendererProvider::defaultTextureBind, CustomRenderTypes.GUI_NEAREST
       );
-      if (modMain.getSupportMods().worldmap()) {
-         this.context.mapDimId = modMain.getSupportMods().worldmapSupport.getMapDimension();
-         this.context.mapDimDiv = modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getLastPlayerDimDiv();
+      if (this.modMain.getSupportMods().worldmap()) {
+         this.context.mapDimId = this.modMain.getSupportMods().worldmapSupport.getMapDimension();
+         this.context.mapDimDiv = this.modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getLastPlayerDimDiv();
       } else {
          this.context.mapDimId = class_310.method_1551().field_1687.method_27983();
          this.context.mapDimDiv = 1.0;
       }
+
+      this.context.helper = this.modMain.getMinimap().getMinimapFBORenderer().getHelper();
    }
 
    @Override
-   public void postRender(
-      int location,
-      class_1297 renderEntity,
-      class_1657 player,
-      double renderX,
-      double renderY,
-      double renderZ,
-      IXaeroMinimap modMain,
-      class_4598 renderTypeBuffers,
-      MultiTextureRenderTypeRendererProvider rendererProvider
-   ) {
+   public void postRender(MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider rendererProvider) {
       rendererProvider.draw(this.context.uniqueTextureUIObjectRenderer);
       renderTypeBuffers.method_22993();
       this.elementCollector.resetRenderedOnRadarFlags();
    }
 
    public boolean renderElement(
-      int location,
+      PlayerTrackerMinimapElement<?> e,
       boolean highlit,
       boolean outOfBounds,
-      class_332 guiGraphics,
-      class_4598 renderTypeBuffers,
-      class_327 font,
-      class_276 framebuffer,
-      MinimapRendererHelper helper,
-      class_1297 renderEntity,
-      class_1657 player,
-      double renderX,
-      double renderY,
-      double renderZ,
-      int elementIndex,
       double optionalDepth,
       float optionalScale,
-      PlayerTrackerMinimapElement<?> e,
       double partialX,
       double partialY,
-      boolean cave,
-      float partialTicks
+      MinimapElementRenderInfo renderInfo,
+      class_332 guiGraphics,
+      class_4598 renderTypeBuffers
    ) {
       if (!outOfBounds && e.wasRenderedOnRadar()) {
          return false;
@@ -123,12 +92,16 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
             matrixStack.method_22903();
             matrixStack.method_22904(0.0, 0.0, optionalDepth);
             matrixStack.method_22905(optionalScale, optionalScale, 1.0F);
-            helper.addColoredRectToExistingBuffer(
-               matrixStack.method_23760().method_23761(), this.context.outlineConsumer, -5.0F, -5.0F, 10, 10, 1.0F, 1.0F, 1.0F, 1.0F
-            );
+            this.context
+               .helper
+               .addColoredRectToExistingBuffer(
+                  matrixStack.method_23760().method_23761(), this.context.outlineConsumer, -5.0F, -5.0F, 10, 10, 1.0F, 1.0F, 1.0F, 1.0F
+               );
             matrixStack.method_22904(0.0, 0.0, 0.01);
             this.playerTrackerIconRenderer
-               .renderIcon(mc, this.context.uniqueTextureUIObjectRenderer, helper, matrixStack, clientPlayer, this.getPlayerSkin(clientPlayer, info));
+               .renderIcon(
+                  mc, this.context.uniqueTextureUIObjectRenderer, this.context.helper, matrixStack, clientPlayer, this.getPlayerSkin(clientPlayer, info)
+               );
             matrixStack.method_22909();
          }
 
@@ -137,7 +110,7 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
    }
 
    @Override
-   public boolean shouldRender(int location) {
+   public boolean shouldRender(MinimapElementRenderLocation location) {
       return this.modMain.getSettings().displayTrackedPlayers;
    }
 

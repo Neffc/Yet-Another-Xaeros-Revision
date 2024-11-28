@@ -1,59 +1,40 @@
 package xaero.common.minimap.info;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 
-public class InfoDisplayManager {
-   private final Map<String, InfoDisplay<?>> displays = new HashMap<>();
-   private final List<String> defaultOrder = new ArrayList<>();
-   private List<String> order;
-
+@Deprecated
+public class InfoDisplayManager extends xaero.hud.minimap.info.InfoDisplayManager {
+   @Deprecated
    public void add(InfoDisplay<?> infoDisplay) {
-      if (this.displays.put(infoDisplay.getId(), infoDisplay) == null) {
-         this.defaultOrder.add(infoDisplay.getId());
-      }
+      super.add(infoDisplay);
    }
 
+   @Deprecated
+   @Override
    public void setOrder(List<String> order) {
-      this.order = new ArrayList<>(order);
-      int lastDefaultOrderIdIndex = -1;
-
-      for (int i = 0; i < this.defaultOrder.size(); i++) {
-         String defaultOrderId = this.defaultOrder.get(i);
-         int defaultOrderIdIndex = this.order.indexOf(defaultOrderId);
-         if (defaultOrderIdIndex == -1) {
-            if (lastDefaultOrderIdIndex != -1) {
-               defaultOrderIdIndex = lastDefaultOrderIdIndex + 1;
-            } else {
-               defaultOrderIdIndex = 0;
-            }
-
-            this.order.add(defaultOrderIdIndex, defaultOrderId);
-         }
-
-         lastDefaultOrderIdIndex = defaultOrderIdIndex;
-      }
+      super.setOrder(order);
    }
 
+   @Deprecated
    public InfoDisplay<?> get(String id) {
-      return this.displays.get(id);
+      return (InfoDisplay<?>)super.get(id);
    }
 
+   @Deprecated
    public Stream<InfoDisplay<?>> getStream() {
-      Stream<InfoDisplay<?>> unfilteredResult = this.order.stream().map(this.displays::get);
-      return unfilteredResult.filter(Objects::nonNull);
+      return super.getOrderedStream();
    }
 
+   @Deprecated
+   @Override
    public int getCount() {
-      return this.displays.size();
+      return super.getCount();
    }
 
+   @Deprecated
+   @Override
    public void reset() {
-      this.setOrder(new ArrayList<>());
-      this.getStream().forEach(InfoDisplay::reset);
+      super.reset();
    }
 }

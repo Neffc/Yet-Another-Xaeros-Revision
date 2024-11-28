@@ -2,8 +2,8 @@ package xaero.common.minimap.highlight;
 
 import net.minecraft.class_1937;
 import net.minecraft.class_5321;
-import xaero.common.minimap.info.render.compile.InfoDisplayCompiler;
 import xaero.common.minimap.write.MinimapWriter;
+import xaero.hud.minimap.info.render.compile.InfoDisplayCompiler;
 
 public class DimensionHighlighterHandler {
    private final MinimapWriter writer;
@@ -149,7 +149,7 @@ public class DimensionHighlighterHandler {
 
          for (AbstractHighlighter hl : this.registry.getHighlighters()) {
             if (this.shouldApplyTileChunkHighlights(hl, regionX, regionZ, localTileChunkX, localTileChunkZ, discovered)) {
-               hl.addBlockHighlightTooltips(compiler, dimension, blockX, blockZ, width);
+               hl.addBlockHighlightTooltips((xaero.common.minimap.info.render.compile.InfoDisplayCompiler)compiler, dimension, blockX, blockZ, width);
             }
          }
       }

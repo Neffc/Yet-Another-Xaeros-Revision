@@ -23,7 +23,7 @@ public class DeathpointHandler {
    }
 
    public void createDeathpoint(class_1657 player) {
-      this.session.getWorldStateUpdater().update(this.session);
+      this.session.getWorldStateUpdater().update();
       if (this.modMain.getSettings().switchToAutoOnDeath) {
          this.session.getWorldState().setCustomWorldPath(null);
       }
@@ -32,11 +32,9 @@ public class DeathpointHandler {
       MinimapWorld potentialAutoWorld = null;
       XaeroPath usedAutoWorldPath = this.session.getWorldState().getAutoWorldPath();
       XaeroPath usedAutoContainerPath = usedAutoWorldPath == null ? null : usedAutoWorldPath.getParent();
-      XaeroPath potentialAutoContainerPath = this.session.getWorldStateUpdater().getPotentialContainerPath(this.session);
+      XaeroPath potentialAutoContainerPath = this.session.getWorldStateUpdater().getPotentialContainerPath();
       if (!potentialAutoContainerPath.equals(usedAutoContainerPath)) {
-         String potentialAutoWorldNode = this.session
-            .getWorldStateUpdater()
-            .getPotentialWorldNode(this.session.getMc().field_1687.method_27983(), worldmap, this.session);
+         String potentialAutoWorldNode = this.session.getWorldStateUpdater().getPotentialWorldNode(this.session.getMc().field_1687.method_27983(), worldmap);
          if (potentialAutoWorldNode != null) {
             XaeroPath potentialAutoWorldPath = potentialAutoContainerPath.resolve(potentialAutoWorldNode);
             potentialAutoWorld = this.session.getWorldManager().getWorld(potentialAutoWorldPath);
@@ -72,7 +70,7 @@ public class DeathpointHandler {
 
             while (waypoints.hasNext()) {
                Waypoint w = waypoints.next();
-               if (w.getWaypointType() == 1) {
+               if (w.getPurpose() == WaypointPurpose.DEATH) {
                   if (set == currentSet) {
                      disabled = w.isDisabled();
                   }
@@ -80,7 +78,7 @@ public class DeathpointHandler {
                   if (!this.modMain.getSettings().getOldDeathpoints()) {
                      waypoints.remove();
                   } else {
-                     w.setType(2);
+                     w.setPurpose(WaypointPurpose.OLD_DEATH);
                      w.setName("gui.xaero_deathpoint_old");
                   }
                   break;
@@ -96,8 +94,8 @@ public class DeathpointHandler {
                OptimizedMath.myFloor((double)OptimizedMath.myFloor(player.method_23321()) * dimDiv),
                "gui.xaero_deathpoint",
                "D",
-               0,
-               1
+               WaypointColor.BLACK,
+               WaypointPurpose.DEATH
             );
             deathpoint.setTemporary(temporary);
             deathpoint.setDisabled(disabled);

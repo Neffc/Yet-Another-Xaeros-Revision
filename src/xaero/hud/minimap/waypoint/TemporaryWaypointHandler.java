@@ -4,7 +4,6 @@ import net.minecraft.class_310;
 import xaero.common.HudMod;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.misc.OptimizedMath;
-import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.MinimapWorld;
 
@@ -31,7 +30,7 @@ public class TemporaryWaypointHandler {
             double dimDiv = dimScale / waypointDestDimScale;
             x = OptimizedMath.myFloor((double)x * dimDiv);
             z = OptimizedMath.myFloor((double)z * dimDiv);
-            Waypoint instant = new Waypoint(x, y, z, "Waypoint", "X", (int)(Math.random() * (double)ModSettings.ENCHANT_COLORS.length), 0, true, yIncluded);
+            Waypoint instant = new Waypoint(x, y, z, "Waypoint", "X", WaypointColor.getRandom(), WaypointPurpose.NORMAL, true, yIncluded);
             minimapWorld.getCurrentWaypointSet().add(instant, !this.modMain.getSettings().waypointsBottom);
          }
       }

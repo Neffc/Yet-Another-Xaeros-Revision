@@ -333,7 +333,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
          }
 
          if (par3 == 0) {
-            if (par2 >= 58.0 && par2 < (double)(this.field_22790 - 61) && this.displayedWorld.getContainer().getRoot().getSortType() == WaypointsSort.NONE) {
+            if (par2 >= 58.0 && par2 < (double)(this.field_22790 - 61) && this.displayedWorld.getRootConfig().getSortType() == WaypointsSort.NONE) {
                this.draggingFromX = (int)par1;
                this.draggingFromY = (int)par2;
                this.draggingFromSlot = this.list.getEntryAt(par1, par2);
@@ -460,7 +460,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    private boolean canTeleport() {
       return this.isOneSelected()
          && (this.modMain.getSettings().allowWrongWorldTeleportation || this.displayingTeleportableWorld)
-         && this.displayedWorld.getContainer().getRoot().isTeleportationEnabled();
+         && this.displayedWorld.getRootConfig().isTeleportationEnabled();
    }
 
    @Override
@@ -526,7 +526,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    }
 
    private void updateSortedList() {
-      WaypointsSort sortType = this.displayedWorld.getContainer().getRoot().getSortType();
+      WaypointsSort sortType = this.displayedWorld.getRootConfig().getSortType();
       this.waypointsSorted = new ArrayList<>();
       if (sortType == WaypointsSort.NONE) {
          for (Waypoint waypoint : this.displayedWorld.getCurrentWaypointSet().getWaypoints()) {
@@ -542,14 +542,14 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                new KeySortableByOther<>(
                   w,
                   (Comparable)(sortType == WaypointsSort.COLOR
-                     ? w.getColor()
+                     ? w.getWaypointColor()
                      : (
                         sortType == WaypointsSort.ANGLE
                            ? -w.getComparisonAngleCos(camera, distanceDivided)
                            : (
                               sortType == WaypointsSort.NAME
                                  ? w.getComparisonName()
-                                 : (sortType == WaypointsSort.SYMBOL ? w.getSymbol() : w.getComparisonDistance(camera, distanceDivided))
+                                 : (sortType == WaypointsSort.SYMBOL ? w.getInitials() : w.getComparisonDistance(camera, distanceDivided))
                            )
                      ))
                )
@@ -562,7 +562,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             this.waypointsSorted.add(k.getKey());
          }
 
-         if (this.displayedWorld.getContainer().getRoot().isSortReversed()) {
+         if (this.displayedWorld.getRootConfig().isSortReversed()) {
             Collections.reverse(this.waypointsSorted);
          }
       }
@@ -705,9 +705,8 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
 
             class_4598 renderTypeBuffers = GuiWaypoints.this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
             GuiWaypoints.this.modMain
-               .getInterfaces()
-               .getMinimapInterface()
-               .getWaypointsGuiRenderer()
+               .getMinimap()
+               .getWaypointGuiRenderer()
                .drawIconOnGUI(
                   guiGraphics,
                   GuiWaypoints.this.modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getHelper(),

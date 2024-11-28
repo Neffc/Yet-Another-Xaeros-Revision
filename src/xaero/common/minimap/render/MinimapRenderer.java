@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.GlStateManager.class_4535;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.class_1297;
 import net.minecraft.class_2338;
+import net.minecraft.class_243;
 import net.minecraft.class_287;
 import net.minecraft.class_289;
 import net.minecraft.class_290;
@@ -22,7 +23,6 @@ import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.GuiHelper;
@@ -31,12 +31,12 @@ import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
-import xaero.common.minimap.waypoints.render.CompassRenderer;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
 import xaero.hud.render.TextureLocations;
 
 public abstract class MinimapRenderer {
@@ -77,24 +77,23 @@ public abstract class MinimapRenderer {
       MinimapSession var1,
       class_332 var2,
       MinimapProcessor var3,
-      double var4,
-      double var6,
-      double var8,
-      double var10,
-      int var12,
+      class_243 var4,
+      double var5,
+      double var7,
+      int var9,
+      int var10,
+      float var11,
+      float var12,
       int var13,
-      float var14,
-      float var15,
+      boolean var14,
+      boolean var15,
       int var16,
-      boolean var17,
-      boolean var18,
-      int var19,
-      double var20,
-      double var22,
-      boolean var24,
-      boolean var25,
-      ModSettings var26,
-      CustomVertexConsumers var27
+      double var17,
+      double var19,
+      boolean var21,
+      boolean var22,
+      ModSettings var23,
+      CustomVertexConsumers var24
    );
 
    public void renderMinimap(
@@ -168,13 +167,13 @@ public abstract class MinimapRenderer {
       }
 
       this.lastPlayerDimDiv = playerDimDiv;
+      class_243 renderPos = new class_243(renderX, playerY, renderZ);
       matrixStack.method_22903();
       this.renderChunks(
          minimapSession,
          guiGraphics,
          minimap,
-         renderX,
-         renderZ,
+         renderPos,
          playerDimDiv,
          mapDimensionScale,
          mapSize,
@@ -197,7 +196,7 @@ public abstract class MinimapRenderer {
       }
 
       RenderSystem.enableBlend();
-      RenderSystem.blendFunc(770, 771);
+      RenderSystem.blendFuncSeparate(class_4535.ONE, class_4534.ONE_MINUS_SRC_ALPHA, class_4535.ZERO, class_4534.ONE);
       matrixStack.method_22905(1.0F / mapScale, 1.0F / mapScale, 1.0F);
       int scaledX = (int)((float)x * mapScale);
       int scaledY = (int)((float)y * mapScale);
@@ -237,6 +236,7 @@ public abstract class MinimapRenderer {
             );
       }
 
+      RenderSystem.defaultBlendFunc();
       if (!this.minimap.usingFBO()) {
          matrixStack.method_22905(1.0F / sizeFix, 1.0F / sizeFix, 1.0F);
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -408,15 +408,14 @@ public abstract class MinimapRenderer {
          this.renderCompass(matrixStack, settings, renderTypeBuffers, specW, specW, halfFrame, ps, pc, circleShape, minimapScale);
       }
 
+      this.minimap.getOverMapRendererHandler().prepareRender(specW, specW, halfFrame, halfFrame, circleShape, minimapScale);
       this.minimap
          .getOverMapRendererHandler()
          .render(
             guiGraphics,
             this.mc.method_1560(),
             this.mc.field_1724,
-            renderX,
-            playerY,
-            renderZ,
+            renderPos,
             playerDimDiv,
             ps,
             pc,
@@ -424,17 +423,7 @@ public abstract class MinimapRenderer {
             cave,
             partial,
             null,
-            this.modMain,
-            helper,
-            renderTypeBuffers,
-            this.mc.field_1772,
-            multiTextureRenderTypeRenderers,
-            specW,
-            specW,
-            halfFrame,
-            halfFrame,
-            circleShape,
-            minimapScale
+            multiTextureRenderTypeRenderers
          );
       if (this.modMain.getSettings().compassOverEverything) {
          this.renderCompass(matrixStack, settings, renderTypeBuffers, specW, specW, halfFrame, ps, pc, circleShape, minimapScale);
@@ -442,6 +431,12 @@ public abstract class MinimapRenderer {
 
       renderTypeBuffers.method_22993();
       matrixStack.method_22909();
+      int depthClearerX = scaledX - 25;
+      int depthClearerY = scaledY - 25;
+      int depthClearerW = 18 + mapSize / 2 + 50;
+      guiGraphics.method_51739(
+         CustomRenderTypes.DEPTH_CLEAR, depthClearerX, depthClearerY, depthClearerX + depthClearerW, depthClearerY + depthClearerW, -16777216
+      );
       RenderSystem.enableBlend();
       boolean crosshairDisplayed = settings.mainEntityAs == 0 && !lockedNorth;
       if (crosshairDisplayed) {
@@ -530,10 +525,10 @@ public abstract class MinimapRenderer {
             this.drawArrow(matrixStack, arrowAngle, 0.0, 1.0, 0.0F, 0.0F, 0.0F, 0.5F, settings);
          }
 
-         float r;
          float g;
          float b;
          float a;
+         float r;
          if (settings.arrowColour != -1) {
             float[] c = ModSettings.arrowColours[settings.arrowColour];
             r = c[0];
@@ -561,14 +556,6 @@ public abstract class MinimapRenderer {
       }
 
       matrixStack.method_22909();
-      int depthClearerX = scaledX - 25;
-      int depthClearerY = scaledY - 25;
-      int depthClearerW = 18 + mapSize / 2 + 50;
-      matrixStack.method_46416(0.0F, 0.0F, -9999.0F);
-      guiGraphics.method_51739(
-         CustomRenderTypes.DEPTH_CLEAR, depthClearerX, depthClearerY, depthClearerX + depthClearerW, depthClearerY + depthClearerW, -16777216
-      );
-      matrixStack.method_46416(0.0F, 0.0F, 9999.0F);
       this.mc.method_1531().method_22813(TextureLocations.GUI_TEXTURES);
       GL11.glTexParameteri(3553, 10240, 9728);
       GL11.glTexParameteri(3553, 10241, 9728);
@@ -577,29 +564,9 @@ public abstract class MinimapRenderer {
       int playerBlockZ = OptimizedMath.myFloor(mainEntity.method_23321());
       class_2338 pos = this.mutableBlockPos.method_10103(playerBlockX, playerBlockY, playerBlockZ);
       this.minimap
-         .getInfoDisplayRenderer()
-         .render(
-            guiGraphics,
-            XaeroMinimapSession.getCurrentSession(),
-            minimap,
-            this.minimap,
-            helper,
-            x,
-            y,
-            width,
-            height,
-            scale,
-            size,
-            playerBlockX,
-            playerBlockY,
-            playerBlockZ,
-            pos,
-            scaledX,
-            scaledY,
-            mapScale,
-            settings,
-            renderTypeBuffers
-         );
+         .getInfoDisplays()
+         .getRenderer()
+         .render(guiGraphics, minimapSession, this.minimap, height, size, pos, scaledX, scaledY, mapScale, renderTypeBuffers);
       matrixStack.method_22909();
       class_308.method_24211();
    }
@@ -631,7 +598,6 @@ public abstract class MinimapRenderer {
          this.compassRenderer
             .drawCompass(
                matrixStack,
-               this.getHelper(),
                halfFrame - 3 * compassScale,
                halfFrame - 3 * compassScale,
                ps,
@@ -644,8 +610,7 @@ public abstract class MinimapRenderer {
                nameBgBuilder
             );
       } else if (settings.compassLocation == 2) {
-         this.compassRenderer
-            .drawCompass(matrixStack, this.helper, specW, specH, ps, pc, this.zoom, circleShape, (float)compassScale, false, renderTypeBuffers, null);
+         this.compassRenderer.drawCompass(matrixStack, specW, specH, ps, pc, this.zoom, circleShape, (float)compassScale, false, renderTypeBuffers, null);
       }
    }
 

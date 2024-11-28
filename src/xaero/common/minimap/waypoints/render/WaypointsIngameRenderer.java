@@ -30,10 +30,13 @@ import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointUtil;
+import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
+import xaero.hud.minimap.waypoint.render.WaypointDeleter;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorldManager;
 
@@ -43,7 +46,7 @@ public class WaypointsIngameRenderer {
    private class_4587 identityMatrixStackOverlay;
    private Vector4f origin4f;
    private List<Waypoint> sortingList;
-   private WaypointFilterParams filterParams;
+   private xaero.hud.minimap.waypoint.render.WaypointFilterParams filterParams;
    private Predicate<Waypoint> filter;
    private Waypoint previousClosest;
    private Waypoint workingClosest;
@@ -58,19 +61,19 @@ public class WaypointsIngameRenderer {
       this.sortingList = new ArrayList<>();
       this.filterParams = new WaypointFilterParams();
       this.filter = w -> {
-         WaypointFilterParams filterParams = this.filterParams;
+         xaero.hud.minimap.waypoint.render.WaypointFilterParams filterParams = this.filterParams;
          boolean deathpoints = filterParams.deathpoints;
          if (!w.isDisabled()
-            && w.getVisibilityType() != 2
-            && w.getVisibilityType() != 3
-            && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
-            double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraX + 0.5;
-            double offY = (double)w.getY() - filterParams.cameraY + 1.0;
+            && w.getVisibility() != WaypointVisibilityType.WORLD_MAP_LOCAL
+            && w.getVisibility() != WaypointVisibilityType.WORLD_MAP_GLOBAL
+            && (!w.getPurpose().isDeath() || deathpoints)) {
+            double offX = (double)w.getX(filterParams.dimDiv) - filterParams.cameraPos.field_1352 + 0.5;
+            double offY = (double)w.getY() - filterParams.cameraPos.field_1351 + 1.0;
             if (!w.isYIncluded()) {
-               offY = filterParams.playerY - filterParams.cameraY + 1.0;
+               offY = filterParams.playerY - filterParams.cameraPos.field_1351 + 1.0;
             }
 
-            double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraZ + 0.5;
+            double offZ = (double)w.getZ(filterParams.dimDiv) - filterParams.cameraPos.field_1350 + 0.5;
             double depth = offX * (double)filterParams.lookVector.x() + offY * (double)filterParams.lookVector.y() + offZ * (double)filterParams.lookVector.z();
             if (depth <= 0.1) {
                return false;
@@ -80,9 +83,9 @@ public class WaypointsIngameRenderer {
                double distance2D = unscaledDistance2D * distanceScale;
                double waypointsDistance = filterParams.waypointsDistance;
                double waypointsDistanceMin = filterParams.waypointsDistanceMin;
-               return w.isOneoffDestination()
+               return w.isDestination()
                   || (
-                        w.getWaypointType() == 1
+                        w.getPurpose() == WaypointPurpose.DEATH
                            || w.isGlobal()
                            || w.isTemporary() && filterParams.temporaryWaypointsGlobal
                            || waypointsDistance == 0.0
@@ -177,20 +180,18 @@ public class WaypointsIngameRenderer {
          if (!sortingList.isEmpty()) {
             this.waypointReachDeleter.begin();
             ModSettings settings = this.modMain.getSettings();
-            this.filterParams
-               .setParams(
-                  d3,
-                  d4,
-                  d5,
-                  lookVector,
-                  dimDiv,
-                  settings.getDeathpoints(),
-                  settings.temporaryWaypointsGlobal,
-                  settings.getMaxWaypointsDistance(),
-                  settings.waypointsDistanceMin,
-                  smoothEntityY,
-                  settings.dimensionScaledMaxWaypointDistance
-               );
+            this.filterParams.cameraPos = cameraPos;
+            ((WaypointFilterParams)this.filterParams).cameraX = cameraPos.field_1352;
+            ((WaypointFilterParams)this.filterParams).cameraY = cameraPos.field_1351;
+            ((WaypointFilterParams)this.filterParams).cameraZ = cameraPos.field_1350;
+            this.filterParams.lookVector = lookVector;
+            this.filterParams.dimDiv = dimDiv;
+            this.filterParams.deathpoints = settings.getDeathpoints();
+            this.filterParams.temporaryWaypointsGlobal = settings.temporaryWaypointsGlobal;
+            this.filterParams.waypointsDistance = settings.getMaxWaypointsDistance();
+            this.filterParams.waypointsDistanceMin = settings.waypointsDistanceMin;
+            this.filterParams.playerY = smoothEntityY;
+            this.filterParams.dimensionScaleDistance = settings.dimensionScaledMaxWaypointDistance;
             Stream<Waypoint> waypointStream = sortingList.stream().filter(this.filter).sorted();
             class_4598 cvcRenderTypeBuffer = this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
             class_4588 waypointBackgroundConsumer = cvcRenderTypeBuffer.getBuffer(CustomRenderTypes.COLORED_WAYPOINTS_BGS);
@@ -409,8 +410,8 @@ public class WaypointsIngameRenderer {
       double correctDistance = Math.sqrt(correctOffX * correctOffX + correctOffY * correctOffY + correctOffZ * correctOffZ);
       double distance2D = Math.sqrt(offX * offX + offZ * offZ);
       double distance = Math.sqrt(offX * offX + offY * offY + offZ * offZ);
-      if ((deleteReachedDeathpoints || w.getWaypointType() != 1 && w.getWaypointType() != 2)
-         && w.isOneoffDestination()
+      if ((deleteReachedDeathpoints || !w.getPurpose().isDeath())
+         && w.isDestination()
          && System.currentTimeMillis() - w.getCreatedAt() > 5000L
          && correctDistance < 4.0) {
          this.waypointReachDeleter.add(w);
@@ -598,7 +599,7 @@ public class WaypointsIngameRenderer {
          nameScale = (double)((int)((nameScale + 1.0) / 2.0) * 2);
       }
 
-      int c = ModSettings.COLORS[w.getColor()];
+      int c = w.getWaypointColor().getHex();
       float red = (float)(c >> 16 & 0xFF) / 255.0F;
       float green = (float)(c >> 8 & 0xFF) / 255.0F;
       float blue = (float)(c & 0xFF) / 255.0F;
@@ -610,11 +611,11 @@ public class WaypointsIngameRenderer {
       int halfIconPixel = (int)iconScale / 2;
       matrixStack.method_46416((float)halfIconPixel, 0.0F, 0.0F);
       matrixStack.method_22905((float)iconScale, (float)iconScale, 1.0F);
-      if (w.getWaypointType() != 1) {
-         int initialsWidth = fontrenderer.method_1727(w.getSymbol());
+      if (w.getPurpose() != WaypointPurpose.DEATH) {
+         int initialsWidth = fontrenderer.method_1727(w.getInitials());
          addedFrame = WaypointUtil.getAddedMinimapIconFrame(addedFrame, initialsWidth);
          this.renderColorBackground(matrixStack, addedFrame, red, green, blue, alpha, waypointBackgroundConsumer);
-         Misc.drawNormalText(matrixStack, w.getSymbol(), (float)(-initialsWidth / 2), -8.0F, -1, false, renderTypeBuffer);
+         Misc.drawNormalText(matrixStack, w.getInitials(), (float)(-initialsWidth / 2), -8.0F, -1, false, renderTypeBuffer);
       } else {
          addedFrame = WaypointUtil.getAddedMinimapIconFrame(addedFrame, 7);
          this.renderColorBackground(matrixStack, addedFrame, red, green, blue, alpha, waypointBackgroundConsumer);

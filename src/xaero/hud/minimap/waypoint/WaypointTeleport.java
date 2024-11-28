@@ -18,6 +18,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.minimap.world.container.config.RootConfig;
 import xaero.hud.path.XaeroPath;
 
 public class WaypointTeleport {
@@ -39,7 +40,7 @@ public class WaypointTeleport {
 
    public boolean canTeleport(boolean displayingTeleportableWorld, MinimapWorld displayedWorld) {
       return (this.modMain.getSettings().allowWrongWorldTeleportation || displayingTeleportableWorld)
-         && displayedWorld.getContainer().getRoot().isTeleportationEnabled();
+         && displayedWorld.getRootConfig().isTeleportationEnabled();
    }
 
    public void teleportAnyway() {
@@ -57,7 +58,7 @@ public class WaypointTeleport {
    }
 
    public void teleportToWaypoint(Waypoint waypoint, MinimapWorld world, class_437 screen, boolean respectHiddenCoords) {
-      this.minimapSession.getWorldStateUpdater().update(world.getContainer().getSession());
+      this.minimapSession.getWorldStateUpdater().update();
       boolean isTeleportableWorld = this.isWorldTeleportable(world);
       if (waypoint != null && this.canTeleport(isTeleportableWorld, world)) {
          this.mc.method_1507(null);
@@ -142,13 +143,12 @@ public class WaypointTeleport {
                   z = (int)Math.floor((double)z / dimDiv);
                }
 
-               String serverTpCommand = waypoint.isRotation()
-                  ? rootContainer.getServerTeleportCommandRotationFormat()
-                  : rootContainer.getServerTeleportCommandFormat();
+               RootConfig config = rootContainer.getConfig();
+               String serverTpCommand = waypoint.isRotation() ? config.getServerTeleportCommandRotationFormat() : config.getServerTeleportCommandFormat();
                String defaultTpCommand = waypoint.isRotation()
                   ? this.modMain.getSettings().defaultWaypointTPCommandRotationFormat
                   : this.modMain.getSettings().defaultWaypointTPCommandFormat;
-               String tpCommand = !rootContainer.isUsingDefaultTeleportCommand() && serverTpCommand != null ? serverTpCommand : defaultTpCommand;
+               String tpCommand = !config.isUsingDefaultTeleportCommand() && serverTpCommand != null ? serverTpCommand : defaultTpCommand;
                if (!fullCommand.isEmpty()) {
                   if (tpCommand.startsWith("/")) {
                      tpCommand = tpCommand.substring(1);

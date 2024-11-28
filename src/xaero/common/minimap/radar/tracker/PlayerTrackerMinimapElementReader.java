@@ -2,7 +2,8 @@ package xaero.common.minimap.radar.tracker;
 
 import net.minecraft.class_310;
 import net.minecraft.class_640;
-import xaero.common.minimap.element.render.MinimapElementReader;
+import xaero.hud.minimap.element.render.MinimapElementReader;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 
 public class PlayerTrackerMinimapElementReader extends MinimapElementReader<PlayerTrackerMinimapElement<?>, PlayerTrackerMinimapElementRenderContext> {
    public boolean isHidden(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context) {
@@ -80,7 +81,7 @@ public class PlayerTrackerMinimapElementReader extends MinimapElementReader<Play
       return true;
    }
 
-   public boolean isInteractable(int location, PlayerTrackerMinimapElement<?> element) {
+   public boolean isInteractable(MinimapElementRenderLocation location, PlayerTrackerMinimapElement<?> element) {
       return true;
    }
 }

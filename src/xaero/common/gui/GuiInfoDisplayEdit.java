@@ -18,9 +18,9 @@ import net.minecraft.class_6382;
 import net.minecraft.class_4280.class_4281;
 import xaero.common.IXaeroMinimap;
 import xaero.common.gui.dropdown.DropDownWidget;
-import xaero.common.minimap.info.InfoDisplay;
-import xaero.common.minimap.info.InfoDisplayManager;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.info.InfoDisplay;
+import xaero.hud.minimap.info.InfoDisplayManager;
 
 public class GuiInfoDisplayEdit extends ScreenBase {
    private static final int FRAME_TOP_SIZE = 30;
@@ -36,9 +36,9 @@ public class GuiInfoDisplayEdit extends ScreenBase {
 
    protected GuiInfoDisplayEdit(IXaeroMinimap modMain, class_437 parent, class_437 escape) {
       super(modMain, parent, escape, class_2561.method_43471("gui.xaero_minimap_info_display_manager"));
-      this.manager = modMain.getInterfaces().getMinimapInterface().getInfoDisplayManager();
+      this.manager = modMain.getMinimap().getInfoDisplays().getManager();
       this.currentOrder = new ArrayList<>();
-      this.manager.getStream().forEach(info -> this.currentOrder.add(info.getId()));
+      this.manager.getOrderedStream().forEach(info -> this.currentOrder.add(info.getId()));
       this.moveableEntries = new HashMap<>();
       this.selected = -1;
       this.subSelected = -1;
@@ -78,7 +78,7 @@ public class GuiInfoDisplayEdit extends ScreenBase {
    }
 
    private <T> void addSubElements(GuiInfoDisplayEdit.MoveableEntry moveable, InfoDisplay<T> infoDisplay) {
-      class_339 stateWidget = infoDisplay.getWidgetFactory().create(this.field_22789 / 2 + 150 - 102, 0, 100, 20, infoDisplay, this.modMain.getSettings());
+      class_339 stateWidget = infoDisplay.createWidget(this.field_22789 / 2 + 150 - 102, 0, 100, 20);
       if (stateWidget != null) {
          moveable.addSubElement(stateWidget);
       }

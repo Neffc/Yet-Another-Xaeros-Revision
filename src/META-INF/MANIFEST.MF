@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Specification-Title: xaerohud
 Specification-Vendor: xaero96
-Specification-Version: 24.4.0
+Specification-Version: 24.5.0
 Implementation-Title: fabric_minimap
-Implementation-Version: 24.4.0
+Implementation-Version: 24.5.0
 Implementation-Vendor: xaero96
-Implementation-Timestamp: 2024-09-01T11:18:04+0300
-Timestamp: 1725178684651
+Implementation-Timestamp: 2024-09-30T13:05:50+0300
+Timestamp: 1727690750544
 Built-On-Java: 17.0.9+9 (Eclipse Adoptium)
 Built-On-Minecraft: 1.20.1
 Fabric-Jar-Type: classes

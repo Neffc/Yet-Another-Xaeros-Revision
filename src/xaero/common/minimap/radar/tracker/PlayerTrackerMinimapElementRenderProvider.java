@@ -1,7 +1,8 @@
 package xaero.common.minimap.radar.tracker;
 
 import java.util.Iterator;
-import xaero.common.minimap.element.render.MinimapElementRenderProvider;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
+import xaero.hud.minimap.element.render.MinimapElementRenderProvider;
 
 public class PlayerTrackerMinimapElementRenderProvider<C> extends MinimapElementRenderProvider<PlayerTrackerMinimapElement<?>, C> {
    private PlayerTrackerMinimapElementCollector collector;
@@ -12,21 +13,21 @@ public class PlayerTrackerMinimapElementRenderProvider<C> extends MinimapElement
    }
 
    @Override
-   public void begin(int location, C context) {
+   public void begin(MinimapElementRenderLocation location, C context) {
       this.iterator = this.collector.getElements().iterator();
    }
 
    @Override
-   public boolean hasNext(int location, C context) {
+   public boolean hasNext(MinimapElementRenderLocation location, C context) {
       return this.iterator != null && this.iterator.hasNext();
    }
 
-   public PlayerTrackerMinimapElement<?> getNext(int location, C context) {
+   public PlayerTrackerMinimapElement<?> getNext(MinimapElementRenderLocation location, C context) {
       return this.iterator.next();
    }
 
    @Override
-   public void end(int location, C context) {
+   public void end(MinimapElementRenderLocation location, C context) {
       this.iterator = null;
    }
 }

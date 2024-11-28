@@ -1,4 +1,4 @@
-package xaero.hud.minimap.world.container.io;
+package xaero.hud.minimap.world.container.config.io;
 
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import java.io.BufferedReader;
@@ -20,6 +20,7 @@ import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.world.container.MinimapWorldContainer;
 import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.minimap.world.container.config.RootConfig;
 import xaero.hud.path.XaeroPath;
 import xaero.hud.path.XaeroPathReader;
 
@@ -47,31 +48,32 @@ public class RootConfigIO {
    public void save(MinimapWorldRootContainer rootContainer) {
       File configFile = this.getFile(rootContainer);
       PrintWriter writer = null;
+      RootConfig config = rootContainer.getConfig();
 
       try {
          writer = new PrintWriter(new FileWriter(configFile));
          writer.println("//waypoints config options");
-         writer.println("usingMultiworldDetection:" + rootContainer.isUsingMultiworldDetection());
-         writer.println("ignoreServerLevelId:" + rootContainer.isIgnoreServerLevelId());
-         if (rootContainer.getDefaultMultiworldId() != null) {
-            writer.println("defaultMultiworldId:" + rootContainer.getDefaultMultiworldId());
+         writer.println("usingMultiworldDetection:" + config.isUsingMultiworldDetection());
+         writer.println("ignoreServerLevelId:" + config.isIgnoreServerLevelId());
+         if (config.getDefaultMultiworldId() != null) {
+            writer.println("defaultMultiworldId:" + config.getDefaultMultiworldId());
          }
 
-         writer.println("teleportationEnabled:" + rootContainer.isTeleportationEnabled());
-         writer.println("usingDefaultTeleportCommand:" + rootContainer.isUsingDefaultTeleportCommand());
-         if (rootContainer.getServerTeleportCommandFormat() != null) {
-            writer.println("serverTeleportCommandFormat:" + rootContainer.getServerTeleportCommandFormat().replace(":", "^col^"));
+         writer.println("teleportationEnabled:" + config.isTeleportationEnabled());
+         writer.println("usingDefaultTeleportCommand:" + config.isUsingDefaultTeleportCommand());
+         if (config.getServerTeleportCommandFormat() != null) {
+            writer.println("serverTeleportCommandFormat:" + config.getServerTeleportCommandFormat().replace(":", "^col^"));
          }
 
-         if (rootContainer.getServerTeleportCommandRotationFormat() != null) {
-            writer.println("serverTeleportCommandRotationFormat:" + rootContainer.getServerTeleportCommandRotationFormat().replace(":", "^col^"));
+         if (config.getServerTeleportCommandRotationFormat() != null) {
+            writer.println("serverTeleportCommandRotationFormat:" + config.getServerTeleportCommandRotationFormat().replace(":", "^col^"));
          }
 
-         writer.println("sortType:" + rootContainer.getSortType().name());
-         writer.println("sortReversed:" + rootContainer.isSortReversed());
+         writer.println("sortType:" + config.getSortType().name());
+         writer.println("sortReversed:" + config.isSortReversed());
          writer.println("");
          writer.println("//other config options");
-         writer.println("ignoreHeightmaps:" + rootContainer.isIgnoreHeightmaps());
+         writer.println("ignoreHeightmaps:" + config.isIgnoreHeightmaps());
          rootContainer.getSubWorldConnections().save(writer);
          writer.println("");
          writer.println("//dimension types (DO NOT EDIT)");
@@ -83,10 +85,10 @@ public class RootConfigIO {
          writer.println("//server waypoints");
 
          for (MinimapWorldContainer dimContainer : rootContainer.getSubContainers()) {
-            IntIterator var6 = dimContainer.getServerWaypointManager().getIds().iterator();
+            IntIterator var7 = dimContainer.getServerWaypointManager().getIds().iterator();
 
-            while (var6.hasNext()) {
-               int serverWaypointId = (Integer)var6.next();
+            while (var7.hasNext()) {
+               int serverWaypointId = (Integer)var7.next();
                Waypoint serverWaypoint = dimContainer.getServerWaypointManager().getById(serverWaypointId);
                writer.print("server-waypoint");
                writer.print(":");
@@ -97,8 +99,8 @@ public class RootConfigIO {
                writer.println(serverWaypoint.isDisabled());
             }
          }
-      } catch (IOException var9) {
-         MinimapLogs.LOGGER.error("suppressed exception", var9);
+      } catch (IOException var10) {
+         MinimapLogs.LOGGER.error("suppressed exception", var10);
       }
 
       if (writer != null) {
@@ -107,7 +109,8 @@ public class RootConfigIO {
    }
 
    public void load(MinimapWorldRootContainer rootContainer) {
-      rootContainer.confirmConfigLoad();
+      RootConfig config = rootContainer.getConfig();
+      config.setLoaded(true);
       File configFile = this.getFile(rootContainer);
       if (!configFile.exists()) {
          this.save(rootContainer);
@@ -122,43 +125,47 @@ public class RootConfigIO {
                String[] args = line.split(":");
                String valueString = args.length < 2 ? "" : args[1];
                if (args[0].equals("usingMultiworldDetection")) {
-                  rootContainer.setUsingMultiworldDetection(valueString.equals("true"));
+                  config.setUsingMultiworldDetection(valueString.equals("true"));
                } else if (args[0].equals("ignoreServerLevelId")) {
-                  rootContainer.setIgnoreServerLevelId(valueString.equals("true"));
+                  config.setIgnoreServerLevelId(valueString.equals("true"));
                } else if (args[0].equals("defaultMultiworldId")) {
-                  rootContainer.setDefaultMultiworldId(valueString);
+                  if (valueString.matches("[a-zA-Z,$0-9-]+")) {
+                     config.setDefaultMultiworldId(valueString);
+                  } else {
+                     MinimapLogs.LOGGER.warn("Ignoring invalid defaultMultiworldId in {}", configFile);
+                  }
                } else if (args[0].equals("teleportationEnabled")) {
-                  rootContainer.setTeleportationEnabled(valueString.equals("true"));
+                  config.setTeleportationEnabled(valueString.equals("true"));
                } else if (args[0].equals("usingDefaultTeleportCommand")) {
-                  rootContainer.setUsingDefaultTeleportCommand(valueString.equals("true"));
+                  config.setUsingDefaultTeleportCommand(valueString.equals("true"));
                } else if (args[0].equals("teleportCommand")) {
-                  rootContainer.setServerTeleportCommandFormat("/" + valueString.replace("^col^", ":") + " {x} {y} {z}");
-                  rootContainer.setServerTeleportCommandRotationFormat("/" + valueString.replace("^col^", ":") + " {x} {y} {z} {yaw} ~");
+                  config.setServerTeleportCommandFormat("/" + valueString.replace("^col^", ":") + " {x} {y} {z}");
+                  config.setServerTeleportCommandRotationFormat("/" + valueString.replace("^col^", ":") + " {x} {y} {z} {yaw} ~");
                } else if (args[0].equals("serverTeleportCommand")) {
-                  rootContainer.setServerTeleportCommandFormat(valueString.replace("^col^", ":") + " {x} {y} {z}");
-                  rootContainer.setServerTeleportCommandRotationFormat(valueString.replace("^col^", ":") + " {x} {y} {z} {yaw} ~");
+                  config.setServerTeleportCommandFormat(valueString.replace("^col^", ":") + " {x} {y} {z}");
+                  config.setServerTeleportCommandRotationFormat(valueString.replace("^col^", ":") + " {x} {y} {z} {yaw} ~");
                } else if (args[0].equals("serverTeleportCommandFormat")) {
-                  rootContainer.setServerTeleportCommandFormat(valueString.replace("^col^", ":"));
+                  config.setServerTeleportCommandFormat(valueString.replace("^col^", ":"));
                } else if (args[0].equals("serverTeleportCommandRotationFormat")) {
-                  rootContainer.setServerTeleportCommandRotationFormat(valueString.replace("^col^", ":"));
+                  config.setServerTeleportCommandRotationFormat(valueString.replace("^col^", ":"));
                } else if (args[0].equals("sortType")) {
-                  rootContainer.setSortType(WaypointsSort.valueOf(valueString));
+                  config.setSortType(WaypointsSort.valueOf(valueString));
                } else if (args[0].equals("sortReversed")) {
-                  rootContainer.setSortReversed(valueString.equals("true"));
+                  config.setSortReversed(valueString.equals("true"));
                } else if (args[0].equals("ignoreHeightmaps")) {
-                  rootContainer.setIgnoreHeightmaps(valueString.equals("true"));
+                  config.setIgnoreHeightmaps(valueString.equals("true"));
                } else if (args[0].equals("connection")) {
                   XaeroPath worldKey1 = new XaeroPathReader().read(valueString);
                   if (args.length > 2) {
                      XaeroPath worldKey2 = new XaeroPathReader().read(args[2]);
-                     rootContainer.getSubWorldConnections().addConnection(worldKey1, worldKey2);
+                     config.getSubWorldConnections().addConnection(worldKey1, worldKey2);
                   }
                } else if (args[0].equals("dimensionType")) {
                   try {
                      rootContainer.setDimensionTypeId(
                         class_5321.method_29179(class_7924.field_41223, new class_2960(args[1].replace('$', ':'))), new class_2960(args[2].replace('$', ':'))
                      );
-                  } catch (Throwable var11) {
+                  } catch (Throwable var12) {
                   }
                } else if (args[0].equals("server-waypoint")) {
                   String dimensionNode = args[1];
@@ -169,15 +176,15 @@ public class RootConfigIO {
                   }
                }
             }
-         } catch (IOException var12) {
-            MinimapLogs.LOGGER.error("suppressed exception", var12);
+         } catch (IOException var13) {
+            MinimapLogs.LOGGER.error("suppressed exception", var13);
          }
 
          if (reader != null) {
             try {
                reader.close();
-            } catch (IOException var10) {
-               MinimapLogs.LOGGER.error("suppressed exception", var10);
+            } catch (IOException var11) {
+               MinimapLogs.LOGGER.error("suppressed exception", var11);
             }
          }
       }

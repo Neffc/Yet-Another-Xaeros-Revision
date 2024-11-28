@@ -257,6 +257,10 @@ public class DropDownWidget extends class_339 {
       if (id == -1) {
          this.setClosed(true);
       } else {
+         if (id < 0 || id >= this.realOptions.length) {
+            id = 0;
+         }
+
          boolean newId = id != this.selected;
          if (newId && (!callCallback || this.callback.onSelected(this, id))) {
             this.selected = id;

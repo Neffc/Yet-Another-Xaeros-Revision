@@ -1,9 +1,12 @@
 package xaero.common.minimap.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.class_4534;
+import com.mojang.blaze3d.platform.GlStateManager.class_4535;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
+import net.minecraft.class_243;
 import net.minecraft.class_308;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
@@ -11,8 +14,10 @@ import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_583;
 import net.minecraft.class_630;
+import net.minecraft.class_8251;
 import net.minecraft.class_4587.class_4665;
 import net.minecraft.class_4597.class_4598;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
 import xaero.common.effect.Effects;
@@ -23,7 +28,6 @@ import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendere
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.graphics.shader.MinimapShaders;
 import xaero.common.minimap.MinimapProcessor;
-import xaero.common.minimap.element.render.map.MinimapElementMapRendererHandler;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
@@ -31,15 +35,17 @@ import xaero.common.minimap.region.MinimapChunk;
 import xaero.common.minimap.render.radar.EntityIconManager;
 import xaero.common.minimap.render.radar.EntityIconPrerenderer;
 import xaero.common.minimap.render.radar.element.RadarRenderer;
-import xaero.common.minimap.waypoints.render.CompassRenderer;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.hud.compat.mods.ImmediatelyFastHelper;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.compass.render.CompassRenderer;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
+import xaero.hud.minimap.element.render.map.MinimapElementMapRendererHandler;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
 
 public class MinimapFBORenderer extends MinimapRenderer {
    private ImprovedFramebuffer scalingFramebuffer;
@@ -84,8 +90,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
       MinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
-      double playerX,
-      double playerZ,
+      class_243 renderPos,
       double playerDimDiv,
       double mapDimensionScale,
       int mapSize,
@@ -110,8 +115,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
             minimap,
             this.mc.field_1724,
             this.mc.method_1560(),
-            playerX,
-            playerZ,
+            renderPos,
             playerDimDiv,
             mapDimensionScale,
             bufferSize,
@@ -142,8 +146,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
       MinimapProcessor minimap,
       class_1657 player,
       class_1297 renderEntity,
-      double playerX,
-      double playerZ,
+      class_243 renderPos,
       double playerDimDiv,
       double mapDimensionScale,
       int bufferSize,
@@ -161,13 +164,15 @@ public class MinimapFBORenderer extends MinimapRenderer {
       boolean circle,
       CustomVertexConsumers cvc
    ) {
+      Matrix4f projectionMatrixBackup = RenderSystem.getProjectionMatrix();
+      class_8251 vertexSortingBackup = RenderSystem.getVertexSorting();
       class_4587 matrixStack = guiGraphics.method_51448();
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers = minimapSession.getMultiTextureRenderTypeRenderers();
       double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
       double halfMaxVisibleLength = maxVisibleLength / 2.0;
       double radiusBlocks = maxVisibleLength / 2.0 / this.zoom;
-      int xFloored = OptimizedMath.myFloor(playerX);
-      int zFloored = OptimizedMath.myFloor(playerZ);
+      int xFloored = OptimizedMath.myFloor(renderPos.field_1352);
+      int zFloored = OptimizedMath.myFloor(renderPos.field_1350);
       int playerChunkX = xFloored >> 6;
       int playerChunkZ = zFloored >> 6;
       int offsetX = xFloored & 63;
@@ -179,17 +184,17 @@ public class MinimapFBORenderer extends MinimapRenderer {
       class_308.method_24210();
       long before = System.currentTimeMillis();
       GlStateManager._clear(256, class_310.field_1703);
-      this.helper.defaultOrtho(this.scalingFramebuffer, false);
+      this.helper.defaultOrtho(this.scalingFramebuffer);
       class_4587 shaderMatrixStack = RenderSystem.getModelViewStack();
       shaderMatrixStack.method_22903();
       shaderMatrixStack.method_34426();
       before = System.currentTimeMillis();
-      double xInsidePixel = playerX - (double)xFloored;
+      double xInsidePixel = renderPos.field_1352 - (double)xFloored;
       if (xInsidePixel < 0.0) {
          xInsidePixel++;
       }
 
-      double zInsidePixel = playerZ - (double)zFloored;
+      double zInsidePixel = renderPos.field_1350 - (double)zFloored;
       if (zInsidePixel < 0.0) {
          zInsidePixel++;
       }
@@ -384,32 +389,27 @@ public class MinimapFBORenderer extends MinimapRenderer {
 
       shaderMatrixStack.method_22904(-xInsidePixel * this.zoom, -zInsidePixel * this.zoom, 0.0);
       RenderSystem.applyModelViewMatrix();
-      RenderSystem.disableBlend();
+      RenderSystem.enableBlend();
+      RenderSystem.blendFuncSeparate(class_4535.SRC_ALPHA, class_4534.ZERO, class_4535.ONE, class_4534.ZERO);
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
       this.helper.drawMyTexturedModalRect(matrixStack, -256.0F, -256.0F, 0, 0, 512.0F, 512.0F, 512.0F, 512.0F);
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       shaderMatrixStack.method_22909();
       RenderSystem.applyModelViewMatrix();
       before = System.currentTimeMillis();
-      RenderSystem.disableBlend();
-      RenderSystem.blendFuncSeparate(770, 771, 1, 1);
-      GlStateManager._depthFunc(519);
-      GlStateManager._depthFunc(515);
-      GlStateManager._depthMask(false);
-      GlStateManager._depthMask(true);
+      CustomRenderTypes.resetTransparency();
+      CustomRenderTypes.resetDepthTest();
+      CustomRenderTypes.resetWriteMask();
       GL11.glBindTexture(3553, 0);
       GlStateManager._bindTexture(0);
-      GlStateManager._enableBlend();
-      GlStateManager._blendFuncSeparate(770, 771, 1, 771);
       matrixStack.method_22903();
+      this.minimapElementMapRendererHandler.prepareRender(halfWView);
       this.minimapElementMapRendererHandler
          .render(
             guiGraphics,
             renderEntity,
             player,
-            playerX,
-            renderEntity.method_23318(),
-            playerZ,
+            renderPos,
             playerDimDiv,
             ps,
             pc,
@@ -417,20 +417,14 @@ public class MinimapFBORenderer extends MinimapRenderer {
             cave,
             partial,
             this.rotationFramebuffer,
-            this.modMain,
-            this.helper,
-            renderTypeBuffers,
-            this.mc.field_1772,
-            multiTextureRenderTypeRenderers,
-            halfWView
+            multiTextureRenderTypeRenderers
          );
       matrixStack.method_22909();
       renderTypeBuffers.method_22993();
       ImmediatelyFastHelper.triggerBatchingBuffersFlush(guiGraphics);
       this.rotationFramebuffer.method_1240();
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      RenderSystem.disableBlend();
-      Misc.minecraftOrtho(this.mc, false);
+      RenderSystem.setProjectionMatrix(projectionMatrixBackup, vertexSortingBackup);
       shaderMatrixStack.method_22909();
       RenderSystem.applyModelViewMatrix();
    }
@@ -506,7 +500,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
       int dotSize = settings.mainDotSize;
       this.radarRenderer
          .renderEntityDotToFBO(
-            1,
+            MinimapElementRenderLocation.OVER_MINIMAP,
             false,
             guiGraphics,
             minimap,

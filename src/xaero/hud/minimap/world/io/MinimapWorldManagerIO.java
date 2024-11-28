@@ -27,7 +27,7 @@ import xaero.hud.minimap.waypoint.io.WaypointIO;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.container.MinimapWorldContainer;
 import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
-import xaero.hud.minimap.world.container.io.RootConfigIO;
+import xaero.hud.minimap.world.container.config.io.RootConfigIO;
 import xaero.hud.path.XaeroPath;
 
 public class MinimapWorldManagerIO {

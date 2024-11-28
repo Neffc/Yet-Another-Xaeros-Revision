@@ -23,125 +23,27 @@ import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointSession;
 import xaero.hud.minimap.world.connection.MinimapWorldConnectionManager;
+import xaero.hud.minimap.world.container.config.RootConfig;
 import xaero.hud.path.XaeroPath;
 
 public class MinimapWorldRootContainer extends WaypointWorldContainer {
-   private boolean configLoaded = false;
-   private boolean usingMultiworldDetection = false;
-   private boolean ignoreServerLevelId = false;
-   private String defaultMultiworldId;
-   private boolean teleportationEnabled = true;
-   private boolean usingDefaultTeleportCommand = true;
-   private String serverTeleportCommandFormat;
-   private String serverTeleportCommandRotationFormat;
-   private WaypointsSort sortType = WaypointsSort.NONE;
-   private boolean sortReversed;
-   private boolean ignoreHeightmaps;
-   private MinimapWorldConnectionManager subWorldConnections;
-   private Map<class_5321<class_1937>, class_2960> dimensionTypeIds;
-   private Map<class_5321<class_1937>, class_2874> dimensionTypes;
+   private final RootConfig config;
+   private final Map<class_5321<class_1937>, class_2960> dimensionTypeIds;
+   private final Map<class_5321<class_1937>, class_2874> dimensionTypes;
 
    protected MinimapWorldRootContainer(HudMod modMain, MinimapSession session, XaeroPath path) {
       super(modMain, session, path, null);
-      this.updateConnectionsField(session.getWaypointSession());
+      this.config = new RootConfig(MinimapWorldContainerUtil.isMultiplayer(path));
       this.dimensionTypeIds = new HashMap<>();
       this.dimensionTypes = new HashMap<>();
    }
 
    public void updateConnectionsField(WaypointSession session) {
-      this.subWorldConnections = MinimapWorldConnectionManager.Builder.begin().setMultiplayer(MinimapWorldContainerUtil.isMultiplayer(this.path)).build();
-   }
-
-   public boolean isUsingMultiworldDetection() {
-      return this.usingMultiworldDetection;
-   }
-
-   public void setUsingMultiworldDetection(boolean usingMultiworldDetection) {
-      this.usingMultiworldDetection = usingMultiworldDetection;
-   }
-
-   public String getDefaultMultiworldId() {
-      return this.defaultMultiworldId;
-   }
-
-   public void setDefaultMultiworldId(String defaultMultiworldId) {
-      this.defaultMultiworldId = defaultMultiworldId;
-   }
-
-   public boolean isTeleportationEnabled() {
-      return this.teleportationEnabled;
-   }
-
-   public void setTeleportationEnabled(boolean teleportation) {
-      this.teleportationEnabled = teleportation;
-   }
-
-   public boolean isUsingDefaultTeleportCommand() {
-      return this.usingDefaultTeleportCommand;
-   }
-
-   public void setUsingDefaultTeleportCommand(boolean usingDefaultTeleportCommand) {
-      this.usingDefaultTeleportCommand = usingDefaultTeleportCommand;
-   }
-
-   public String getServerTeleportCommandFormat() {
-      return this.serverTeleportCommandFormat;
-   }
-
-   public String getServerTeleportCommandRotationFormat() {
-      return this.serverTeleportCommandRotationFormat;
-   }
-
-   public void setServerTeleportCommandFormat(String serverTeleportCommandFormat) {
-      this.serverTeleportCommandFormat = serverTeleportCommandFormat;
-   }
-
-   public void setServerTeleportCommandRotationFormat(String serverTeleportCommandRotationFormat) {
-      this.serverTeleportCommandRotationFormat = serverTeleportCommandRotationFormat;
-   }
-
-   public WaypointsSort getSortType() {
-      return this.sortType;
-   }
-
-   public void setSortType(WaypointsSort sortType) {
-      this.sortType = sortType;
-   }
-
-   public void toggleSortType() {
-      this.sortType = WaypointsSort.values()[(this.sortType.ordinal() + 1) % WaypointsSort.values().length];
-   }
-
-   public boolean isSortReversed() {
-      return this.sortReversed;
-   }
-
-   public void setSortReversed(boolean sortReversed) {
-      this.sortReversed = sortReversed;
-   }
-
-   public void toggleSortReversed() {
-      this.sortReversed = !this.sortReversed;
-   }
-
-   public boolean isIgnoreServerLevelId() {
-      return this.ignoreServerLevelId;
-   }
-
-   public void setIgnoreServerLevelId(boolean ignoreServerLevelId) {
-      this.ignoreServerLevelId = ignoreServerLevelId;
+      this.config.resetSubWorldConnections(MinimapWorldContainerUtil.isMultiplayer(this.path));
    }
 
    public MinimapWorldConnectionManager getSubWorldConnections() {
-      return this.subWorldConnections;
-   }
-
-   public boolean isIgnoreHeightmaps() {
-      return this.ignoreHeightmaps;
-   }
-
-   public void setIgnoreHeightmaps(boolean ignoreHeightmaps) {
-      this.ignoreHeightmaps = ignoreHeightmaps;
+      return this.config.getSubWorldConnections();
    }
 
    public class_2874 getDimensionType(class_5321<class_1937> dimId) {
@@ -243,10 +145,6 @@ public class MinimapWorldRootContainer extends WaypointWorldContainer {
       }
    }
 
-   public void confirmConfigLoad() {
-      this.configLoaded = true;
-   }
-
    public Iterable<Entry<class_5321<class_1937>, class_2960>> getDimensionTypeIds() {
       return this.dimensionTypeIds.entrySet();
    }
@@ -262,7 +160,141 @@ public class MinimapWorldRootContainer extends WaypointWorldContainer {
    }
 
    public boolean isConfigLoaded() {
-      return this.configLoaded;
+      return this.config.isLoaded();
+   }
+
+   public RootConfig getConfig() {
+      return this.config;
+   }
+
+   @Deprecated
+   public boolean isUsingMultiworldDetection() {
+      return this.config.isUsingMultiworldDetection();
+   }
+
+   @Deprecated
+   public void setUsingMultiworldDetection(boolean usingMultiworldDetection) {
+      this.config.setUsingMultiworldDetection(usingMultiworldDetection);
+   }
+
+   @Deprecated
+   public String getDefaultMultiworldId() {
+      return this.config.getDefaultMultiworldId();
+   }
+
+   @Deprecated
+   public void setDefaultMultiworldId(String defaultMultiworldId) {
+      this.config.setDefaultMultiworldId(defaultMultiworldId);
+   }
+
+   @Deprecated
+   public boolean isTeleportationEnabled() {
+      return this.config.isTeleportationEnabled();
+   }
+
+   @Deprecated
+   public void setTeleportationEnabled(boolean teleportation) {
+      this.config.setTeleportationEnabled(teleportation);
+   }
+
+   @Deprecated
+   public boolean isUsingDefaultTeleportCommand() {
+      return this.config.isUsingDefaultTeleportCommand();
+   }
+
+   @Deprecated
+   public void setUsingDefaultTeleportCommand(boolean usingDefaultTeleportCommand) {
+      this.config.setUsingDefaultTeleportCommand(usingDefaultTeleportCommand);
+   }
+
+   @Deprecated
+   public String getServerTeleportCommandFormat() {
+      return this.config.getServerTeleportCommandFormat();
+   }
+
+   @Deprecated
+   public String getServerTeleportCommandRotationFormat() {
+      return this.config.getServerTeleportCommandRotationFormat();
+   }
+
+   @Deprecated
+   public void setServerTeleportCommandFormat(String serverTeleportCommandFormat) {
+      this.config.setServerTeleportCommandFormat(serverTeleportCommandFormat);
+   }
+
+   @Deprecated
+   public void setServerTeleportCommandRotationFormat(String serverTeleportCommandRotationFormat) {
+      this.config.setServerTeleportCommandRotationFormat(serverTeleportCommandRotationFormat);
+   }
+
+   @Deprecated
+   public WaypointsSort getSortType() {
+      return this.config.getSortType();
+   }
+
+   @Deprecated
+   public void setSortType(WaypointsSort sortType) {
+      this.config.setSortType(sortType);
+   }
+
+   @Deprecated
+   public void toggleSortType() {
+      this.config.toggleSortType();
+   }
+
+   @Deprecated
+   public boolean isSortReversed() {
+      return this.config.isSortReversed();
+   }
+
+   @Deprecated
+   public void setSortReversed(boolean sortReversed) {
+      this.config.setSortReversed(sortReversed);
+   }
+
+   @Deprecated
+   public void toggleSortReversed() {
+      this.config.toggleSortReversed();
+   }
+
+   @Deprecated
+   public boolean isIgnoreServerLevelId() {
+      return this.config.isIgnoreServerLevelId();
+   }
+
+   @Deprecated
+   public void setIgnoreServerLevelId(boolean ignoreServerLevelId) {
+      this.config.setIgnoreServerLevelId(ignoreServerLevelId);
+   }
+
+   @Deprecated
+   public boolean isIgnoreHeightmaps() {
+      return this.config.isIgnoreHeightmaps();
+   }
+
+   @Deprecated
+   public void setIgnoreHeightmaps(boolean ignoreHeightmaps) {
+      this.config.setIgnoreHeightmaps(ignoreHeightmaps);
+   }
+
+   @Override
+   public boolean isEmpty() {
+      return super.isEmpty();
+   }
+
+   @Override
+   public String getName(String worldNode) {
+      return super.getName(worldNode);
+   }
+
+   @Override
+   public void removeName(String worldNode) {
+      super.removeName(worldNode);
+   }
+
+   @Override
+   public String getSubName() {
+      return super.getSubName();
    }
 
    public static final class Builder {

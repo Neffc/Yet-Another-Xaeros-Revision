@@ -2,7 +2,6 @@ package xaero.hud.minimap.waypoint;
 
 import net.minecraft.class_310;
 import xaero.common.HudMod;
-import xaero.common.minimap.waypoints.WaypointSharingHandler;
 import xaero.hud.minimap.module.MinimapSession;
 
 public class WaypointSession {
@@ -17,7 +16,7 @@ public class WaypointSession {
    public WaypointSession(HudMod modMain, MinimapSession session) {
       this.session = session;
       this.mc = class_310.method_1551();
-      this.sharing = new WaypointSharingHandler(modMain, session);
+      this.sharing = WaypointSharingHandler.Builder.begin().setModMain(modMain).setSession(session).build();
       this.deathpointHandler = new DeathpointHandler(modMain, session);
       this.temporaryHandler = new TemporaryWaypointHandler(modMain);
       this.teleport = new WaypointTeleport(modMain, this, session);

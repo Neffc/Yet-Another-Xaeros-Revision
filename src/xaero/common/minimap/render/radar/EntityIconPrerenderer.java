@@ -79,6 +79,8 @@ public class EntityIconPrerenderer {
    private ResolvedFieldModelRootPathListener resolvedFieldModelRootPathListener;
    private LivingEntityRotationResetter livingEntityRotationResetter;
    private final XaeroIconAtlasManager iconAtlasManager;
+   private Matrix4f projectionMatrixBackup;
+   private class_8251 vertexSortingBackup;
    private class_4598 entityIconRenderTypeBuffer = class_4597.method_22991(new class_287(256));
    public static boolean DETECTING_MODEL_RENDERS;
    private class_1297 modelRenderDetectionEntity;
@@ -532,6 +534,8 @@ public class EntityIconPrerenderer {
 
    private void setupMatrices(class_4587 matrixStack, int finalIconSize, int farPlane) {
       this.shaderMatrixBackup = RenderSystem.getModelViewStack().method_23760();
+      this.projectionMatrixBackup = RenderSystem.getProjectionMatrix();
+      this.vertexSortingBackup = RenderSystem.getVertexSorting();
       matrixStack.method_22903();
       matrixStack.method_34426();
       Matrix4f ortho = new Matrix4f().setOrtho(0.0F, (float)finalIconSize, 0.0F, (float)finalIconSize, -1.0F, (float)farPlane);
@@ -543,7 +547,7 @@ public class EntityIconPrerenderer {
 
    private void restoreMatrices(class_4587 matrixStack, MinimapRendererHelper helper, class_276 framebuffer) {
       matrixStack.method_22909();
-      helper.defaultOrtho(framebuffer, false);
+      RenderSystem.setProjectionMatrix(this.projectionMatrixBackup, this.vertexSortingBackup);
       if (RenderSystem.getModelViewStack().method_23760() != this.shaderMatrixBackup) {
          RenderSystem.getModelViewStack().method_22909();
       }

@@ -1,6 +1,5 @@
 package xaero.common.misc;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import net.minecraft.class_1041;
 import net.minecraft.class_1291;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
@@ -25,11 +23,9 @@ import net.minecraft.class_310;
 import net.minecraft.class_342;
 import net.minecraft.class_437;
 import net.minecraft.class_4587;
-import net.minecraft.class_8251;
 import net.minecraft.class_327.class_6415;
 import net.minecraft.class_3675.class_307;
 import net.minecraft.class_4597.class_4598;
-import org.joml.Matrix4f;
 import xaero.common.IXaeroMinimap;
 import xaero.common.controls.IKeyBindingHelper;
 import xaero.common.gui.IScreenBase;
@@ -79,15 +75,6 @@ public class Misc {
 
    public static void drawCenteredPiercingText(class_4587 matrices, class_2561 name, float x, float y, int color, boolean shadow, class_4598 renderTypeBuffer) {
       drawPiercingText(matrices, name, x - (float)(class_310.method_1551().field_1772.method_27525(name) / 2), y, color, shadow, renderTypeBuffer);
-   }
-
-   public static void minecraftOrtho(class_310 mc, boolean raw) {
-      class_1041 mainwindow = mc.method_22683();
-      int width = raw ? mainwindow.method_4480() : mainwindow.method_4489();
-      int height = raw ? mainwindow.method_4507() : mainwindow.method_4506();
-      Matrix4f ortho = new Matrix4f()
-         .setOrtho(0.0F, (float)((double)width / mainwindow.method_4495()), (float)((double)height / mainwindow.method_4495()), 0.0F, 1000.0F, 21000.0F);
-      RenderSystem.setProjectionMatrix(ortho, class_8251.field_43361);
    }
 
    public static Path quickFileBackupMove(Path file) throws IOException {

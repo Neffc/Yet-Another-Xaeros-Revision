@@ -51,6 +51,7 @@ public class CustomRenderTypes extends class_1921 {
       RenderSystem.disableBlend();
       RenderSystem.defaultBlendFunc();
    });
+   public static final float DEFAULT_POLYGON_OFFSET = 10.0F;
    protected static final class_4675 POLYGON_OFFSET_LAYERING = new class_4675("xaero_polygon_offset_layering", () -> {
       RenderSystem.polygonOffset(0.0F, 10.0F);
       RenderSystem.enablePolygonOffset();
@@ -93,6 +94,18 @@ public class CustomRenderTypes extends class_1921 {
       Runnable endAction
    ) {
       super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);
+   }
+
+   public static void resetDepthTest() {
+      CustomRenderTypes.MultiPhaseBuilder.resetDepthTest();
+   }
+
+   public static void resetWriteMask() {
+      CustomRenderTypes.MultiPhaseBuilder.resetWriteMask();
+   }
+
+   public static void resetTransparency() {
+      CustomRenderTypes.MultiPhaseBuilder.resetTransparency();
    }
 
    public static class_4685 getTransparencyPhase(int srcFactor, int dstFactor, int srcFactorAlpha, int dstFactorAlpha) {
@@ -300,6 +313,23 @@ public class CustomRenderTypes extends class_1921 {
             this.lineWidth,
             new class_4668[0]
          );
+      }
+
+      public static void resetDepthTest() {
+         class_4668.field_21347.method_23516();
+         class_4668.field_21347.method_23518();
+      }
+
+      public static void resetWriteMask() {
+         class_4668.field_21350.method_23516();
+         class_4668.field_21350.method_23518();
+         class_4668.field_21351.method_23516();
+         class_4668.field_21351.method_23518();
+      }
+
+      public static void resetTransparency() {
+         class_4668.field_21366.method_23516();
+         class_4668.field_21366.method_23518();
       }
    }
 

@@ -2,10 +2,12 @@ package xaero.common.minimap.render.radar.element;
 
 import net.minecraft.class_1297;
 import net.minecraft.class_1921;
+import net.minecraft.class_327;
 import net.minecraft.class_4588;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.minimap.radar.MinimapRadar;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
+import xaero.common.minimap.render.MinimapRendererHelper;
 
 public final class RadarRenderContext {
    public MinimapRadar minimapRadar;
@@ -34,28 +36,6 @@ public final class RadarRenderContext {
    public boolean name;
    public boolean icon;
    public class_1297 renderEntity;
-
-   public void setupGlobalContext(
-      double nameScale,
-      boolean smoothDots,
-      boolean debugEntityIcons,
-      boolean debugEntityVariantIds,
-      int dotsStyle,
-      class_1921 dotsRenderType,
-      class_4588 dotsBufferBuilder,
-      class_4588 nameBgBuilder,
-      MultiTextureRenderTypeRenderer iconsRenderer,
-      class_1297 renderEntity
-   ) {
-      this.nameScale = nameScale;
-      this.smoothDots = smoothDots;
-      this.debugEntityIcons = debugEntityIcons;
-      this.debugEntityVariantIds = debugEntityVariantIds;
-      this.dotsStyle = dotsStyle;
-      this.dotsRenderType = dotsRenderType;
-      this.dotsBufferBuilder = dotsBufferBuilder;
-      this.nameBgBuilder = nameBgBuilder;
-      this.iconsRenderer = iconsRenderer;
-      this.renderEntity = renderEntity;
-   }
+   public class_327 font;
+   public MinimapRendererHelper helper;
 }

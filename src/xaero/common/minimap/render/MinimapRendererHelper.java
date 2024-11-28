@@ -8,7 +8,6 @@ import net.minecraft.class_277;
 import net.minecraft.class_287;
 import net.minecraft.class_289;
 import net.minecraft.class_290;
-import net.minecraft.class_310;
 import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_757;
@@ -20,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.shader.MinimapShaders;
 import xaero.common.graphics.shader.PositionTexAlphaTestShader;
-import xaero.common.misc.Misc;
 
 public class MinimapRendererHelper {
    private static class_277 defaultShaderDisabledBlendState = new class_277();
@@ -387,12 +385,10 @@ public class MinimapRendererHelper {
       result[2] = (blue + 64) / 2;
    }
 
-   public void defaultOrtho(class_276 framebuffer, boolean raw) {
+   public void defaultOrtho(class_276 framebuffer) {
       if (framebuffer != null) {
          Matrix4f ortho = new Matrix4f().setOrtho(0.0F, (float)framebuffer.field_1482, (float)framebuffer.field_1481, 0.0F, 1000.0F, 21000.0F);
          RenderSystem.setProjectionMatrix(ortho, class_8251.field_43361);
-      } else {
-         Misc.minecraftOrtho(class_310.method_1551(), raw);
       }
    }
 

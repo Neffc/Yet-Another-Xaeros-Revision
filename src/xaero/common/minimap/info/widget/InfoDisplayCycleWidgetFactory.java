@@ -6,10 +6,12 @@ import net.minecraft.class_339;
 import xaero.common.minimap.info.InfoDisplay;
 import xaero.common.settings.ModSettings;
 
+@Deprecated
 public class InfoDisplayCycleWidgetFactory<T> implements InfoDisplayWidgetFactory<T> {
    private final List<T> values;
    private final List<class_2561> valueNames;
 
+   @Deprecated
    public InfoDisplayCycleWidgetFactory(List<T> values, List<class_2561> valueNames) {
       this.values = values;
       this.valueNames = valueNames;

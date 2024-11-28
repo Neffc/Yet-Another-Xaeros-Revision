@@ -1,5 +1,6 @@
 package xaero.common.minimap.element.render;
 
+@Deprecated
 public class MinimapElementRenderLocation {
    public static final int UNKNOWN = -1;
    public static final int IN_MINIMAP = 0;

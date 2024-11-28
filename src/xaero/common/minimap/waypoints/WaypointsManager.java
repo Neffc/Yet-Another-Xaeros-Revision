@@ -86,17 +86,17 @@ public class WaypointsManager extends MinimapSession {
 
    @Deprecated
    private String getMainContainer(int version, class_634 connection) {
-      return this.pathToString(this.getWorldStateUpdater().getAutoRootContainerPath(version, connection, this));
+      return this.pathToString(this.getWorldStateUpdater().getAutoRootContainerPath(version));
    }
 
    @Deprecated
    public String ignoreContainerCase(String potentialContainerID, String current) {
-      return this.pathToString(this.getWorldStateUpdater().ignoreContainerCase(this.pathReader.read(potentialContainerID), this.pathReader.read(current), this));
+      return this.pathToString(this.getWorldStateUpdater().ignoreContainerCase(this.pathReader.read(potentialContainerID), this.pathReader.read(current)));
    }
 
    @Deprecated
    public String getNewAutoWorldID(class_5321<class_1937> dimId, boolean useWorldmap) {
-      return this.getWorldStateUpdater().getPotentialWorldNode(dimId, useWorldmap, this);
+      return this.getWorldStateUpdater().getPotentialWorldNode(dimId, useWorldmap);
    }
 
    @Deprecated
@@ -216,12 +216,12 @@ public class WaypointsManager extends MinimapSession {
 
    @Deprecated
    public void updateWorldIds() {
-      this.getWorldStateUpdater().update(this);
+      this.getWorldStateUpdater().update();
    }
 
    @Deprecated
    private String getPotentialContainerID() {
-      return this.pathToString(this.getWorldStateUpdater().getPotentialContainerPath(this));
+      return this.pathToString(this.getWorldStateUpdater().getPotentialContainerPath());
    }
 
    @Deprecated

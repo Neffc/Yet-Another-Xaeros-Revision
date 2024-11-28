@@ -40,12 +40,11 @@ public abstract class ModClientEvents {
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
       if (minimapSession != null) {
+         guiGraphics.method_51448().method_22903();
+         guiGraphics.method_51448().method_46416(0.0F, 0.0F, -1.0F);
          this.modMain.getHudRenderer().render(this.modMain.getHud(), guiGraphics, partialTicks);
-         this.modMain
-            .getInterfaces()
-            .getMinimapInterface()
-            .getWaypointsGuiRenderer()
-            .drawSetChange(minimapSession, guiGraphics, class_310.method_1551().method_22683());
+         this.modMain.getMinimap().getWaypointGuiRenderer().drawSetChange(minimapSession, guiGraphics, class_310.method_1551().method_22683());
+         guiGraphics.method_51448().method_22909();
       }
    }
 

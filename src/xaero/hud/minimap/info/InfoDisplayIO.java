@@ -1,4 +1,4 @@
-package xaero.common.minimap.info;
+package xaero.hud.minimap.info;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -13,12 +13,12 @@ public class InfoDisplayIO {
 
    public void save(PrintWriter writer) {
       writer.print("infoDisplayOrder");
-      this.manager.getStream().forEach(infoDisplay -> {
+      this.manager.getOrderedStream().forEach(infoDisplay -> {
          writer.print(":");
          writer.print(infoDisplay.getId());
       });
       writer.println();
-      this.manager.getStream().forEach(infoDisplay -> writer.println(this.getInfoDisplayLine((InfoDisplay<?>)infoDisplay)));
+      this.manager.getOrderedStream().forEach(infoDisplay -> writer.println(this.getInfoDisplayLine((InfoDisplay<?>)infoDisplay)));
    }
 
    private <T> String getInfoDisplayLine(InfoDisplay<T> infoDisplay) {

@@ -26,8 +26,6 @@ import xaero.common.gui.GuiSettings;
 import xaero.common.gui.GuiSlimeSeed;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.highlight.DimensionHighlighterHandler;
-import xaero.common.minimap.info.BuiltInInfoDisplays;
-import xaero.common.minimap.info.InfoDisplayIO;
 import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
 import xaero.common.minimap.radar.category.EntityRadarBackwardsCompatibilityConfig;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
@@ -37,6 +35,8 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.hud.HudSession;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.info.BuiltInInfoDisplays;
+import xaero.hud.minimap.info.InfoDisplayIO;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
 import xaero.hud.path.XaeroPath;
@@ -549,7 +549,7 @@ public class ModSettings {
          return this.modMain.getSupportMods().worldmapSupport.getWorldMapIgnoreHeightmaps();
       } else {
          MinimapWorldRootContainer currentRootContainer = BuiltInHudModules.MINIMAP.getCurrentSession().getWorldManager().getAutoRootContainer();
-         return currentRootContainer.isIgnoreHeightmaps();
+         return currentRootContainer.getConfig().isIgnoreHeightmaps();
       }
    }
 
@@ -694,7 +694,7 @@ public class ModSettings {
       try {
          writer = new PrintWriter(new FileWriter(this.modMain.getConfigFile().toFile()));
          this.writeSettings(writer);
-         this.modMain.getInterfaces().getMinimapInterface().getInfoDisplayIO().save(writer);
+         this.modMain.getMinimap().getInfoDisplays().getIo().save(writer);
          Object[] keys = serverSlimeSeeds.keySet().toArray();
          Object[] values = serverSlimeSeeds.values().toArray();
 
@@ -1020,7 +1020,7 @@ public class ModSettings {
 
       try {
          reader = new BufferedReader(new FileReader(file));
-         InfoDisplayIO infoDisplayIO = this.modMain.getInterfaces().getMinimapInterface().getInfoDisplayIO();
+         InfoDisplayIO infoDisplayIO = this.modMain.getMinimap().getInfoDisplays().getIo();
 
          String s;
          while ((s = reader.readLine()) != null) {
@@ -1702,7 +1702,7 @@ public class ModSettings {
                this.renderAllSets = (Boolean)value;
             } else if (par1EnumOptions == ModOptions.IGNORE_HEIGHTMAPS) {
                MinimapWorldRootContainer currentRootContainer = BuiltInHudModules.MINIMAP.getCurrentSession().getWorldManager().getAutoRootContainer();
-               currentRootContainer.setIgnoreHeightmaps((Boolean)value);
+               currentRootContainer.getConfig().setIgnoreHeightmaps((Boolean)value);
                currentRootContainer.getSession().getWorldManagerIO().getRootConfigIO().save(currentRootContainer);
             } else if (par1EnumOptions == ModOptions.WAYPOINTS_BOTTOM) {
                this.waypointsBottom = (Boolean)value;

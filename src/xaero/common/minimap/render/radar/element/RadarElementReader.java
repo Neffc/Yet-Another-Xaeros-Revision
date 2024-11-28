@@ -3,6 +3,7 @@ package xaero.common.minimap.render.radar.element;
 import net.minecraft.class_1297;
 import net.minecraft.class_310;
 import xaero.common.minimap.element.render.MinimapElementReader;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 
 public final class RadarElementReader extends MinimapElementReader<class_1297, RadarRenderContext> {
    public double getRenderX(class_1297 element, RadarRenderContext context, float partialTicks) {
@@ -73,8 +74,21 @@ public final class RadarElementReader extends MinimapElementReader<class_1297, R
       return 0;
    }
 
+   @Deprecated
    public float getBoxScale(int location, class_1297 element, RadarRenderContext context) {
-      return location == 1 ? 0.5F : 1.0F;
+      return this.getBoxScale(MinimapElementRenderLocation.fromIndex(location), element, context);
+   }
+
+   public float getBoxScale(MinimapElementRenderLocation location, class_1297 element, RadarRenderContext context) {
+      return location == MinimapElementRenderLocation.OVER_MINIMAP ? 0.5F : 1.0F;
+   }
+
+   public boolean isInteractable(int location, class_1297 element) {
+      return this.isInteractable(MinimapElementRenderLocation.fromIndex(location), element);
+   }
+
+   public boolean isInteractable(MinimapElementRenderLocation location, class_1297 element) {
+      return false;
    }
 
    @Override

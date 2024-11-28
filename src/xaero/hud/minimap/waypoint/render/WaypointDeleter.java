@@ -1,4 +1,4 @@
-package xaero.common.minimap.waypoints.render;
+package xaero.hud.minimap.waypoint.render;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +38,9 @@ public class WaypointDeleter {
       } else {
          this.started = false;
          if (!this.toDeleteList.isEmpty()) {
-            if (world != null) {
+            if (world == null) {
+               this.toDeleteList.clear();
+            } else {
                if (allSets) {
                   for (WaypointSet set : world.getIterableWaypointSets()) {
                      set.removeAll(this.toDeleteList);
@@ -52,9 +54,9 @@ public class WaypointDeleter {
                } catch (IOException var6) {
                   MinimapLogs.LOGGER.error("suppressed exception", var6);
                }
-            }
 
-            this.toDeleteList.clear();
+               this.toDeleteList.clear();
+            }
          }
       }
    }

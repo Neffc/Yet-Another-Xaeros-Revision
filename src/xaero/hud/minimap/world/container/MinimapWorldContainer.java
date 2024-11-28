@@ -17,6 +17,7 @@ import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.server.ServerWaypointManager;
 import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.container.config.RootConfig;
 import xaero.hud.path.XaeroPath;
 
 public abstract class MinimapWorldContainer {
@@ -324,6 +325,10 @@ public abstract class MinimapWorldContainer {
 
    public MinimapWorldRootContainer getRoot() {
       return this.rootContainer;
+   }
+
+   public RootConfig getRootConfig() {
+      return this.getRoot().getConfig();
    }
 
    public Path getDirectoryPath() {

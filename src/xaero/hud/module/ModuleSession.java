@@ -15,6 +15,10 @@ public abstract class ModuleSession<MS extends ModuleSession<MS>> {
       return this.module;
    }
 
+   public HudMod getModMain() {
+      return this.modMain;
+   }
+
    public boolean isActive() {
       return this.module.isActive();
    }

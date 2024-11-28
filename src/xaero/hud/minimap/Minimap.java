@@ -1,20 +1,18 @@
 package xaero.hud.minimap;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import net.minecraft.class_310;
 import xaero.common.HudMod;
-import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
-import xaero.common.minimap.info.BuiltInInfoDisplays;
-import xaero.common.minimap.info.InfoDisplayIO;
 import xaero.common.minimap.info.InfoDisplayManager;
 import xaero.common.minimap.info.render.InfoDisplayRenderer;
 import xaero.common.minimap.render.MinimapFBORenderer;
 import xaero.common.minimap.render.MinimapSafeModeRenderer;
-import xaero.common.minimap.waypoints.render.CompassRenderer;
-import xaero.common.minimap.waypoints.render.WaypointDeleter;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
+import xaero.hud.minimap.compass.render.CompassRenderer;
+import xaero.hud.minimap.element.render.over.MinimapElementOverMapRendererHandler;
+import xaero.hud.minimap.info.InfoDisplays;
+import xaero.hud.minimap.waypoint.render.WaypointDeleter;
+import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
 
 public class Minimap {
    private final HudMod modMain;
@@ -24,9 +22,7 @@ public class Minimap {
    private final MinimapFBORenderer minimapFBORenderer;
    private final CompassRenderer compassRenderer;
    private final MinimapElementOverMapRendererHandler overMapRendererHandler;
-   private final InfoDisplayManager infoDisplayManager;
-   private final InfoDisplayIO infoDisplayIO;
-   private final InfoDisplayRenderer infoDisplayRenderer;
+   private final InfoDisplays infoDisplays;
    private Throwable crashedWith;
    private MinimapSafeModeRenderer minimapSafeModeRenderer;
 
@@ -40,11 +36,7 @@ public class Minimap {
       this.waypointsIngameRenderer = new WaypointsIngameRenderer(modMain, waypointDeleter, this.mc);
       this.minimapFBORenderer = new MinimapFBORenderer(modMain, this.mc, this.waypointsGuiRenderer, this, this.compassRenderer);
       this.minimapSafeModeRenderer = new MinimapSafeModeRenderer(modMain, this.mc, this.waypointsGuiRenderer, this, this.compassRenderer);
-      this.infoDisplayManager = new InfoDisplayManager();
-      BuiltInInfoDisplays.addToManager(this.infoDisplayManager);
-      this.infoDisplayManager.setOrder(new ArrayList<>());
-      this.infoDisplayIO = new InfoDisplayIO(this.infoDisplayManager);
-      this.infoDisplayRenderer = new InfoDisplayRenderer();
+      this.infoDisplays = new InfoDisplays();
    }
 
    public Throwable getCrashedWith() {
@@ -65,7 +57,12 @@ public class Minimap {
       }
    }
 
-   public WaypointsGuiRenderer getWaypointsGuiRenderer() {
+   @Deprecated
+   public xaero.common.minimap.waypoints.render.WaypointsGuiRenderer getWaypointsGuiRenderer() {
+      return (xaero.common.minimap.waypoints.render.WaypointsGuiRenderer)this.waypointsGuiRenderer;
+   }
+
+   public WaypointsGuiRenderer getWaypointGuiRenderer() {
       return this.waypointsGuiRenderer;
    }
 
@@ -93,15 +90,21 @@ public class Minimap {
       return this.compassRenderer;
    }
 
+   @Deprecated
    public InfoDisplayRenderer getInfoDisplayRenderer() {
-      return this.infoDisplayRenderer;
+      return (InfoDisplayRenderer)this.infoDisplays.getRenderer();
    }
 
+   @Deprecated
    public InfoDisplayManager getInfoDisplayManager() {
-      return this.infoDisplayManager;
+      return (InfoDisplayManager)this.infoDisplays.getManager();
    }
 
-   public InfoDisplayIO getInfoDisplayIO() {
-      return this.infoDisplayIO;
+   public InfoDisplays getInfoDisplays() {
+      return this.infoDisplays;
+   }
+
+   public HudMod getModMain() {
+      return this.modMain;
    }
 }

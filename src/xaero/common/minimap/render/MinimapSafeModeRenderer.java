@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
+import net.minecraft.class_243;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
@@ -22,13 +23,13 @@ import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.minimap.region.MinimapChunk;
 import xaero.common.minimap.region.MinimapTile;
-import xaero.common.minimap.waypoints.render.CompassRenderer;
-import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
 
 public class MinimapSafeModeRenderer extends MinimapRenderer {
    private static final class_2960 mapTextures = new class_2960("xaeromaptexture");
@@ -313,8 +314,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       MinimapSession session,
       class_332 guiGraphics,
       MinimapProcessor minimap,
-      double playerX,
-      double playerZ,
+      class_243 renderPos,
       double playerDimDiv,
       double mapDimensionScale,
       int mapSize,
@@ -341,9 +341,10 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       try {
          this.mapTexture.loadIfNeeded();
          this.getHelper().bindTextureBuffer(this.mapTexture.buffer, bufferSize, bufferSize, this.mapTexture.method_4624());
-         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-      } catch (Throwable var30) {
-         this.minimap.setCrashedWith(var30);
+         float opacity = (float)(this.modMain.getSettings().minimapOpacity / 100.0);
+         RenderSystem.setShaderColor(opacity, opacity, opacity, opacity);
+      } catch (Throwable var27) {
+         this.minimap.setCrashedWith(var27);
       }
    }
 

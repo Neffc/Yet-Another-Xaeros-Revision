@@ -41,103 +41,103 @@ public class WaypointWorldRootContainer extends MinimapWorldRootContainer {
    @Deprecated
    @Override
    public boolean isUsingMultiworldDetection() {
-      return super.isUsingMultiworldDetection();
+      return super.getConfig().isUsingMultiworldDetection();
    }
 
    @Deprecated
    @Override
    public void setUsingMultiworldDetection(boolean usingMultiworldDetection) {
-      super.setUsingMultiworldDetection(usingMultiworldDetection);
+      super.getConfig().setUsingMultiworldDetection(usingMultiworldDetection);
    }
 
    @Deprecated
    @Override
    public String getDefaultMultiworldId() {
-      return super.getDefaultMultiworldId();
+      return super.getConfig().getDefaultMultiworldId();
    }
 
    @Deprecated
    @Override
    public void setDefaultMultiworldId(String defaultMultiworldId) {
-      super.setDefaultMultiworldId(defaultMultiworldId);
+      super.getConfig().setDefaultMultiworldId(defaultMultiworldId);
    }
 
    @Deprecated
    @Override
    public boolean isTeleportationEnabled() {
-      return super.isTeleportationEnabled();
+      return super.getConfig().isTeleportationEnabled();
    }
 
    @Deprecated
    @Override
    public void setTeleportationEnabled(boolean teleportation) {
-      super.setTeleportationEnabled(teleportation);
+      super.getConfig().setTeleportationEnabled(teleportation);
    }
 
    @Deprecated
    @Override
    public boolean isUsingDefaultTeleportCommand() {
-      return super.isUsingDefaultTeleportCommand();
+      return super.getConfig().isUsingDefaultTeleportCommand();
    }
 
    @Deprecated
    @Override
    public void setUsingDefaultTeleportCommand(boolean usingDefaultTeleportCommand) {
-      super.setUsingDefaultTeleportCommand(usingDefaultTeleportCommand);
+      super.getConfig().setUsingDefaultTeleportCommand(usingDefaultTeleportCommand);
    }
 
    @Deprecated
    @Override
    public String getServerTeleportCommandFormat() {
-      return super.getServerTeleportCommandFormat();
+      return super.getConfig().getServerTeleportCommandFormat();
    }
 
    @Deprecated
    @Override
    public String getServerTeleportCommandRotationFormat() {
-      return super.getServerTeleportCommandRotationFormat();
+      return super.getConfig().getServerTeleportCommandRotationFormat();
    }
 
    @Deprecated
    @Override
    public void setServerTeleportCommandFormat(String serverTeleportCommandFormat) {
-      super.setServerTeleportCommandFormat(serverTeleportCommandFormat);
+      super.getConfig().setServerTeleportCommandFormat(serverTeleportCommandFormat);
    }
 
    @Deprecated
    @Override
    public void setServerTeleportCommandRotationFormat(String serverTeleportCommandRotationFormat) {
-      super.setServerTeleportCommandRotationFormat(serverTeleportCommandRotationFormat);
+      super.getConfig().setServerTeleportCommandRotationFormat(serverTeleportCommandRotationFormat);
    }
 
    @Deprecated
    @Override
    public WaypointsSort getSortType() {
-      return super.getSortType();
+      return super.getConfig().getSortType();
    }
 
    @Deprecated
    @Override
    public void toggleSortType() {
-      super.toggleSortType();
+      super.getConfig().toggleSortType();
    }
 
    @Deprecated
    @Override
    public boolean isSortReversed() {
-      return super.isSortReversed();
+      return super.getConfig().isSortReversed();
    }
 
    @Deprecated
    @Override
    public void toggleSortReversed() {
-      super.toggleSortReversed();
+      super.getConfig().toggleSortReversed();
    }
 
    @Deprecated
    @Override
    public boolean isIgnoreServerLevelId() {
-      return super.isIgnoreServerLevelId();
+      return super.getConfig().isIgnoreServerLevelId();
    }
 
    @Deprecated
@@ -148,13 +148,13 @@ public class WaypointWorldRootContainer extends MinimapWorldRootContainer {
    @Deprecated
    @Override
    public boolean isIgnoreHeightmaps() {
-      return super.isIgnoreHeightmaps();
+      return super.getConfig().isIgnoreHeightmaps();
    }
 
    @Deprecated
    @Override
    public void setIgnoreHeightmaps(boolean ignoreHeightmaps) {
-      super.setIgnoreHeightmaps(ignoreHeightmaps);
+      super.getConfig().setIgnoreHeightmaps(ignoreHeightmaps);
    }
 
    @Deprecated

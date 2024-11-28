@@ -30,7 +30,7 @@ public class XaeroMinimapSession extends HudSession {
    }
 
    public WaypointSharingHandler getWaypointSharing() {
-      return BuiltInHudModules.MINIMAP.getCurrentSession().getWaypointSession().getSharing();
+      return (WaypointSharingHandler)BuiltInHudModules.MINIMAP.getCurrentSession().getWaypointSession().getSharing();
    }
 
    public MinimapProcessor getMinimapProcessor() {

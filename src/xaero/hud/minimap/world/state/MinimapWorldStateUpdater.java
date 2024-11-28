@@ -13,59 +13,80 @@ import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.world.container.MinimapWorldContainer;
+import xaero.hud.minimap.world.container.MinimapWorldContainerUtil;
 import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.minimap.world.container.config.RootConfig;
 import xaero.hud.path.XaeroPath;
 
 public class MinimapWorldStateUpdater {
    public static final int ROOT_CONTAINER_FORMAT = 2;
    private final HudMod modMain;
+   private final MinimapSession session;
+   private final class_634 connection;
    private class_2338 currentWorldSpawn;
 
-   public MinimapWorldStateUpdater(HudMod modMain) {
+   public MinimapWorldStateUpdater(HudMod modMain, MinimapSession session, class_634 connection) {
       this.modMain = modMain;
+      this.session = session;
+      this.connection = connection;
    }
 
-   public void init(MinimapSession session, class_634 connection) {
-      session.getWorldState().setAutoRootContainerPath(this.getAutoRootContainerPath(2, connection, session));
+   public void init() {
+      this.session.getWorldState().setAutoRootContainerPath(this.getAutoRootContainerPath(2));
 
       for (int i = 0; i < 2; i++) {
-         session.getWorldState().setOutdatedAutoRootContainerPath(i, this.getAutoRootContainerPath(i, connection, session));
+         this.session.getWorldState().setOutdatedAutoRootContainerPath(i, this.getAutoRootContainerPath(i));
       }
    }
 
+   @Deprecated
    public void update(MinimapSession session) {
-      MinimapWorldState state = session.getWorldState();
+      this.update();
+   }
+
+   public void update() {
+      MinimapWorldState state = this.session.getWorldState();
       XaeroPath oldAutoWorldPath = state.getAutoWorldPath();
-      XaeroPath potentialAutoContainerPath = this.getPotentialContainerPath(session);
+      XaeroPath potentialAutoContainerPath = this.getPotentialContainerPath();
       state.setAutoContainerPathIgnoreCaseCache(potentialAutoContainerPath);
       boolean worldmap = this.modMain.getSupportMods().worldmap();
-      String potentialAutoWorldNode = this.getPotentialWorldNode(session.getMc().field_1687.method_27983(), worldmap, session);
+      String potentialAutoWorldNode = this.getPotentialWorldNode(this.session.getMc().field_1687.method_27983(), worldmap);
       if (potentialAutoWorldNode != null) {
          XaeroPath autoWorldPath = potentialAutoContainerPath.resolve(potentialAutoWorldNode);
          state.setAutoWorldPath(autoWorldPath);
          if (oldAutoWorldPath == null || !potentialAutoContainerPath.equals(oldAutoWorldPath.getParent())) {
-            MinimapWorldRootContainer autoRootContainer = session.getWorldManager().getAutoRootContainer();
+            MinimapWorldRootContainer autoRootContainer = this.session.getWorldManager().getAutoRootContainer();
             autoRootContainer.renameOldContainer(potentialAutoContainerPath);
-            autoRootContainer.updateDimensionType(session.getMc().field_1687);
+            autoRootContainer.updateDimensionType(this.session.getMc().field_1687);
             if (oldAutoWorldPath != null) {
-               MinimapWorldContainer oldContainer = session.getWorldManager().getWorldContainer(oldAutoWorldPath.getParent());
+               MinimapWorldContainer oldContainer = this.session.getWorldManager().getWorldContainer(oldAutoWorldPath.getParent());
                oldContainer.getServerWaypointManager().clear();
             }
          }
       }
    }
 
+   @Deprecated
    public XaeroPath getPotentialContainerPath(MinimapSession session) {
-      String dimensionNode = session.getDimensionHelper().getDimensionDirectoryName(session.getMc().field_1687.method_27983());
-      XaeroPath potentialContainerPath = session.getWorldState().getAutoRootContainerPath().resolve(dimensionNode);
-      return this.ignoreContainerCase(potentialContainerPath, session.getWorldState().getAutoContainerPathIgnoreCaseCache(), session);
+      return this.getPotentialContainerPath();
    }
 
+   public XaeroPath getPotentialContainerPath() {
+      String dimensionNode = this.session.getDimensionHelper().getDimensionDirectoryName(this.session.getMc().field_1687.method_27983());
+      XaeroPath potentialContainerPath = this.session.getWorldState().getAutoRootContainerPath().resolve(dimensionNode);
+      return this.ignoreContainerCase(potentialContainerPath, this.session.getWorldState().getAutoContainerPathIgnoreCaseCache());
+   }
+
+   @Deprecated
    public XaeroPath ignoreContainerCase(XaeroPath potentialContainerPath, XaeroPath currentPath, MinimapSession session) {
+      return this.ignoreContainerCase(potentialContainerPath, currentPath);
+   }
+
+   public XaeroPath ignoreContainerCase(XaeroPath potentialContainerPath, XaeroPath currentPath) {
       if (potentialContainerPath.equals(currentPath)) {
          return currentPath;
       } else {
-         for (MinimapWorldRootContainer rootContainer : session.getWorldManager().getRootContainers()) {
+         for (MinimapWorldRootContainer rootContainer : this.session.getWorldManager().getRootContainers()) {
             XaeroPath containerSearch = rootContainer.fixPathCharacterCases(potentialContainerPath);
             if (containerSearch != null) {
                return containerSearch;
@@ -76,22 +97,19 @@ public class MinimapWorldStateUpdater {
       }
    }
 
+   @Deprecated
    public XaeroPath getAutoRootContainerPath(int version, class_634 connection, MinimapSession session) {
-      class_642 serverData = connection.method_45734();
+      return this.getAutoRootContainerPath(version);
+   }
+
+   public XaeroPath getAutoRootContainerPath(int version) {
+      class_642 serverData = this.connection.method_45734();
       class_310 mc = class_310.method_1551();
       String potentialContainerID;
       if (mc.method_1576() != null) {
-         potentialContainerID = mc.method_1576()
-            .method_27050(class_5218.field_24188)
-            .getParent()
-            .getFileName()
-            .toString()
-            .replace("_", "%us%")
-            .replace("/", "%fs%")
-            .replace("\\", "%bs%");
-         if (version >= 2) {
-            potentialContainerID = potentialContainerID.replace("[", "%lb%").replace("]", "%rb%");
-         }
+         potentialContainerID = MinimapWorldContainerUtil.convertWorldFolderToContainerNode(
+            mc.method_1576().method_27050(class_5218.field_24188).getParent().getFileName().toString(), version
+         );
       } else if (mc.method_1589() && this.modMain.getEvents().latestRealm != null) {
          potentialContainerID = "Realms_" + this.modMain.getEvents().latestRealm.field_22605 + "." + this.modMain.getEvents().latestRealm.field_22599;
       } else if (serverData != null) {
@@ -121,15 +139,20 @@ public class MinimapWorldStateUpdater {
       }
 
       XaeroPath potentialContainerPath = XaeroPath.root(potentialContainerID);
-      return this.ignoreContainerCase(potentialContainerPath, null, session);
+      return this.ignoreContainerCase(potentialContainerPath, null);
    }
 
+   @Deprecated
    public String getPotentialWorldNode(class_5321<class_1937> dimId, boolean useWorldmap, MinimapSession session) {
-      if (session.getMc().method_1576() != null) {
+      return this.getPotentialWorldNode(dimId, useWorldmap);
+   }
+
+   public String getPotentialWorldNode(class_5321<class_1937> dimId, boolean useWorldmap) {
+      if (this.session.getMc().method_1576() != null) {
          return "waypoints";
       } else {
-         MinimapWorldState state = session.getWorldState();
-         MinimapWorldRootContainer rootContainer = session.getWorldManager().getRootWorldContainer(state.getAutoRootContainerPath());
+         MinimapWorldState state = this.session.getWorldState();
+         MinimapWorldRootContainer rootContainer = this.session.getWorldManager().getRootWorldContainer(state.getAutoRootContainerPath());
          Object autoNodeBase = this.getAutoWorldNodeBase(rootContainer);
          if (autoNodeBase == null) {
             return null;
@@ -141,11 +164,12 @@ public class MinimapWorldStateUpdater {
                String actualWorldNode;
                if (autoNodeBase instanceof class_2338 pos) {
                   actualWorldNode = "mw" + (pos.method_10263() >> 6) + "," + (pos.method_10264() >> 6) + "," + (pos.method_10260() >> 6);
-                  if (!rootContainer.isUsingMultiworldDetection()) {
-                     String defaultMultiworldId = rootContainer.getDefaultMultiworldId();
+                  RootConfig config = rootContainer.getConfig();
+                  if (!config.isUsingMultiworldDetection()) {
+                     String defaultMultiworldId = config.getDefaultMultiworldId();
                      if (defaultMultiworldId == null) {
-                        rootContainer.setDefaultMultiworldId(actualWorldNode);
-                        session.getWorldManagerIO().getRootConfigIO().save(rootContainer);
+                        config.setDefaultMultiworldId(actualWorldNode);
+                        this.session.getWorldManagerIO().getRootConfigIO().save(rootContainer);
                      } else {
                         actualWorldNode = defaultMultiworldId;
                      }
@@ -166,7 +190,7 @@ public class MinimapWorldStateUpdater {
 
    public boolean hasServerLevelId(MinimapWorldRootContainer rootContainer) {
       MinimapClientWorldData worldData = MinimapClientWorldDataHelper.getCurrentWorldData();
-      return worldData.serverLevelId != null && !rootContainer.isIgnoreServerLevelId();
+      return worldData.serverLevelId != null && !rootContainer.getConfig().isIgnoreServerLevelId();
    }
 
    public Object getAutoWorldNodeBase(MinimapWorldRootContainer rootContainer) {

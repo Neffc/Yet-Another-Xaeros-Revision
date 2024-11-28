@@ -595,5 +595,8 @@
 	"gui.xaero_entity_category_tracked" : "Tracked (e.g. Party/Allies)",
 	"gui.xaero_dimension_scaled_max_waypoint_distance" : "Dimension-scaled Max WP Distance",
 	"gui.xaero_box_dimension_scaled_max_waypoint_distance" : "Scale the maximum waypoint render distance by the current dimension's coordinate scale (e.g. 1/8 in the Nether).",
-	"gui.xaero_box_waypoints_distance2" : "Maximum render distance for local waypoints. Global waypoints are not affected. By default, the maximum distance is scaled by the current dimension's coordinate scale. You can toggle this with \"Dimension-scaled Max WP Distance\"."
+	"gui.xaero_box_waypoints_distance2" : "Maximum render distance for local waypoints. Global waypoints are not affected. By default, the maximum distance is scaled by the current dimension's coordinate scale. You can toggle this with \"Dimension-scaled Max WP Distance\".",
+	"gui.xaero_waypoint_shared2" : "%1$s shared a waypoint called \"%2$s\"!",
+	"gui.xaero_waypoint_shared_dimension2" : "%1$s shared a waypoint called \"%2$s\" from %3$s!",
+	"gui.xaero_waypoint_shared_add" : " [Add]"
 }

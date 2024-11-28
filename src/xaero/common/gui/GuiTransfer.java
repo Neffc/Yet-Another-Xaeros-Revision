@@ -143,13 +143,12 @@ public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
 
             for (Waypoint w : fromSet.getWaypoints()) {
                Waypoint copy = new Waypoint(
-                  w.getX(), w.getY(), w.getZ(), w.getName(), w.getSymbol(), w.getColor(), w.getWaypointType(), w.isTemporary(), w.isYIncluded()
+                  w.getX(), w.getY(), w.getZ(), w.getName(), w.getInitials(), w.getWaypointColor(), w.getPurpose(), w.isTemporary(), w.isYIncluded()
                );
                copy.setRotation(w.isRotation());
                copy.setDisabled(w.isDisabled());
                copy.setYaw(w.getYaw());
-               copy.setVisibilityType(w.getVisibilityType());
-               copy.setOneoffDestination(w.isOneoffDestination());
+               copy.setVisibility(w.getVisibility());
                toSet.add(copy);
             }
 

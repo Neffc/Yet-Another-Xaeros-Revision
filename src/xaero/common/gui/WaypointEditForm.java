@@ -1,5 +1,8 @@
 package xaero.common.gui;
 
+import xaero.common.minimap.waypoints.WaypointVisibilityType;
+import xaero.hud.minimap.waypoint.WaypointColor;
+
 public class WaypointEditForm {
    public String name = "";
    public String xText = "";
@@ -9,8 +12,8 @@ public class WaypointEditForm {
    public String initial = "";
    public boolean autoInitial;
    public int disabledOrTemporary;
-   public int visibilityType;
-   public int color;
+   public WaypointVisibilityType visibilityType = WaypointVisibilityType.LOCAL;
+   public WaypointColor color;
    public boolean keepName;
    public boolean keepXText;
    public boolean keepYText;
@@ -22,6 +25,7 @@ public class WaypointEditForm {
    public boolean defaultKeepYawText;
    public boolean defaultKeepDisabledOrTemporary;
    public boolean defaultKeepVisibilityType;
+   public boolean defaultKeepColor;
 
    public String getName() {
       return this.name;
@@ -47,7 +51,7 @@ public class WaypointEditForm {
       return this.initial;
    }
 
-   public int getVisibilityType() {
+   public WaypointVisibilityType getVisibilityType() {
       return this.visibilityType;
    }
 
@@ -55,7 +59,7 @@ public class WaypointEditForm {
       return this.disabledOrTemporary;
    }
 
-   public int getColor() {
+   public WaypointColor getColor() {
       return this.color;
    }
 }

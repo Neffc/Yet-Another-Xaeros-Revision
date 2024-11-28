@@ -62,7 +62,7 @@ public class GuiWaypointsOptions extends ScreenBase {
       this.minimapWorld = minimapWorld;
       this.rootContainer = minimapWorld.getContainer().getRoot();
       this.automaticMinimapWorld = this.manager.getWorld(frozenAutoWorldPath);
-      this.teleportationOptionShown = this.rootContainer.isTeleportationEnabled();
+      this.teleportationOptionShown = this.rootContainer.getConfig().isTeleportationEnabled();
    }
 
    @Override
@@ -130,17 +130,19 @@ public class GuiWaypointsOptions extends ScreenBase {
          case 0:
             return class_1074.method_4662("gui.xaero_use_multiworld", new Object[0])
                + ": "
-               + ModSettings.getTranslation(this.rootContainer.isUsingMultiworldDetection());
+               + ModSettings.getTranslation(this.rootContainer.getConfig().isUsingMultiworldDetection());
          case 1:
             return class_1074.method_4662("gui.xaero_teleportation", new Object[0])
                + ": "
-               + ModSettings.getTranslation(this.rootContainer.isTeleportationEnabled());
+               + ModSettings.getTranslation(this.rootContainer.getConfig().isTeleportationEnabled());
          case 2:
             return class_1074.method_4662("gui.xaero_sort", new Object[0])
                + ": "
-               + class_1074.method_4662(this.rootContainer.getSortType().optionName, new Object[0]);
+               + class_1074.method_4662(this.rootContainer.getConfig().getSortType().optionName, new Object[0]);
          case 3:
-            return class_1074.method_4662("gui.xaero_sort_reversed", new Object[0]) + ": " + ModSettings.getTranslation(this.rootContainer.isSortReversed());
+            return class_1074.method_4662("gui.xaero_sort_reversed", new Object[0])
+               + ": "
+               + ModSettings.getTranslation(this.rootContainer.getConfig().isSortReversed());
          case 4:
             return this.selectedWorldIsConnected
                ? class_1074.method_4662("gui.xaero_disconnect_from_auto", new Object[0])
@@ -155,18 +157,18 @@ public class GuiWaypointsOptions extends ScreenBase {
       MinimapWorldRootContainer wc = this.rootContainer;
       switch (button.getId() - 200) {
          case 0:
-            wc.setUsingMultiworldDetection(!this.rootContainer.isUsingMultiworldDetection());
-            wc.setDefaultMultiworldId(null);
+            wc.getConfig().setUsingMultiworldDetection(!this.rootContainer.getConfig().isUsingMultiworldDetection());
+            wc.getConfig().setDefaultMultiworldId(null);
             break;
          case 1:
-            wc.setTeleportationEnabled(!wc.isTeleportationEnabled());
+            wc.getConfig().setTeleportationEnabled(!wc.getConfig().isTeleportationEnabled());
             break;
          case 2:
-            this.rootContainer.toggleSortType();
+            this.rootContainer.getConfig().toggleSortType();
             this.parent.method_25423(this.field_22787, this.field_22789, this.field_22790);
             break;
          case 3:
-            this.rootContainer.toggleSortReversed();
+            this.rootContainer.getConfig().toggleSortReversed();
             this.parent.method_25423(this.field_22787, this.field_22789, this.field_22790);
       }
 

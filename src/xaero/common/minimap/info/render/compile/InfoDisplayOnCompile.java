@@ -5,8 +5,10 @@ import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.info.InfoDisplay;
 
+@Deprecated
 @FunctionalInterface
 public interface InfoDisplayOnCompile<T> {
+   @Deprecated
    void onCompile(
       InfoDisplay<T> var1,
       InfoDisplayCompiler var2,

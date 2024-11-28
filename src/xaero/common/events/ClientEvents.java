@@ -195,8 +195,12 @@ public class ClientEvents {
          return false;
       } else {
          MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
-         minimapSession.getWaypointSession().getSharing().onWaypointReceived(playerName, textString);
-         return true;
+         if (minimapSession == null) {
+            return false;
+         } else {
+            minimapSession.getWaypointSession().getSharing().onWaypointReceived(playerName, textString);
+            return true;
+         }
       }
    }
 
@@ -249,7 +253,7 @@ public class ClientEvents {
             if (minimapSession != null) {
                try {
                   MinimapProcessor minimap = minimapSession.getProcessor();
-                  minimapSession.getWorldStateUpdater().update(minimapSession);
+                  minimapSession.getWorldStateUpdater().update();
                   minimap.onPlayerTick();
                   class_310 mc = class_310.method_1551();
                   HudSession hudSession = HudSession.getCurrentSession();

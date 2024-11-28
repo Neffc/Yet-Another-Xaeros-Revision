@@ -11,6 +11,7 @@ import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.misc.Misc;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointColor;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.container.MinimapWorldContainer;
@@ -79,7 +80,7 @@ public class WaypointOldIO {
                Integer.parseInt(args[6]),
                args[2].replace("§§", ":"),
                args[3].replace("§§", ":"),
-               Integer.parseInt(args[7])
+               WaypointColor.fromIndex(Integer.parseInt(args[7]))
             );
             if (args.length > 8) {
                loadedWaypoint.setDisabled(args[8].equals("true"));

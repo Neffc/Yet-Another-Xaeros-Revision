@@ -27,10 +27,11 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
-import xaero.common.settings.ModSettings;
 import xaero.common.validator.NumericFieldValidator;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointColor;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 import xaero.hud.minimap.world.MinimapWorldManager;
@@ -401,10 +402,10 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       form.yText = w.isYIncluded() ? w.getY() + "" : "~";
       form.zText = w.getZ() + "";
       form.yawText = w.isRotation() ? w.getYaw() + "" : "";
-      form.initial = StringConcatFactory.makeConcatWithConstants<"makeConcatWithConstants","\u0001">(w.getSymbol());
-      form.disabledOrTemporary = w.isOneoffDestination() ? 3 : (w.isTemporary() ? 2 : (w.isDisabled() ? 1 : 0));
-      form.color = 1 + (w.getActualColor() == -1 ? (int)(Math.random() * (double)(ModSettings.ENCHANT_COLORS.length - 1)) : w.getActualColor());
-      form.visibilityType = w.getVisibilityType();
+      form.initial = StringConcatFactory.makeConcatWithConstants<"makeConcatWithConstants","\u0001">(w.getInitials());
+      form.disabledOrTemporary = w.isDestination() ? 3 : (w.isTemporary() ? 2 : (w.isDisabled() ? 1 : 0));
+      form.color = w.getWaypointColor();
+      form.visibilityType = w.getVisibility();
       if (form.initial.length() == 0) {
          form.autoInitial = true;
       }
@@ -438,7 +439,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       form.xText = "";
       form.yText = "";
       form.zText = "";
-      form.color = (int)(Math.random() * (double)(ModSettings.ENCHANT_COLORS.length - 1)) + 1;
+      form.color = WaypointColor.getRandom();
       form.autoInitial = true;
    }
 
@@ -483,14 +484,8 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       String yTextMutual = "";
       String zTextMutual = "";
       int waypointDisabledOrTemporaryMutual = 0;
-      int waypointVisibilityTypeMutual = 0;
-      int colorMutual = 0;
-      if (this.differentValues(WaypointEditForm::getColor)) {
-         colorMutual = 0;
-      } else {
-         colorMutual = this.editForms.get(0).color;
-      }
-
+      WaypointVisibilityType waypointVisibilityTypeMutual = WaypointVisibilityType.LOCAL;
+      WaypointColor colorMutual = null;
       xTextMutual = "";
       yTextMutual = "";
       zTextMutual = "";
@@ -504,6 +499,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       this.mutualForm.autoInitial = this.editForms.size() == 1 && firstForm.autoInitial;
       this.mutualForm.defaultKeepDisabledOrTemporary = this.mutualForm.keepDisabledOrTemporary = this.differentValues(WaypointEditForm::getDisabledOrTemporary);
       this.mutualForm.defaultKeepVisibilityType = this.mutualForm.keepVisibilityType = this.differentValues(WaypointEditForm::getVisibilityType);
+      this.mutualForm.defaultKeepColor = this.differentValues(WaypointEditForm::getColor);
       if (!this.mutualForm.keepName) {
          nameTextMutual = firstForm.name;
       }
@@ -534,6 +530,10 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
 
       if (!this.mutualForm.keepVisibilityType) {
          waypointVisibilityTypeMutual = firstForm.visibilityType;
+      }
+
+      if (!this.mutualForm.defaultKeepColor) {
+         colorMutual = firstForm.color;
       }
 
       this.mutualForm.name = nameTextMutual;
@@ -586,7 +586,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             individualForm.visibilityType = this.mutualForm.visibilityType;
          }
 
-         if (this.mutualForm.color != 0) {
+         if (this.mutualForm.color != null) {
             individualForm.color = this.mutualForm.color;
          }
       }
@@ -610,19 +610,17 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public String[] createColorOptions() {
-      boolean unchangedOption = this.getCurrent().color == 0;
-      String[] options = new String[ModSettings.ENCHANT_COLOR_NAMES.length + (unchangedOption ? 1 : 0)];
+      boolean unchangedOption = this.getCurrent().defaultKeepColor;
+      String[] options = new String[WaypointColor.values().length + (unchangedOption ? 1 : 0)];
       if (unchangedOption) {
          options[0] = this.colorPlaceholder;
       }
 
-      for (int i = 0; i < ModSettings.ENCHANT_COLOR_NAMES.length; i++) {
+      for (int i = 0; i < WaypointColor.values().length; i++) {
          if (i == 0) {
-            options[i + (unchangedOption ? 1 : 0)] = class_1074.method_4662(ModSettings.ENCHANT_COLOR_NAMES[i], new Object[0]);
+            options[i + (unchangedOption ? 1 : 0)] = WaypointColor.values()[i].getName().getString();
          } else {
-            options[i + (unchangedOption ? 1 : 0)] = "§"
-               + ModSettings.ENCHANT_COLORS[i]
-               + class_1074.method_4662(ModSettings.ENCHANT_COLOR_NAMES[i], new Object[0]);
+            options[i + (unchangedOption ? 1 : 0)] = "§" + WaypointColor.values()[i].getFormat() + WaypointColor.values()[i].getName().getString();
          }
       }
 
@@ -697,30 +695,29 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
 
                String zString = waypointForm.zText;
                String initialString = waypointForm.initial;
-               int colorInt = waypointForm.color;
+               WaypointColor color = waypointForm.color;
                boolean yIncluded = !yString.equals("~");
                int x = !xString.equals("-") && !xString.isEmpty() ? Integer.parseInt(xString) : this.getAutomaticX(waypointDimScale);
                int y = !yIncluded ? 0 : Integer.parseInt(yString);
                int z = !zString.equals("-") && !zString.isEmpty() ? Integer.parseInt(zString) : this.getAutomaticZ(waypointDimScale);
                Waypoint w;
                if (shouldCreate) {
-                  w = new Waypoint(x, y, z, nameString, initialString, colorInt - 1, 0, false, yIncluded);
+                  w = new Waypoint(x, y, z, nameString, initialString, color, WaypointPurpose.NORMAL, false, yIncluded);
                   this.waypointsEdited.add(w);
                } else {
                   w = this.waypointsEdited.get(i);
-                  if (w.getWaypointType() != 1 || !nameString.equals(class_1074.method_4662("gui.xaero_deathpoint", new Object[0]))) {
+                  if (w.getPurpose() != WaypointPurpose.DEATH || !nameString.equals(class_1074.method_4662("gui.xaero_deathpoint", new Object[0]))) {
                      w.setName(nameString);
-                     if (w.getWaypointType() != 0) {
-                        w.setType(0);
-                        w.setOneoffDestination(false);
+                     if (w.getPurpose() != WaypointPurpose.NORMAL) {
+                        w.setPurpose(WaypointPurpose.NORMAL);
                      }
                   }
 
                   w.setX(x);
                   w.setY(y);
                   w.setZ(z);
-                  w.setSymbol(initialString);
-                  w.setColor(colorInt - 1);
+                  w.setInitials(initialString);
+                  w.setWaypointColor(color);
                   w.setYIncluded(yIncluded);
                }
 
@@ -732,13 +729,16 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
                   w.setYaw(Integer.parseInt(yawText));
                }
 
-               w.setOneoffDestination(disableOrTemporary == 3);
+               if (w.isDestination() != (disableOrTemporary == 3)) {
+                  w.setPurpose(disableOrTemporary == 3 ? WaypointPurpose.DESTINATION : WaypointPurpose.NORMAL);
+               }
+
                w.setDisabled(disableOrTemporary == 1);
                if (disableOrTemporary == 2) {
                   w.setTemporary(true);
                }
 
-               w.setVisibilityType(waypointForm.visibilityType);
+               w.setVisibility(waypointForm.visibilityType);
             }
 
             MinimapWorld sourceWorld = this.defaultWorld;
@@ -881,14 +881,21 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       }, () -> TYPE_TOOLTIP));
       this.method_37063(
          this.visibilityTypeButton = new TooltipButton(
-            this.field_22789 / 2 - 109, 164, 79, 20, WaypointVisibilityType.values()[this.getCurrent().visibilityType].getTranslation(), b -> {
-               this.getCurrent().visibilityType = (this.getCurrent().visibilityType + 1) % WaypointVisibilityType.values().length;
-               this.visibilityTypeButton.method_25355(WaypointVisibilityType.values()[this.getCurrent().visibilityType].getTranslation());
+            this.field_22789 / 2 - 109,
+            164,
+            79,
+            20,
+            this.getCurrent().visibilityType.getTranslation(),
+            b -> {
+               this.getCurrent().visibilityType = WaypointVisibilityType.values()[(this.getCurrent().visibilityType.ordinal() + 1)
+                  % WaypointVisibilityType.values().length];
+               this.visibilityTypeButton.method_25355(this.getCurrent().visibilityType.getTranslation());
                this.getCurrent().keepVisibilityType = false;
                if (this.defaultVisibilityTypeButton != null) {
                   this.defaultVisibilityTypeButton.field_22763 = true;
                }
-            }, () -> VISIBILITY_TYPE_TOOLTIP
+            },
+            () -> VISIBILITY_TYPE_TOOLTIP
          )
       );
       if (this.getCurrent().defaultKeepYawText) {
@@ -914,8 +921,8 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       if (this.getCurrent().defaultKeepVisibilityType) {
          this.method_37063(this.defaultVisibilityTypeButton = class_4185.method_46430(class_2561.method_43470("-"), b -> {
             this.getCurrent().keepVisibilityType = true;
-            this.getCurrent().visibilityType = 0;
-            this.visibilityTypeButton.method_25355(WaypointVisibilityType.values()[this.getCurrent().visibilityType].getTranslation());
+            this.getCurrent().visibilityType = WaypointVisibilityType.LOCAL;
+            this.visibilityTypeButton.method_25355(this.getCurrent().visibilityType.getTranslation());
             b.field_22763 = false;
          }).method_46434(this.field_22789 / 2 - 130, 164, 20, 20).method_46431());
          this.defaultVisibilityTypeButton.field_22763 = !this.getCurrent().keepVisibilityType;
@@ -935,13 +942,13 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
          );
       }
 
-      int currentColor = this.getCurrent().color;
+      WaypointColor currentColor = this.getCurrent().color;
       this.colorDD = DropDownWidget.Builder.begin()
          .setOptions(this.createColorOptions())
          .setX(this.field_22789 / 2 - 60)
          .setY(82)
          .setW(120)
-         .setSelected(currentColor == 0 ? 0 : currentColor - 1)
+         .setSelected((currentColor == null ? -1 : currentColor.ordinal()) + (this.getCurrent().defaultKeepColor ? 1 : 0))
          .setCallback(this)
          .setContainer(this)
          .setNarrationTitle(class_2561.method_43471("gui.xaero_dropdown_waypoint_color"))
@@ -1298,7 +1305,9 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             }
          }
       } else if (menu == this.colorDD) {
-         this.getCurrent().color = this.colorDD.size() > ModSettings.ENCHANT_COLORS.length ? selected : selected + 1;
+         this.getCurrent().color = !this.getCurrent().defaultKeepColor
+            ? WaypointColor.fromIndex(selected)
+            : (selected == 0 ? null : WaypointColor.fromIndex(selected - 1));
       } else if (menu == this.containersDD) {
          this.containers.current = selected;
          MinimapWorld currentWorld;

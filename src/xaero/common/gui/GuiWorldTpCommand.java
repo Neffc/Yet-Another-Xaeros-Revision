@@ -35,13 +35,13 @@ public class GuiWorldTpCommand extends ScreenBase {
    public GuiWorldTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape, MinimapWorldRootContainer rootContainer) {
       super(modMain, parent, escape, class_2561.method_43471("gui.xaero_world_teleport_command"));
       this.rootContainer = rootContainer;
-      this.commandFormat = rootContainer.getServerTeleportCommandFormat() == null
+      this.commandFormat = rootContainer.getConfig().getServerTeleportCommandFormat() == null
          ? modMain.getSettings().defaultWaypointTPCommandFormat
-         : rootContainer.getServerTeleportCommandFormat();
-      this.rotationCommandFormat = rootContainer.getServerTeleportCommandRotationFormat() == null
+         : rootContainer.getConfig().getServerTeleportCommandFormat();
+      this.rotationCommandFormat = rootContainer.getConfig().getServerTeleportCommandRotationFormat() == null
          ? modMain.getSettings().defaultWaypointTPCommandRotationFormat
-         : rootContainer.getServerTeleportCommandRotationFormat();
-      this.usingDefault = rootContainer.isUsingDefaultTeleportCommand();
+         : rootContainer.getConfig().getServerTeleportCommandRotationFormat();
+      this.usingDefault = rootContainer.getConfig().isUsingDefaultTeleportCommand();
    }
 
    @Override
@@ -125,9 +125,9 @@ public class GuiWorldTpCommand extends ScreenBase {
                   this.rotationCommandFormat = null;
                }
 
-               this.rootContainer.setUsingDefaultTeleportCommand(this.usingDefault);
-               this.rootContainer.setServerTeleportCommandFormat(this.commandFormat);
-               this.rootContainer.setServerTeleportCommandRotationFormat(this.rotationCommandFormat);
+               this.rootContainer.getConfig().setUsingDefaultTeleportCommand(this.usingDefault);
+               this.rootContainer.getConfig().setServerTeleportCommandFormat(this.commandFormat);
+               this.rootContainer.getConfig().setServerTeleportCommandRotationFormat(this.rotationCommandFormat);
                this.rootContainer.getSession().getWorldManagerIO().getRootConfigIO().save(this.rootContainer);
                this.goBack();
             }

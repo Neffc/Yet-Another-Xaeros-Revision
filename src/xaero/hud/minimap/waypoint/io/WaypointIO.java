@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import xaero.common.HudMod;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.hud.minimap.MinimapLogs;
+import xaero.common.minimap.waypoints.WaypointVisibilityType;
+import xaero.hud.minimap.waypoint.WaypointColor;
+import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.MinimapWorld;
 
@@ -40,19 +42,13 @@ public class WaypointIO {
                Integer.parseInt(args[5]),
                Waypoint.getStringFromStringSafe(args[1], "§§"),
                Waypoint.getStringFromStringSafe(args[2], "§§"),
-               Integer.parseInt(args[6]),
-               0,
+               WaypointColor.fromIndex(Integer.parseInt(args[6])),
+               WaypointPurpose.NORMAL,
                false,
                yIncluded
             );
-            if (args.length > 7) {
-               loadWaypoint.setDisabled(args[7].equals("true"));
-            }
-
-            if (args.length > 8) {
-               loadWaypoint.setType(Integer.parseInt(args[8]));
-            }
-
+            loadWaypoint.setDisabled(args[7].equals("true"));
+            loadWaypoint.setType(Integer.parseInt(args[8]));
             if (args.length > 10) {
                loadWaypoint.setRotation(args[10].equals("true"));
             }
@@ -63,22 +59,29 @@ public class WaypointIO {
 
             if (args.length > 12) {
                String visibilityTypeString = args[12];
-               int visibilityType = 0;
-
-               try {
-                  visibilityType = visibilityTypeString.equals("true")
-                     ? 1
-                     : (visibilityTypeString.equals("false") ? 0 : Integer.parseInt(visibilityTypeString));
-               } catch (NumberFormatException var11) {
-                  MinimapLogs.LOGGER.error("suppressed exception", var11);
+               WaypointVisibilityType visibilityType = WaypointVisibilityType.LOCAL;
+               if (visibilityTypeString.equals("true")) {
+                  visibilityType = WaypointVisibilityType.GLOBAL;
+               } else if (!visibilityTypeString.equals("false")) {
+                  try {
+                     visibilityType = WaypointVisibilityType.valueOf(visibilityTypeString);
+                  } catch (IllegalArgumentException var13) {
+                     try {
+                        int visibilityIndex = Integer.parseInt(visibilityTypeString);
+                        visibilityType = WaypointVisibilityType.values()[visibilityIndex];
+                     } catch (Exception var12) {
+                     }
+                  }
                }
 
-               loadWaypoint.setVisibilityType(visibilityType);
+               loadWaypoint.setVisibility(visibilityType);
             }
 
             if (args.length > 13) {
                String destinationString = args[13];
-               loadWaypoint.setOneoffDestination(destinationString.equals("true"));
+               if (destinationString.equals("true")) {
+                  loadWaypoint.setOneoffDestination(true);
+               }
             }
 
             waypoints.add(loadWaypoint);
@@ -120,7 +123,7 @@ public class WaypointIO {
                output.write("waypoint:");
                output.write(w.getNameSafe("§§"));
                output.write(":");
-               output.write(w.getSymbolSafe("§§"));
+               output.write(w.getInitialsSafe("§§"));
                output.write(":");
                output.write(String.valueOf(w.getX()));
                output.write(":");
@@ -128,7 +131,7 @@ public class WaypointIO {
                output.write(":");
                output.write(String.valueOf(w.getZ()));
                output.write(":");
-               output.write(String.valueOf(w.getColor()));
+               output.write(String.valueOf(w.getWaypointColor().ordinal()));
                output.write(":");
                output.write(String.valueOf(w.isDisabled()));
                output.write(":");
@@ -142,7 +145,7 @@ public class WaypointIO {
                output.write(":");
                output.write(String.valueOf(w.getVisibilityType()));
                output.write(":");
-               output.write(String.valueOf(w.isOneoffDestination()));
+               output.write(String.valueOf(w.isDestination()));
                output.write("\n");
             }
          }

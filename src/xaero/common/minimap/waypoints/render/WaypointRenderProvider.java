@@ -1,25 +1,27 @@
 package xaero.common.minimap.waypoints.render;
 
-import java.util.Iterator;
-import xaero.common.minimap.element.render.MinimapElementRenderProvider;
 import xaero.common.minimap.waypoints.Waypoint;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 
-public class WaypointRenderProvider extends MinimapElementRenderProvider<Waypoint, WaypointGuiRenderContext> {
-   private Iterator<Waypoint> iterator;
-
-   public void begin(int location, WaypointGuiRenderContext context) {
-      this.iterator = context.sortingList.stream().filter(context.filter).sorted().iterator();
+@Deprecated
+public class WaypointRenderProvider extends xaero.hud.minimap.waypoint.render.WaypointRenderProvider {
+   public void begin(int location, xaero.hud.minimap.waypoint.render.WaypointGuiRenderContext context) {
+      this.begin(MinimapElementRenderLocation.fromIndex(location), context);
    }
 
-   public boolean hasNext(int location, WaypointGuiRenderContext context) {
-      return this.iterator.hasNext();
+   public Waypoint setupContextAndGetNext(int location, xaero.hud.minimap.waypoint.render.WaypointGuiRenderContext context) {
+      return this.setupContextAndGetNext(MinimapElementRenderLocation.fromIndex(location), context);
    }
 
-   public Waypoint getNext(int location, WaypointGuiRenderContext context) {
-      return this.iterator.next();
+   public boolean hasNext(int location, xaero.hud.minimap.waypoint.render.WaypointGuiRenderContext context) {
+      return this.hasNext(MinimapElementRenderLocation.fromIndex(location), context);
    }
 
-   public void end(int location, WaypointGuiRenderContext context) {
-      this.iterator = null;
+   public Waypoint getNext(int location, xaero.hud.minimap.waypoint.render.WaypointGuiRenderContext context) {
+      return this.getNext(MinimapElementRenderLocation.fromIndex(location), context);
+   }
+
+   public void end(int location, xaero.hud.minimap.waypoint.render.WaypointGuiRenderContext context) {
+      this.end(MinimapElementRenderLocation.fromIndex(location), context);
    }
 }

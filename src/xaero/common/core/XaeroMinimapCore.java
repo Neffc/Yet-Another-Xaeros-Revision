@@ -34,6 +34,7 @@ import xaero.common.misc.Misc;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.container.MinimapWorldContainerUtil;
 import xaero.hud.pushbox.BuiltInPushBoxes;
 import xaero.hud.pushbox.boss.IBossHealthPushBox;
 import xaero.hud.pushbox.effect.IPotionEffectsPushBox;
@@ -240,15 +241,16 @@ public class XaeroMinimapCore {
 
    public static void onDeleteWorld(class_5143 levelStorageAccess) {
       if (isModLoaded()) {
-         Path worldName = levelStorageAccess.method_27010(class_5218.field_24188).getParent().getFileName();
-         if (!worldName.toString().isEmpty()) {
-            Path worldMinimapDataFolder = HudMod.INSTANCE.getMinimapFolder().resolve(worldName);
-            if (worldMinimapDataFolder.toFile().exists()) {
+         String worldFolder = levelStorageAccess.method_27010(class_5218.field_24188).getParent().getFileName().toString();
+         if (!worldFolder.isEmpty()) {
+            String minimapWorldFolder = MinimapWorldContainerUtil.convertWorldFolderToContainerNode(worldFolder);
+            Path minimapWorldFolderPath = HudMod.INSTANCE.getMinimapFolder().resolve(minimapWorldFolder);
+            if (minimapWorldFolderPath.toFile().exists()) {
                try {
-                  Misc.deleteFile(worldMinimapDataFolder, 20);
-                  MinimapLogs.LOGGER.info(String.format("Deleted minimap world data at %s", worldMinimapDataFolder));
-               } catch (IOException var4) {
-                  MinimapLogs.LOGGER.error(String.format("Failed to delete minimap world data at %s!", worldMinimapDataFolder), var4);
+                  Misc.deleteFile(minimapWorldFolderPath, 20);
+                  MinimapLogs.LOGGER.info(String.format("Deleted minimap world data at %s", minimapWorldFolderPath));
+               } catch (IOException var5) {
+                  MinimapLogs.LOGGER.error(String.format("Failed to delete minimap world data at %s!", minimapWorldFolderPath), var5);
                }
             }
          }

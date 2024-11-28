@@ -13,6 +13,7 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldContainer;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 import xaero.hud.minimap.world.container.MinimapWorldContainer;
+import xaero.hud.minimap.world.container.config.RootConfig;
 import xaero.hud.path.XaeroPath;
 
 public abstract class MinimapWorld {
@@ -117,6 +118,10 @@ public abstract class MinimapWorld {
 
    public int getSetCount() {
       return this.waypointSets.size();
+   }
+
+   public RootConfig getRootConfig() {
+      return this.getContainer().getRootConfig();
    }
 
    public static final class Builder {

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
 import net.minecraft.class_1921;
+import net.minecraft.class_243;
 import net.minecraft.class_2561;
 import net.minecraft.class_276;
 import net.minecraft.class_310;
@@ -27,12 +28,15 @@ import xaero.common.minimap.render.radar.EntityIconManager;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
+import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.render.TextureLocations;
 
 public final class RadarRenderer extends MinimapElementRenderer<class_1297, RadarRenderContext> {
    private final IXaeroMinimap modMain;
    private final EntityIconManager entityIconManager;
    private final Minimap minimap;
+   private MinimapElementRenderInfo compatibleRenderInfo;
 
    private RadarRenderer(
       IXaeroMinimap modMain,
@@ -50,17 +54,9 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
 
    @Override
    public void preRender(
-      int location,
-      class_1297 renderEntity,
-      class_1657 player,
-      double renderX,
-      double renderY,
-      double renderZ,
-      IXaeroMinimap modMain,
-      class_4598 renderTypeBuffers,
-      MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+      MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
-      ModSettings settings = modMain.getSettings();
+      ModSettings settings = this.modMain.getSettings();
       this.entityIconManager.allowPrerender();
       RenderSystem.setShaderTexture(0, TextureLocations.GUI_TEXTURES);
       class_310.method_1551().method_1531().method_22813(TextureLocations.GUI_TEXTURES);
@@ -75,34 +71,25 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       RenderSystem.enableBlend();
       RenderSystem.blendFuncSeparate(770, 771, 1, 771);
       class_1921 dotsRenderType = settings.getSmoothDots() ? CustomRenderTypes.GUI_BILINEAR : CustomRenderTypes.GUI_NEAREST;
-      this.context
-         .setupGlobalContext(
-            settings.getDotNameScale(),
-            settings.getSmoothDots(),
-            settings.debugEntityIcons,
-            settings.debugEntityVariantIds,
-            settings.getDotsStyle(),
-            dotsRenderType,
-            renderTypeBuffers.getBuffer(dotsRenderType),
-            renderTypeBuffers.getBuffer(CustomRenderTypes.RADAR_NAME_BGS),
-            multiTextureRenderTypeRenderers.getRenderer(
-               t -> RenderSystem.setShaderTexture(0, t), MultiTextureRenderTypeRendererProvider::defaultTextureBind, CustomRenderTypes.GUI_BILINEAR
-            ),
-            renderEntity
-         );
+      this.context.nameScale = settings.getDotNameScale();
+      this.context.smoothDots = settings.getSmoothDots();
+      this.context.debugEntityIcons = settings.debugEntityIcons;
+      this.context.debugEntityVariantIds = settings.debugEntityVariantIds;
+      this.context.dotsStyle = settings.getDotsStyle();
+      this.context.dotsRenderType = dotsRenderType;
+      this.context.dotsBufferBuilder = renderTypeBuffers.getBuffer(dotsRenderType);
+      this.context.nameBgBuilder = renderTypeBuffers.getBuffer(CustomRenderTypes.RADAR_NAME_BGS);
+      this.context.iconsRenderer = multiTextureRenderTypeRenderers.getRenderer(
+         t -> RenderSystem.setShaderTexture(0, t), MultiTextureRenderTypeRendererProvider::defaultTextureBind, CustomRenderTypes.GUI_BILINEAR
+      );
+      this.context.renderEntity = renderInfo.renderEntity;
+      this.context.font = class_310.method_1551().field_1772;
+      this.context.helper = this.modMain.getMinimap().getMinimapFBORenderer().getHelper();
    }
 
    @Override
    public void postRender(
-      int location,
-      class_1297 renderEntity,
-      class_1657 player,
-      double renderX,
-      double renderY,
-      double renderZ,
-      IXaeroMinimap modMain,
-      class_4598 renderTypeBuffers,
-      MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+      MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
       if (this.context.reversedOrder) {
          renderTypeBuffers.method_22994(this.context.dotsRenderType);
@@ -123,28 +110,19 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
    }
 
    public boolean renderElement(
-      int location,
+      class_1297 e,
       boolean highlit,
       boolean outOfBounds,
-      class_332 guiGraphics,
-      class_4598 renderTypeBuffers,
-      class_327 font,
-      class_276 framebuffer,
-      MinimapRendererHelper helper,
-      class_1297 renderEntity,
-      class_1657 player,
-      double renderX,
-      double renderY,
-      double renderZ,
-      int elementIndex,
       double optionalDepth,
       float optionalScale,
-      class_1297 e,
       double partialX,
       double partialY,
-      boolean cave,
-      float partialTicks
+      MinimapElementRenderInfo renderInfo,
+      class_332 guiGraphics,
+      class_4598 renderTypeBuffers
    ) {
+      RadarRenderContext context = this.context;
+      MinimapRendererHelper helper = context.helper;
       class_4587 matrixStack = guiGraphics.method_51448();
       if (e instanceof class_1657) {
          if (this.modMain.getTrackedPlayerRenderer().getCollector().playerExists(e.method_5667())) {
@@ -160,9 +138,13 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
          }
       }
 
-      float optionScaleAdjust = this.elementReader.getBoxScale(location, e, this.context);
+      MinimapElementRenderLocation location = renderInfo.location;
+      class_276 framebuffer = renderInfo.framebuffer;
+      class_1297 renderEntity = renderInfo.renderEntity;
+      boolean cave = renderInfo.cave;
+      class_1657 player = renderInfo.player;
+      float optionScaleAdjust = this.elementReader.getBoxScale(location, e, context);
       optionalScale *= optionScaleAdjust;
-      RadarRenderContext context = this.context;
       int nameOffsetX = 0;
       int nameOffsetY = 0;
       matrixStack.method_22903();
@@ -246,50 +228,50 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
          int dotTextureH = 0;
          float dotOffset = 0.0F;
          double dotActualScale = (double)optionalScale;
-         short var76;
-         byte var77;
-         byte var78;
+         short var68;
+         byte var70;
+         byte var71;
          if (context.dotsStyle == 1) {
             if (smooth) {
                dotTextureX = 1;
-               var76 = 88;
+               var68 = 88;
             } else {
                dotsScale = (double)((int)dotsScale);
                dotTextureX = 9;
-               var76 = 77;
+               var68 = 77;
             }
 
             dotOffset = -3.5F;
-            var78 = 8;
-            var77 = 8;
+            var71 = 8;
+            var70 = 8;
             dotActualScale *= dotsScale;
             matrixStack.method_22905((float)dotsScale, (float)dotsScale, 1.0F);
          } else {
             switch (dotSize) {
                case 1:
                   dotOffset = -4.5F;
-                  var76 = 108;
-                  var78 = 9;
-                  var77 = 9;
+                  var68 = 108;
+                  var71 = 9;
+                  var70 = 9;
                   break;
                case 2:
                default:
                   dotOffset = -5.5F;
-                  var76 = 117;
-                  var78 = 11;
-                  var77 = 11;
+                  var68 = 117;
+                  var71 = 11;
+                  var70 = 11;
                   break;
                case 3:
                   dotOffset = -7.5F;
-                  var76 = 128;
-                  var78 = 15;
-                  var77 = 15;
+                  var68 = 128;
+                  var71 = 15;
+                  var70 = 15;
                   break;
                case 4:
                   dotOffset = -10.5F;
-                  var76 = 160;
-                  var78 = 21;
-                  var77 = 21;
+                  var68 = 160;
+                  var71 = 21;
+                  var70 = 21;
             }
          }
 
@@ -301,7 +283,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
          }
 
          helper.addTexturedColoredRectToExistingBuffer(
-            matrixStack.method_23760().method_23761(), context.dotsBufferBuilder, dotOffset, dotOffset, dotTextureX, var76, var77, var78, r, g, b, a, 256.0F
+            matrixStack.method_23760().method_23761(), context.dotsBufferBuilder, dotOffset, dotOffset, dotTextureX, var68, var70, var71, r, g, b, a, 256.0F
          );
       }
 
@@ -337,6 +319,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
             }
          }
 
+         class_327 font = context.font;
          if (name) {
             class_2561 component = Misc.getFixedDisplayName(e);
             if (component != null) {
@@ -376,6 +359,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       return true;
    }
 
+   @Deprecated
    public void renderEntityDotToFBO(
       int location,
       boolean highlit,
@@ -414,10 +398,96 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       class_276 framebuffer,
       float minimapScale
    ) {
-      this.context
-         .setupGlobalContext(
-            dotNameScale, smooth, debug, debugEntityVariantIds, style, dotsRenderType, dotsBufferBuilder, nameBgBuilder, iconsRenderer, renderEntity
-         );
+      this.renderEntityDotToFBO(
+         MinimapElementRenderLocation.fromIndex(location),
+         highlit,
+         guiGraphics,
+         minimap,
+         p,
+         renderEntity,
+         e,
+         partial,
+         name,
+         icon,
+         minimapRadar,
+         style,
+         smooth,
+         debug,
+         debugEntityVariantIds,
+         cave,
+         dotNameScale,
+         textRenderTypeBuffer,
+         dotsRenderType,
+         dotsBufferBuilder,
+         iconsRenderer,
+         nameBgBuilder,
+         dotIndex,
+         displayNameWhenIconFails,
+         heightLimit,
+         heightBasedFade,
+         startFadingAt,
+         iconScale,
+         dotSize,
+         colorIndex,
+         displayY,
+         category,
+         helper,
+         font,
+         framebuffer,
+         minimapScale
+      );
+   }
+
+   public void renderEntityDotToFBO(
+      MinimapElementRenderLocation location,
+      boolean highlit,
+      class_332 guiGraphics,
+      MinimapProcessor minimap,
+      class_1657 p,
+      class_1297 renderEntity,
+      class_1297 e,
+      float partial,
+      boolean name,
+      boolean icon,
+      MinimapRadar minimapRadar,
+      int style,
+      boolean smooth,
+      boolean debug,
+      boolean debugEntityVariantIds,
+      boolean cave,
+      double dotNameScale,
+      class_4598 textRenderTypeBuffer,
+      class_1921 dotsRenderType,
+      class_4588 dotsBufferBuilder,
+      MultiTextureRenderTypeRenderer iconsRenderer,
+      class_4588 nameBgBuilder,
+      int dotIndex,
+      boolean displayNameWhenIconFails,
+      int heightLimit,
+      boolean heightBasedFade,
+      int startFadingAt,
+      double iconScale,
+      int dotSize,
+      int colorIndex,
+      int displayY,
+      EntityRadarCategory category,
+      MinimapRendererHelper helper,
+      class_327 font,
+      class_276 framebuffer,
+      float minimapScale
+   ) {
+      this.context.nameScale = dotNameScale;
+      this.context.smoothDots = smooth;
+      this.context.debugEntityIcons = debug;
+      this.context.debugEntityVariantIds = debugEntityVariantIds;
+      this.context.dotsStyle = style;
+      this.context.dotsRenderType = dotsRenderType;
+      this.context.dotsBufferBuilder = dotsBufferBuilder;
+      this.context.nameBgBuilder = nameBgBuilder;
+      this.context.iconsRenderer = iconsRenderer;
+      this.context.renderEntity = renderEntity;
+      this.context.font = font;
+      this.context.helper = helper;
       this.context.minimapRadar = minimapRadar;
       this.context.name = name;
       this.context.icon = icon;
@@ -430,37 +500,101 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       this.context.colorIndex = colorIndex;
       this.context.displayY = displayY;
       this.context.entityCategory = category;
-      this.renderElement(
-         location,
-         highlit,
-         false,
-         guiGraphics,
-         textRenderTypeBuffer,
-         font,
-         framebuffer,
-         helper,
-         renderEntity,
-         p,
-         0.0,
-         0.0,
-         0.0,
-         0,
-         0.0,
-         minimapScale,
-         e,
-         0.0,
-         0.0,
-         cave,
-         1.0F
-      );
+      MinimapElementRenderInfo renderInfo = new MinimapElementRenderInfo(location, renderEntity, p, new class_243(0.0, 0.0, 0.0), cave, 1.0F, framebuffer);
+      this.renderElement(e, highlit, false, 0.0, minimapScale, 0.0, 0.0, renderInfo, guiGraphics, textRenderTypeBuffer);
       this.context.renderEntity = null;
       this.context.minimapRadar = null;
       this.context.iconsRenderer = null;
    }
 
    @Override
+   public boolean shouldRender(MinimapElementRenderLocation location) {
+      return this.minimap.usingFBO()
+         && (
+            location == MinimapElementRenderLocation.WORLD_MAP
+               || location == MinimapElementRenderLocation.WORLD_MAP_MENU
+               || this.modMain.getSettings().getEntityRadar()
+         );
+   }
+
+   @Deprecated
+   public boolean renderElement(
+      int location,
+      boolean highlit,
+      boolean outOfBounds,
+      class_332 guiGraphics,
+      class_4598 renderTypeBuffers,
+      class_327 font,
+      class_276 framebuffer,
+      MinimapRendererHelper helper,
+      class_1297 renderEntity,
+      class_1657 player,
+      double renderX,
+      double renderY,
+      double renderZ,
+      int elementIndex,
+      double optionalDepth,
+      float optionalScale,
+      class_1297 element,
+      double partialX,
+      double partialY,
+      boolean cave,
+      float partialTicks
+   ) {
+      if (this.compatibleRenderInfo == null) {
+         this.compatibleRenderInfo = new MinimapElementRenderInfo(
+            MinimapElementRenderLocation.fromIndex(location), renderEntity, player, new class_243(renderX, renderY, renderZ), cave, partialTicks, framebuffer
+         );
+      }
+
+      return this.renderElement(
+         element, highlit, outOfBounds, optionalDepth, optionalScale, partialX, partialY, this.compatibleRenderInfo, guiGraphics, renderTypeBuffers
+      );
+   }
+
+   @Deprecated
+   @Override
+   public void preRender(
+      int location,
+      class_1297 renderEntity,
+      class_1657 player,
+      double renderX,
+      double renderY,
+      double renderZ,
+      IXaeroMinimap modMain,
+      class_4598 renderTypeBuffers,
+      MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+   ) {
+      this.preRender(
+         new MinimapElementRenderInfo(
+            MinimapElementRenderLocation.fromIndex(location), renderEntity, player, new class_243(renderX, renderY, renderZ), false, 1.0F, null
+         ),
+         renderTypeBuffers,
+         multiTextureRenderTypeRenderers
+      );
+   }
+
+   @Deprecated
+   @Override
+   public void postRender(
+      int location,
+      class_1297 renderEntity,
+      class_1657 player,
+      double renderX,
+      double renderY,
+      double renderZ,
+      IXaeroMinimap modMain,
+      class_4598 renderTypeBuffers,
+      MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+   ) {
+      this.postRender(this.compatibleRenderInfo, renderTypeBuffers, multiTextureRenderTypeRenderers);
+      this.compatibleRenderInfo = null;
+   }
+
+   @Deprecated
+   @Override
    public boolean shouldRender(int location) {
-      return this.minimap.usingFBO() && (location == 3 || location == 4 || this.modMain.getSettings().getEntityRadar());
+      return this.shouldRender(MinimapElementRenderLocation.fromIndex(location));
    }
 
    public static final class Builder {

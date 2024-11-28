@@ -12,12 +12,15 @@ import net.fabricmc.loader.api.metadata.ModOrigin;
 import net.fabricmc.loader.api.metadata.ModOrigin.Kind;
 import xaero.common.controls.IKeyBindingHelper;
 import xaero.common.controls.KeyBindingHelperFabric;
+import xaero.common.hud.render.util.FabricRenderUtil;
 import xaero.common.misc.IObfuscatedReflection;
 import xaero.common.misc.ObfuscatedReflectionFabric;
+import xaero.hud.render.util.IPlatformRenderUtil;
 
 public class FabricPlatformHelper implements IPlatformHelper {
    private final IObfuscatedReflection obfuscatedReflectionFabric = new ObfuscatedReflectionFabric();
    private final KeyBindingHelperFabric keyBindingHelperFabric = new KeyBindingHelperFabric();
+   private final FabricRenderUtil fabricRenderUtil = new FabricRenderUtil();
 
    @Override
    public String getPlatformName() {
@@ -42,6 +45,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
    @Override
    public IKeyBindingHelper getKeyBindingHelper() {
       return this.keyBindingHelperFabric;
+   }
+
+   @Override
+   public IPlatformRenderUtil getPlatformRenderUtil() {
+      return this.fabricRenderUtil;
    }
 
    @Override

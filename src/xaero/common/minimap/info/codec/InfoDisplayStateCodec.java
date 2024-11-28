@@ -2,20 +2,22 @@ package xaero.common.minimap.info.codec;
 
 import java.util.function.Function;
 
-public class InfoDisplayStateCodec<T> {
-   private final Function<String, T> decoder;
-   private final Function<T, String> encoder;
-
+@Deprecated
+public class InfoDisplayStateCodec<T> extends xaero.hud.minimap.info.codec.InfoDisplayStateCodec<T> {
+   @Deprecated
    public InfoDisplayStateCodec(Function<String, T> decoder, Function<T, String> encoder) {
-      this.decoder = decoder;
-      this.encoder = encoder;
+      super(decoder, encoder);
    }
 
+   @Deprecated
+   @Override
    public T decode(String string) {
-      return this.decoder.apply(string);
+      return super.decode(string);
    }
 
+   @Deprecated
+   @Override
    public String encode(T value) {
-      return this.encoder.apply(value);
+      return super.encode(value);
    }
 }

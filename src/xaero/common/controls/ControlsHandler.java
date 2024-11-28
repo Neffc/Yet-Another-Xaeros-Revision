@@ -182,7 +182,7 @@ public class ControlsHandler {
                   currentWorld.setCurrentWaypointSetId(firstSetKey);
                }
 
-               session.getWorldStateUpdater().update(session);
+               session.getWorldStateUpdater().update();
                session.getWaypointSession().setSetChangedTime(System.currentTimeMillis());
 
                try {

@@ -335,7 +335,7 @@ public abstract class HudMod implements IXaeroMinimap {
    public void resetSettings() throws IOException {
       this.settings = this.createModSettings();
       this.settings.loadDefaultSettings();
-      this.interfaces.getMinimapInterface().getInfoDisplayManager().reset();
+      this.getMinimap().getInfoDisplays().getManager().reset();
       ObjectCategoryDefaultSettingsSetter defaultSettings = ObjectCategoryDefaultSettingsSetter.Builder.getDefault()
          .setSettings(EntityRadarCategorySettings.SETTINGS)
          .build();
