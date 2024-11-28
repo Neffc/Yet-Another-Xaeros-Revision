@@ -4,6 +4,7 @@ import net.minecraft.class_1657;
 import net.minecraft.class_1937;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
+import net.minecraft.class_5321;
 import net.minecraft.class_638;
 import xaero.common.IXaeroMinimap;
 import xaero.common.anim.MultiplyAnimationHelper;
@@ -35,6 +36,9 @@ public class MinimapProcessor {
    private boolean manualCaveMode;
    private boolean noMinimapMessageReceived;
    private boolean fairPlayOnlyMessageReceived;
+   private double lastMapDimensionScale = 1.0;
+   private class_5321<class_1937> lastMapDimension;
+   private double lastPlayerDimDiv = 1.0;
 
    public MinimapProcessor(
       IXaeroMinimap modMain,
@@ -253,5 +257,35 @@ public class MinimapProcessor {
    public int getServerModNetworkVersion() {
       MinimapClientWorldData worldData = MinimapClientWorldDataHelper.getCurrentWorldData();
       return worldData == null ? 0 : worldData.getServerModNetworkVersion();
+   }
+
+   public double getLastMapDimensionScale() {
+      return this.lastMapDimensionScale;
+   }
+
+   public void setLastMapDimensionScale(double lastMapDimensionScale) {
+      this.lastMapDimensionScale = lastMapDimensionScale;
+   }
+
+   public class_5321<class_1937> getLastMapDimension() {
+      return this.lastMapDimension;
+   }
+
+   public void setLastMapDimension(class_5321<class_1937> lastMapDimension) {
+      this.lastMapDimension = lastMapDimension;
+   }
+
+   @Deprecated
+   public double getLastPlayerDimDiv() {
+      return this.lastPlayerDimDiv;
+   }
+
+   @Deprecated
+   public void setLastPlayerDimDiv(double lastPlayerDimDiv) {
+      this.lastPlayerDimDiv = lastPlayerDimDiv;
+   }
+
+   public MinimapSession getSession() {
+      return this.minimapSession;
    }
 }

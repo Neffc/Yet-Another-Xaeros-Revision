@@ -126,7 +126,11 @@ public class ModOptions {
    public static ModOptions CAVE_MODE_TOGGLE_TIMER;
    public static ModOptions LEGIBLE_CAVE_MAPS;
    public static ModOptions BIOME_BLENDING;
-   public static ModOptions TRACKED_PLAYERS;
+   public static ModOptions TRACKED_PLAYERS_ON_MAP;
+   public static ModOptions TRACKED_PLAYERS_IN_WORLD;
+   public static ModOptions TRACKED_PLAYER_WORLD_ICON_SCALE;
+   public static ModOptions TRACKED_PLAYER_WORLD_NAME_SCALE;
+   public static ModOptions TRACKED_PLAYER_MINIMAP_ICON_SCALE;
    public static ModOptions PAC_CLAIMS;
    public static ModOptions PAC_CLAIMS_FILL_OPACITY;
    public static ModOptions PAC_CLAIMS_BORDER_OPACITY;
@@ -362,9 +366,19 @@ public class ModOptions {
       );
       LEGIBLE_CAVE_MAPS = new ModOptions("gui.xaero_legible_cave_maps", new CursorBox("gui.xaero_box_legible_cave_maps"), false);
       BIOME_BLENDING = new ModOptions("gui.xaero_biome_blending", new CursorBox("gui.xaero_box_biome_blending"), false);
-      TRACKED_PLAYERS = new ModOptions("gui.xaero_tracked_players", new CursorBox("gui.xaero_box_tracked_players"), false);
+      TRACKED_PLAYERS_ON_MAP = new ModOptions("gui.xaero_tracked_players_on_map", new CursorBox("gui.xaero_box_tracked_players_on_map"), false);
+      TRACKED_PLAYERS_IN_WORLD = new ModOptions("gui.xaero_tracked_players_in_world", new CursorBox("gui.xaero_box_tracked_players_in_world"), false);
       SCALED_MAX_WAYPOINT_DISTANCE = new ModOptions(
          "gui.xaero_dimension_scaled_max_waypoint_distance", new CursorBox("gui.xaero_box_dimension_scaled_max_waypoint_distance"), false
+      );
+      TRACKED_PLAYER_WORLD_ICON_SCALE = new ModOptions(
+         "gui.xaero_tracked_player_world_icon_scale", 0.0, 17.0, 1.0F, new CursorBox("gui.xaero_box_tracked_player_world_icon_scale"), false
+      );
+      TRACKED_PLAYER_WORLD_NAME_SCALE = new ModOptions(
+         "gui.xaero_tracked_player_world_name_scale", 0.0, 17.0, 1.0F, new CursorBox("gui.xaero_box_tracked_player_world_name_scale"), false
+      );
+      TRACKED_PLAYER_MINIMAP_ICON_SCALE = new ModOptions(
+         "gui.xaero_tracked_player_minimap_icon_scale", 0.0, 17.0, 1.0F, new CursorBox("gui.xaero_box_tracked_player_minimap_icon_scale"), false
       );
       PAC_CLAIMS = new ModOptions("gui.xaero_pac_claims", new CursorBox("gui.xaero_box_pac_claims"), false);
       PAC_CLAIMS_FILL_OPACITY = new ModOptions(

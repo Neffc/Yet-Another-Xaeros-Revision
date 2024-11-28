@@ -20,6 +20,7 @@ import xaero.common.minimap.radar.category.EntityRadarCategoryManager;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.entity.EntityUtils;
 import xaero.hud.minimap.module.MinimapSession;
 
 public class MinimapRadar {
@@ -131,18 +132,15 @@ public class MinimapRadar {
    }
 
    public double getEntityX(class_1297 e, float partial) {
-      double xOld = e.field_6012 > 0 ? e.field_6038 : e.method_23317();
-      return xOld + (e.method_23317() - xOld) * (double)partial;
+      return EntityUtils.getEntityX(e, partial);
    }
 
    public double getEntityY(class_1297 e, float partial) {
-      double yOld = e.field_6012 > 0 ? e.field_5971 : e.method_23318();
-      return yOld + (e.method_23318() - yOld) * (double)partial;
+      return EntityUtils.getEntityY(e, partial);
    }
 
    public double getEntityZ(class_1297 e, float partial) {
-      double zOld = e.field_6012 > 0 ? e.field_5989 : e.method_23321();
-      return zOld + (e.method_23321() - zOld) * (double)partial;
+      return EntityUtils.getEntityZ(e, partial);
    }
 
    public int getTeamColour(class_1297 e) {

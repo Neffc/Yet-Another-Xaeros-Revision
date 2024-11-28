@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager.class_4534;
 import com.mojang.blaze3d.platform.GlStateManager.class_4535;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.class_1297;
+import net.minecraft.class_1937;
 import net.minecraft.class_2338;
 import net.minecraft.class_243;
 import net.minecraft.class_287;
@@ -15,6 +16,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_3532;
 import net.minecraft.class_4587;
 import net.minecraft.class_4588;
+import net.minecraft.class_5321;
 import net.minecraft.class_638;
 import net.minecraft.class_757;
 import net.minecraft.class_2338.class_2339;
@@ -33,10 +35,11 @@ import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
-import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 import xaero.hud.render.TextureLocations;
 
 public abstract class MinimapRenderer {
@@ -46,18 +49,16 @@ public abstract class MinimapRenderer {
    protected class_310 mc;
    protected Minimap minimap;
    protected MinimapRendererHelper helper;
-   protected WaypointsGuiRenderer waypointsGuiRenderer;
+   protected WaypointMapRenderer waypointMapRenderer;
    private int lastMinimapSize;
    protected double zoom = 1.0;
    private class_2339 mutableBlockPos;
    protected final CompassRenderer compassRenderer;
-   private double lastMapDimensionScale = 1.0;
-   private double lastPlayerDimDiv = 1.0;
 
-   public MinimapRenderer(IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimap, CompassRenderer compassRenderer) {
+   public MinimapRenderer(IXaeroMinimap modMain, class_310 mc, WaypointMapRenderer waypointMapRenderer, Minimap minimap, CompassRenderer compassRenderer) {
       this.modMain = modMain;
       this.mc = mc;
-      this.waypointsGuiRenderer = waypointsGuiRenderer;
+      this.waypointMapRenderer = waypointMapRenderer;
       this.minimap = minimap;
       this.helper = new MinimapRendererHelper();
       this.mutableBlockPos = new class_2339();
@@ -78,22 +79,22 @@ public abstract class MinimapRenderer {
       class_332 var2,
       MinimapProcessor var3,
       class_243 var4,
-      double var5,
-      double var7,
+      class_5321<class_1937> var5,
+      double var6,
+      int var8,
       int var9,
-      int var10,
+      float var10,
       float var11,
-      float var12,
-      int var13,
+      int var12,
+      boolean var13,
       boolean var14,
-      boolean var15,
-      int var16,
-      double var17,
-      double var19,
+      int var15,
+      double var16,
+      double var18,
+      boolean var20,
       boolean var21,
-      boolean var22,
-      ModSettings var23,
-      CustomVertexConsumers var24
+      ModSettings var22,
+      CustomVertexConsumers var23
    );
 
    public void renderMinimap(
@@ -128,7 +129,6 @@ public abstract class MinimapRenderer {
       minimap.updateZoom();
       this.zoom = minimap.getMinimapZoom();
       class_308.method_24210();
-      RenderSystem.disableDepthTest();
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       RenderSystem.pixelStore(3317, 4);
       RenderSystem.pixelStore(3316, 0);
@@ -152,21 +152,25 @@ public abstract class MinimapRenderer {
       double renderX = playerX;
       double renderZ = playerZ;
       double mapDimensionScale = this.mc.field_1687.method_8597().comp_646();
+      class_5321<class_1937> mapDimension = this.mc.field_1687.method_27983();
       double playerDimDiv = 1.0;
       if (useWorldMap) {
          double playerCoordinateScale = mapDimensionScale;
          mapDimensionScale = this.modMain.getSupportMods().worldmapSupport.getMapDimensionScale();
+         mapDimension = this.modMain.getSupportMods().worldmapSupport.getMapDimension();
          if (mapDimensionScale == 0.0) {
-            mapDimensionScale = this.lastMapDimensionScale;
+            mapDimensionScale = minimap.getLastMapDimensionScale();
+            mapDimension = minimap.getLastMapDimension();
          }
 
          playerDimDiv = mapDimensionScale / playerCoordinateScale;
          renderX = playerX / playerDimDiv;
          renderZ = playerZ / playerDimDiv;
-         this.lastMapDimensionScale = mapDimensionScale;
       }
 
-      this.lastPlayerDimDiv = playerDimDiv;
+      minimap.setLastMapDimensionScale(mapDimensionScale);
+      minimap.setLastMapDimension(mapDimension);
+      minimap.setLastPlayerDimDiv(playerDimDiv);
       class_243 renderPos = new class_243(renderX, playerY, renderZ);
       matrixStack.method_22903();
       this.renderChunks(
@@ -174,7 +178,7 @@ public abstract class MinimapRenderer {
          guiGraphics,
          minimap,
          renderPos,
-         playerDimDiv,
+         mapDimension,
          mapDimensionScale,
          mapSize,
          bufferSize,
@@ -398,7 +402,7 @@ public abstract class MinimapRenderer {
       matrixStack.method_46416((float)(scaledX + 9), (float)(scaledY + 9), 0.0F);
       matrixStack.method_22905(1.0F / minimapScale, 1.0F / minimapScale, 1.0F);
       int halfFrame = (int)((float)mapSize * minimapScale / 2.0F / 2.0F);
-      matrixStack.method_46416((float)halfFrame, (float)halfFrame, 0.0F);
+      matrixStack.method_22904((double)halfFrame, (double)halfFrame, 0.5);
       int specW = halfFrame + (int)(3.0F * minimapScale);
       boolean safeMode = this instanceof MinimapSafeModeRenderer;
       class_4598 renderTypeBuffers = this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
@@ -408,23 +412,8 @@ public abstract class MinimapRenderer {
          this.renderCompass(matrixStack, settings, renderTypeBuffers, specW, specW, halfFrame, ps, pc, circleShape, minimapScale);
       }
 
-      this.minimap.getOverMapRendererHandler().prepareRender(specW, specW, halfFrame, halfFrame, circleShape, minimapScale);
-      this.minimap
-         .getOverMapRendererHandler()
-         .render(
-            guiGraphics,
-            this.mc.method_1560(),
-            this.mc.field_1724,
-            renderPos,
-            playerDimDiv,
-            ps,
-            pc,
-            scaledZoom,
-            cave,
-            partial,
-            null,
-            multiTextureRenderTypeRenderers
-         );
+      this.minimap.getOverMapRendererHandler().prepareRender(ps, pc, scaledZoom, specW, specW, halfFrame, halfFrame, circleShape, minimapScale);
+      this.minimap.getOverMapRendererHandler().render(guiGraphics, renderPos, partial, null, mapDimensionScale, mapDimension);
       if (this.modMain.getSettings().compassOverEverything) {
          this.renderCompass(matrixStack, settings, renderTypeBuffers, specW, specW, halfFrame, ps, pc, circleShape, minimapScale);
       }
@@ -654,7 +643,9 @@ public abstract class MinimapRenderer {
       return this.helper;
    }
 
+   @Deprecated
    public double getLastPlayerDimDiv() {
-      return this.lastPlayerDimDiv;
+      MinimapSession session = BuiltInHudModules.MINIMAP.getCurrentSession();
+      return session == null ? 1.0 : session.getProcessor().getLastPlayerDimDiv();
    }
 }

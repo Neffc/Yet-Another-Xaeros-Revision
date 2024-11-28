@@ -6,12 +6,14 @@ import com.mojang.blaze3d.platform.GlStateManager.class_4535;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
+import net.minecraft.class_1937;
 import net.minecraft.class_243;
 import net.minecraft.class_308;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import net.minecraft.class_4588;
+import net.minecraft.class_5321;
 import net.minecraft.class_583;
 import net.minecraft.class_630;
 import net.minecraft.class_8251;
@@ -45,7 +47,7 @@ import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.minimap.element.render.map.MinimapElementMapRendererHandler;
 import xaero.hud.minimap.module.MinimapSession;
-import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 
 public class MinimapFBORenderer extends MinimapRenderer {
    private ImprovedFramebuffer scalingFramebuffer;
@@ -56,8 +58,8 @@ public class MinimapFBORenderer extends MinimapRenderer {
    private boolean triedFBO;
    private boolean loadedFBO;
 
-   public MinimapFBORenderer(IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimap, CompassRenderer compassRenderer) {
-      super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
+   public MinimapFBORenderer(IXaeroMinimap modMain, class_310 mc, WaypointMapRenderer waypointMapRenderer, Minimap minimap, CompassRenderer compassRenderer) {
+      super(modMain, mc, waypointMapRenderer, minimap, compassRenderer);
    }
 
    public void loadFrameBuffer(MinimapProcessor minimapProcessor) {
@@ -91,7 +93,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
       class_332 guiGraphics,
       MinimapProcessor minimap,
       class_243 renderPos,
-      double playerDimDiv,
+      class_5321<class_1937> mapDimension,
       double mapDimensionScale,
       int mapSize,
       int bufferSize,
@@ -113,24 +115,18 @@ public class MinimapFBORenderer extends MinimapRenderer {
             minimapSession,
             guiGraphics,
             minimap,
-            this.mc.field_1724,
-            this.mc.method_1560(),
             renderPos,
-            playerDimDiv,
+            mapDimension,
             mapDimensionScale,
-            bufferSize,
             mapSize,
-            sizeFix,
             partial,
             lightLevel,
-            true,
             useWorldMap,
             lockedNorth,
             shape,
             ps,
             pc,
             cave,
-            circle,
             cvc
          );
       }
@@ -144,29 +140,25 @@ public class MinimapFBORenderer extends MinimapRenderer {
       MinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
-      class_1657 player,
-      class_1297 renderEntity,
       class_243 renderPos,
-      double playerDimDiv,
+      class_5321<class_1937> mapDimension,
       double mapDimensionScale,
-      int bufferSize,
       int viewW,
-      float sizeFix,
       float partial,
       int level,
-      boolean retryIfError,
       boolean useWorldMap,
       boolean lockedNorth,
       int shape,
       double ps,
       double pc,
       boolean cave,
-      boolean circle,
       CustomVertexConsumers cvc
    ) {
       Matrix4f projectionMatrixBackup = RenderSystem.getProjectionMatrix();
       class_8251 vertexSortingBackup = RenderSystem.getVertexSorting();
       class_4587 matrixStack = guiGraphics.method_51448();
+      matrixStack.method_22903();
+      matrixStack.method_34426();
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers = minimapSession.getMultiTextureRenderTypeRenderers();
       double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
       double halfMaxVisibleLength = maxVisibleLength / 2.0;
@@ -399,27 +391,12 @@ public class MinimapFBORenderer extends MinimapRenderer {
       before = System.currentTimeMillis();
       CustomRenderTypes.resetTransparency();
       CustomRenderTypes.resetDepthTest();
+      RenderSystem.enableDepthTest();
       CustomRenderTypes.resetWriteMask();
       GL11.glBindTexture(3553, 0);
       GlStateManager._bindTexture(0);
-      matrixStack.method_22903();
-      this.minimapElementMapRendererHandler.prepareRender(halfWView);
-      this.minimapElementMapRendererHandler
-         .render(
-            guiGraphics,
-            renderEntity,
-            player,
-            renderPos,
-            playerDimDiv,
-            ps,
-            pc,
-            this.zoom,
-            cave,
-            partial,
-            this.rotationFramebuffer,
-            multiTextureRenderTypeRenderers
-         );
-      matrixStack.method_22909();
+      this.minimapElementMapRendererHandler.prepareRender(ps, pc, this.zoom, halfWView);
+      this.minimapElementMapRendererHandler.render(guiGraphics, renderPos, partial, this.rotationFramebuffer, mapDimensionScale, mapDimension);
       renderTypeBuffers.method_22993();
       ImmediatelyFastHelper.triggerBatchingBuffersFlush(guiGraphics);
       this.rotationFramebuffer.method_1240();
@@ -427,6 +404,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
       RenderSystem.setProjectionMatrix(projectionMatrixBackup, vertexSortingBackup);
       shaderMatrixStack.method_22909();
       RenderSystem.applyModelViewMatrix();
+      matrixStack.method_22909();
    }
 
    public void deleteFramebuffers() {

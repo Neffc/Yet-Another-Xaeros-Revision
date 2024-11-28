@@ -711,11 +711,11 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                   guiGraphics,
                   GuiWaypoints.this.modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getHelper(),
                   w,
-                  GuiWaypoints.this.modMain.getSettings(),
                   rectX,
                   rectY,
                   renderTypeBuffers,
-                  renderTypeBuffers.getBuffer(CustomRenderTypes.COLORED_WAYPOINTS_BGS)
+                  renderTypeBuffers.getBuffer(CustomRenderTypes.COLORED_WAYPOINTS_BGS),
+                  renderTypeBuffers.getBuffer(CustomRenderTypes.GUI_NEAREST)
                );
             renderTypeBuffers.method_22993();
             matrixStack.method_22909();

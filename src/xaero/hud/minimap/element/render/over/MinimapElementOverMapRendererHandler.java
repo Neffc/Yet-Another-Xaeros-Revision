@@ -7,12 +7,14 @@ import net.minecraft.class_4587;
 import net.minecraft.class_4597.class_4598;
 import xaero.common.HudMod;
 import xaero.common.minimap.element.render.MinimapElementRendererHandler;
-import xaero.hud.minimap.element.render.MinimapElementReader;
 import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.minimap.element.render.MinimapElementRenderer;
 
 public class MinimapElementOverMapRendererHandler extends MinimapElementRendererHandler {
+   private double ps;
+   private double pc;
+   private double zoom;
    private int halfViewW;
    private int halfViewH;
    private int specW;
@@ -26,7 +28,10 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
       this.partialTranslate = partialTranslate;
    }
 
-   public void prepareRender(int specW, int specH, int halfViewW, int halfViewH, boolean circle, float minimapScale) {
+   public void prepareRender(double ps, double pc, double zoom, int specW, int specH, int halfViewW, int halfViewH, boolean circle, float minimapScale) {
+      this.ps = ps;
+      this.pc = pc;
+      this.zoom = zoom;
       this.specW = specW;
       this.specH = specH;
       this.halfViewW = halfViewW;
@@ -38,27 +43,24 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
    @Override
    protected <E, RRC, RR extends MinimapElementRenderer<E, RRC>> boolean transformAndRenderForRenderer(
       E element,
+      double elementX,
+      double elementY,
+      double elementZ,
       RR renderer,
       RRC context,
-      double playerDimDiv,
-      double ps,
-      double pc,
-      double zoom,
       int elementIndex,
       double optionalDepth,
       MinimapElementRenderInfo renderInfo,
       class_332 guiGraphics,
-      class_4598 renderTypeBuffers
+      class_4598 vanillaBufferSource
    ) {
       class_4587 matrixStack = guiGraphics.method_51448();
-      float partialTicks = renderInfo.partialTicks;
       class_243 renderPos = renderInfo.renderPos;
-      MinimapElementReader<E, RRC> elementReader = renderer.getElementReader();
-      double offx = elementReader.getRenderX(element, context, partialTicks) / playerDimDiv - renderPos.field_1352;
-      double offy = elementReader.getRenderZ(element, context, partialTicks) / playerDimDiv - renderPos.field_1350;
+      double offx = elementX - renderPos.field_1352;
+      double offy = elementZ - renderPos.field_1350;
       matrixStack.method_22903();
       boolean outOfBounds = translatePosition(
-         matrixStack, this.specW, this.specH, this.halfViewW, this.halfViewH, ps, pc, offx, offy, zoom, this.circle, this.partialTranslate
+         matrixStack, this.specW, this.specH, this.halfViewW, this.halfViewH, this.ps, this.pc, offx, offy, this.zoom, this.circle, this.partialTranslate
       );
       boolean result = renderer.renderElement(
          element,
@@ -70,23 +72,18 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
          this.partialTranslate[1],
          renderInfo,
          guiGraphics,
-         renderTypeBuffers
+         vanillaBufferSource
       );
       matrixStack.method_22909();
       return result;
    }
 
    @Override
-   protected void beforeRender(class_4587 matrixStack) {
+   protected void beforeRender(class_332 guiGraphics, MinimapElementRenderInfo renderInfo, class_4598 vanillaBufferSource) {
    }
 
    @Override
-   protected void afterRender(class_4587 matrixStack) {
-   }
-
-   @Override
-   protected int getIndexLimit() {
-      return 9800;
+   protected void afterRender(class_332 guiGraphics, MinimapElementRenderInfo renderInfo, class_4598 vanillaBufferSource) {
    }
 
    public static boolean translatePosition(

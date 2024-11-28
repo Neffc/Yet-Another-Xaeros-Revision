@@ -11,6 +11,14 @@ public abstract class MinimapElementReader<E, RC> {
 
    public abstract double getRenderZ(E var1, RC var2, float var3);
 
+   public double getCoordinateScale(E element, RC context, MinimapElementRenderInfo renderInfo) {
+      return renderInfo.renderEntityDimensionScale;
+   }
+
+   public boolean shouldScalePartialCoordinates(E element, RC context, MinimapElementRenderInfo renderInfo) {
+      return true;
+   }
+
    public abstract int getInteractionBoxLeft(E var1, RC var2, float var3);
 
    public abstract int getInteractionBoxRight(E var1, RC var2, float var3);
@@ -45,5 +53,9 @@ public abstract class MinimapElementReader<E, RC> {
 
    public float getBoxScale(MinimapElementRenderLocation location, E element, RC context) {
       return 1.0F;
+   }
+
+   public boolean isAlwaysHighlightedWhenHovered(E element, RC context) {
+      return false;
    }
 }

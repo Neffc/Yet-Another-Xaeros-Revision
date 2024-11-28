@@ -1,25 +1,40 @@
 package xaero.common.minimap.radar.tracker;
 
+import net.minecraft.class_1657;
 import net.minecraft.class_310;
 import net.minecraft.class_640;
+import xaero.hud.entity.EntityUtils;
 import xaero.hud.minimap.element.render.MinimapElementReader;
+import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 
 public class PlayerTrackerMinimapElementReader extends MinimapElementReader<PlayerTrackerMinimapElement<?>, PlayerTrackerMinimapElementRenderContext> {
    public boolean isHidden(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context) {
-      return class_310.method_1551().field_1687.method_27983() != element.getDimension() && context.mapDimId != element.getDimension();
+      return context.renderEntityDimId != element.getDimension() && context.mapDimId != element.getDimension();
    }
 
    public double getRenderX(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
-      return class_310.method_1551().field_1687.method_27983() != element.getDimension() ? element.getX() * context.mapDimDiv : element.getX();
+      class_310 mc = class_310.method_1551();
+      class_1657 clientPlayer = mc.field_1687.method_18470(element.getPlayerId());
+      return clientPlayer == null ? element.getX() : EntityUtils.getEntityX(clientPlayer, partialTicks);
    }
 
    public double getRenderY(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
-      return element.getY();
+      class_310 mc = class_310.method_1551();
+      class_1657 clientPlayer = mc.field_1687.method_18470(element.getPlayerId());
+      return clientPlayer == null ? element.getY() : EntityUtils.getEntityY(clientPlayer, partialTicks);
    }
 
    public double getRenderZ(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
-      return class_310.method_1551().field_1687.method_27983() != element.getDimension() ? element.getZ() * context.mapDimDiv : element.getZ();
+      class_310 mc = class_310.method_1551();
+      class_1657 clientPlayer = mc.field_1687.method_18470(element.getPlayerId());
+      return clientPlayer == null ? element.getZ() : EntityUtils.getEntityZ(clientPlayer, partialTicks);
+   }
+
+   public double getCoordinateScale(
+      PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, MinimapElementRenderInfo renderInfo
+   ) {
+      return element.getDimension() == renderInfo.renderEntityDimension ? renderInfo.renderEntityDimensionScale : renderInfo.backgroundCoordinateScale;
    }
 
    public int getInteractionBoxLeft(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
@@ -79,6 +94,10 @@ public class PlayerTrackerMinimapElementReader extends MinimapElementReader<Play
    @Override
    public boolean shouldScaleBoxWithOptionalScale() {
       return true;
+   }
+
+   public float getBoxScale(MinimapElementRenderLocation location, PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context) {
+      return context.iconScale;
    }
 
    public boolean isInteractable(MinimapElementRenderLocation location, PlayerTrackerMinimapElement<?> element) {

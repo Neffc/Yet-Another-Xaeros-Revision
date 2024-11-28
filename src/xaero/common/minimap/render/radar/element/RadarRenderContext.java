@@ -24,6 +24,7 @@ public final class RadarRenderContext {
    public EntityRadarCategory entityCategory;
    public double iconScale;
    public int dotSize;
+   public double dotScale;
    public int heightLimit;
    public boolean heightBasedFade;
    public int startFadingAt;
@@ -31,6 +32,7 @@ public final class RadarRenderContext {
    public boolean alwaysNameTags;
    public int colorIndex;
    public int displayY;
+   public int nameSettingForList;
    public boolean namesForList;
    public boolean iconsForList;
    public boolean name;
@@ -38,4 +40,5 @@ public final class RadarRenderContext {
    public class_1297 renderEntity;
    public class_327 font;
    public MinimapRendererHelper helper;
+   public boolean playerListDown;
 }

@@ -7,70 +7,69 @@ import net.minecraft.class_4587;
 import net.minecraft.class_4597.class_4598;
 import xaero.common.HudMod;
 import xaero.common.minimap.element.render.MinimapElementRendererHandler;
-import xaero.hud.minimap.element.render.MinimapElementReader;
 import xaero.hud.minimap.element.render.MinimapElementRenderInfo;
 import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.minimap.element.render.MinimapElementRenderer;
 
 public class MinimapElementMapRendererHandler extends MinimapElementRendererHandler {
+   private double ps;
+   private double pc;
+   private double zoom;
    private float halfWView;
 
    protected MinimapElementMapRendererHandler(HudMod modMain, List<MinimapElementRenderer<?, ?>> renderers) {
       super(modMain, renderers, MinimapElementRenderLocation.IN_MINIMAP, 19490);
    }
 
-   public void prepareRender(float halfWView) {
+   public void prepareRender(double ps, double pc, double zoom, float halfWView) {
+      this.ps = ps;
+      this.pc = pc;
+      this.zoom = zoom;
       this.halfWView = halfWView;
    }
 
    @Override
    protected <E, RRC, RR extends MinimapElementRenderer<E, RRC>> boolean transformAndRenderForRenderer(
       E element,
+      double elementX,
+      double elementY,
+      double elementZ,
       RR renderer,
       RRC context,
-      double playerDimDiv,
-      double ps,
-      double pc,
-      double zoom,
       int elementIndex,
       double optionalDepth,
       MinimapElementRenderInfo renderInfo,
       class_332 guiGraphics,
-      class_4598 renderTypeBuffers
+      class_4598 vanillaBufferSource
    ) {
       class_4587 matrixStack = guiGraphics.method_51448();
-      float partialTicks = renderInfo.partialTicks;
       class_243 renderPos = renderInfo.renderPos;
-      MinimapElementReader<E, RRC> elementReader = renderer.getElementReader();
-      double offx = elementReader.getRenderX(element, context, partialTicks) / playerDimDiv - renderPos.field_1352;
-      double offz = elementReader.getRenderZ(element, context, partialTicks) / playerDimDiv - renderPos.field_1350;
+      double offx = elementX - renderPos.field_1352;
+      double offz = elementZ - renderPos.field_1350;
       matrixStack.method_22903();
-      double zoomedOffX = offx * zoom;
-      double zoomedOffZ = offz * zoom;
-      double translateX = ps * zoomedOffX - pc * zoomedOffZ;
-      double translateY = pc * zoomedOffX + ps * zoomedOffZ;
+      double zoomedOffX = offx * this.zoom;
+      double zoomedOffZ = offz * this.zoom;
+      double translateX = this.ps * zoomedOffX - this.pc * zoomedOffZ;
+      double translateY = this.pc * zoomedOffX + this.ps * zoomedOffZ;
       int roundedX = (int)Math.round(translateX);
       int roundedY = (int)Math.round(translateY);
       boolean outOfBounds = (float)Math.abs(roundedX) > this.halfWView || (float)Math.abs(roundedY) > this.halfWView;
       double partialX = translateX - (double)roundedX;
       double partialY = translateY - (double)roundedY;
       matrixStack.method_46416((float)roundedX, (float)roundedY, 0.0F);
-      boolean result = renderer.renderElement(element, false, outOfBounds, optionalDepth, 1.0F, partialX, partialY, renderInfo, guiGraphics, renderTypeBuffers);
+      boolean result = renderer.renderElement(
+         element, false, outOfBounds, optionalDepth, 1.0F, partialX, partialY, renderInfo, guiGraphics, vanillaBufferSource
+      );
       matrixStack.method_22909();
       return result;
    }
 
    @Override
-   protected int getIndexLimit() {
-      return 19490;
+   protected void beforeRender(class_332 guiGraphics, MinimapElementRenderInfo renderInfo, class_4598 vanillaBufferSource) {
    }
 
    @Override
-   protected void beforeRender(class_4587 matrixStack) {
-   }
-
-   @Override
-   protected void afterRender(class_4587 matrixStack) {
+   protected void afterRender(class_332 guiGraphics, MinimapElementRenderInfo renderInfo, class_4598 vanillaBufferSource) {
    }
 
    public static final class Builder extends xaero.hud.minimap.element.render.MinimapElementRendererHandler.Builder {

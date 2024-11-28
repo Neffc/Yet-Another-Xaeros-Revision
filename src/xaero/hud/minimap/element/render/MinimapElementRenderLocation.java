@@ -8,9 +8,11 @@ public class MinimapElementRenderLocation {
    public static final MinimapElementRenderLocation UNKNOWN = new MinimapElementRenderLocation(-1);
    public static final MinimapElementRenderLocation IN_MINIMAP = new MinimapElementRenderLocation(0);
    public static final MinimapElementRenderLocation OVER_MINIMAP = new MinimapElementRenderLocation(1);
-   public static final MinimapElementRenderLocation IN_GAME = new MinimapElementRenderLocation(2);
+   public static final MinimapElementRenderLocation IN_WORLD = new MinimapElementRenderLocation(2);
    public static final MinimapElementRenderLocation WORLD_MAP = new MinimapElementRenderLocation(3);
    public static final MinimapElementRenderLocation WORLD_MAP_MENU = new MinimapElementRenderLocation(4);
+   @Deprecated
+   public static final MinimapElementRenderLocation IN_GAME = IN_WORLD;
    private final int index;
 
    private MinimapElementRenderLocation(int index) {

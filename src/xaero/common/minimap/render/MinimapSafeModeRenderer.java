@@ -6,11 +6,13 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
+import net.minecraft.class_1937;
 import net.minecraft.class_243;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_4587;
+import net.minecraft.class_5321;
 import xaero.common.IXaeroMinimap;
 import xaero.common.core.IXaeroMinimapMinecraftClient;
 import xaero.common.effect.Effects;
@@ -29,7 +31,7 @@ import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.compass.render.CompassRenderer;
 import xaero.hud.minimap.module.MinimapSession;
-import xaero.hud.minimap.waypoint.render.WaypointsGuiRenderer;
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderer;
 
 public class MinimapSafeModeRenderer extends MinimapRenderer {
    private static final class_2960 mapTextures = new class_2960("xaeromaptexture");
@@ -39,9 +41,9 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
    private MinimapTexture mapTexture = new MinimapTexture(mapTextures);
 
    public MinimapSafeModeRenderer(
-      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, Minimap minimap, CompassRenderer compassRenderer
+      IXaeroMinimap modMain, class_310 mc, WaypointMapRenderer waypointMapRenderer, Minimap minimap, CompassRenderer compassRenderer
    ) throws IOException {
-      super(modMain, mc, waypointsGuiRenderer, minimap, compassRenderer);
+      super(modMain, mc, waypointMapRenderer, minimap, compassRenderer);
    }
 
    public void updateMapFrameSafeMode(
@@ -315,7 +317,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       class_332 guiGraphics,
       MinimapProcessor minimap,
       class_243 renderPos,
-      double playerDimDiv,
+      class_5321<class_1937> mapDimension,
       double mapDimensionScale,
       int mapSize,
       int bufferSize,
@@ -343,8 +345,8 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
          this.getHelper().bindTextureBuffer(this.mapTexture.buffer, bufferSize, bufferSize, this.mapTexture.method_4624());
          float opacity = (float)(this.modMain.getSettings().minimapOpacity / 100.0);
          RenderSystem.setShaderColor(opacity, opacity, opacity, opacity);
-      } catch (Throwable var27) {
-         this.minimap.setCrashedWith(var27);
+      } catch (Throwable var26) {
+         this.minimap.setCrashedWith(var26);
       }
    }
 

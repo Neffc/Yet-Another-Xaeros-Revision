@@ -92,7 +92,7 @@ public abstract class MinimapElementRenderer<E, RC> extends xaero.hud.minimap.el
    @Override
    public boolean renderElement(
       E element,
-      boolean highlit,
+      boolean highlighted,
       boolean outOfBounds,
       double optionalDepth,
       float optionalScale,
@@ -100,14 +100,14 @@ public abstract class MinimapElementRenderer<E, RC> extends xaero.hud.minimap.el
       double partialY,
       MinimapElementRenderInfo renderInfo,
       class_332 guiGraphics,
-      class_4598 renderTypeBuffers
+      class_4598 vanillaBufferSource
    ) {
       return this.renderElement(
          renderInfo.location.getIndex(),
-         highlit,
+         highlighted,
          outOfBounds,
          guiGraphics,
-         renderTypeBuffers,
+         vanillaBufferSource,
          class_310.method_1551().field_1772,
          renderInfo.framebuffer,
          HudMod.INSTANCE.getMinimap().getMinimapFBORenderer().getHelper(),
@@ -129,7 +129,7 @@ public abstract class MinimapElementRenderer<E, RC> extends xaero.hud.minimap.el
 
    @Override
    public void preRender(
-      MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+      MinimapElementRenderInfo renderInfo, class_4598 vanillaBufferSource, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
       this.preRender(
          renderInfo.location.getIndex(),
@@ -139,14 +139,14 @@ public abstract class MinimapElementRenderer<E, RC> extends xaero.hud.minimap.el
          renderInfo.renderPos.field_1351,
          renderInfo.renderPos.field_1350,
          HudMod.INSTANCE,
-         renderTypeBuffers,
+         vanillaBufferSource,
          multiTextureRenderTypeRenderers
       );
    }
 
    @Override
    public void postRender(
-      MinimapElementRenderInfo renderInfo, class_4598 renderTypeBuffers, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
+      MinimapElementRenderInfo renderInfo, class_4598 vanillaBufferSource, MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
       this.postRender(
          renderInfo.location.getIndex(),
@@ -156,7 +156,7 @@ public abstract class MinimapElementRenderer<E, RC> extends xaero.hud.minimap.el
          renderInfo.renderPos.field_1351,
          renderInfo.renderPos.field_1350,
          HudMod.INSTANCE,
-         renderTypeBuffers,
+         vanillaBufferSource,
          multiTextureRenderTypeRenderers
       );
    }

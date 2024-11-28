@@ -10,6 +10,7 @@ import net.minecraft.class_1657;
 import net.minecraft.class_1936;
 import net.minecraft.class_1937;
 import net.minecraft.class_2338;
+import net.minecraft.class_243;
 import net.minecraft.class_2561;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
@@ -25,6 +26,7 @@ import net.minecraft.class_8251;
 import net.minecraft.class_2556.class_7602;
 import org.apache.commons.lang3.StringUtils;
 import org.joml.Matrix4f;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.core.XaeroMinimapCore;
@@ -39,6 +41,7 @@ import xaero.common.settings.ModSettings;
 import xaero.hud.HudSession;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.element.render.world.MinimapElementWorldRendererHandler;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.WaypointSession;
 
@@ -120,11 +123,11 @@ public class ClientEvents {
             RenderSystem.getModelViewStack().method_22903();
             RenderSystem.getModelViewStack().method_34426();
             RenderSystem.applyModelViewMatrix();
-            this.modMain
-               .getInterfaces()
-               .getMinimapInterface()
-               .getWaypointsIngameRenderer()
-               .render(minimapSession, partialTicks, minimapSession.getProcessor(), XaeroMinimapCore.waypointsProjection, XaeroMinimapCore.waypointModelView);
+            class_310 mc = class_310.method_1551();
+            class_243 renderPos = mc.field_1773.method_19418().method_19326();
+            MinimapElementWorldRendererHandler worldRendererHandler = HudMod.INSTANCE.getMinimap().getWorldRendererHandler();
+            worldRendererHandler.prepareRender(XaeroMinimapCore.waypointsProjection, XaeroMinimapCore.waypointModelView);
+            worldRendererHandler.render(guiGraphics, renderPos, partialTicks, null, mc.field_1687.method_8597().comp_646(), mc.field_1687.method_27983());
             RenderSystem.getModelViewStack().method_22909();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.setProjectionMatrix(projectionMatrixBU, vertexSortingBU);

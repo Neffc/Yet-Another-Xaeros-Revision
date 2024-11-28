@@ -7,9 +7,10 @@ import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendere
 import xaero.common.minimap.render.MinimapRendererHelper;
 
 public class PlayerTrackerMinimapElementRenderContext {
-   public class_4588 outlineConsumer;
+   public class_4588 coloredBackgroundConsumer;
    public MultiTextureRenderTypeRenderer uniqueTextureUIObjectRenderer;
+   public class_5321<class_1937> renderEntityDimId;
    public class_5321<class_1937> mapDimId;
-   public double mapDimDiv;
    public MinimapRendererHelper helper;
+   public float iconScale = 1.0F;
 }

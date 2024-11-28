@@ -28,7 +28,8 @@ public abstract class ControlsRegister {
          ModSettings.keyReverseEntityRadar,
          ModSettings.keyManualCaveMode,
          ModSettings.keyAlternativeListPlayers,
-         ModSettings.keyToggleTrackedPlayers,
+         ModSettings.keyToggleTrackedPlayersOnMap,
+         ModSettings.keyToggleTrackedPlayersInWorld,
          ModSettings.keyTogglePacChunkClaims
       }
    );

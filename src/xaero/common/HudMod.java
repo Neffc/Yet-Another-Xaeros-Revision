@@ -279,7 +279,8 @@ public abstract class HudMod implements IXaeroMinimap {
 
          this.playerTrackerSystemManager.register("minimap_synced", new SyncedPlayerTrackerSystem());
          this.supportMods = this.platformContext.createSupportMods(this);
-         this.getInterfaces().getMinimapInterface().getOverMapRendererHandler().add(this.trackedPlayerRenderer);
+         this.getMinimap().getOverMapRendererHandler().add(this.trackedPlayerRenderer);
+         this.getMinimap().getWorldRendererHandler().add(this.trackedPlayerRenderer);
       } catch (Throwable var3) {
          LOGGER.error("error", var3);
          this.interfaces.getMinimapInterface().setCrashedWith(var3);

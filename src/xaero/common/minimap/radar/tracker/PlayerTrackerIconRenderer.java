@@ -18,7 +18,8 @@ public class PlayerTrackerIconRenderer {
       MinimapRendererHelper helper,
       class_4587 matrixStack,
       class_1657 player,
-      class_2960 skinTextureLocation
+      class_2960 skinTextureLocation,
+      float alpha
    ) {
       boolean upsideDown = player != null && class_922.method_38563(player);
       int textureY = 8 + (!upsideDown ? 8 : 0);
@@ -28,13 +29,13 @@ public class PlayerTrackerIconRenderer {
          int textureId = texture.method_4624();
          class_287 bufferbuilder = renderer.begin(textureId);
          helper.addTexturedColoredRectToExistingBuffer(
-            matrixStack.method_23760().method_23761(), bufferbuilder, -4.0F, -4.0F, 8, textureY, 8, 8, 8, textureH, 1.0F, 1.0F, 1.0F, 1.0F, 64.0F
+            matrixStack.method_23760().method_23761(), bufferbuilder, -4.0F, -4.0F, 8, textureY, 8, 8, 8, textureH, 1.0F, 1.0F, 1.0F, alpha, 64.0F
          );
          if (player != null && player.method_7348(class_1664.field_7563)) {
             textureY = 8 + (!upsideDown ? 8 : 0);
             textureH = 8 * (!upsideDown ? -1 : 1);
             helper.addTexturedColoredRectToExistingBuffer(
-               matrixStack.method_23760().method_23761(), bufferbuilder, -4.0F, -4.0F, 40, textureY, 8, 8, 8, textureH, 1.0F, 1.0F, 1.0F, 1.0F, 64.0F
+               matrixStack.method_23760().method_23761(), bufferbuilder, -4.0F, -4.0F, 40, textureY, 8, 8, 8, textureH, 1.0F, 1.0F, 1.0F, alpha, 64.0F
             );
          }
       }

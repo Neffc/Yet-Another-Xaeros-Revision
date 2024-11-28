@@ -236,8 +236,10 @@ public class ControlsHandler {
             this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.RADAR_DISPLAYED);
          } else if (kb == ModSettings.keyManualCaveMode) {
             session.getProcessor().toggleManualCaveMode();
-         } else if (kb == ModSettings.keyToggleTrackedPlayers) {
-            this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.TRACKED_PLAYERS);
+         } else if (kb == ModSettings.keyToggleTrackedPlayersOnMap) {
+            this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.TRACKED_PLAYERS_ON_MAP);
+         } else if (kb == ModSettings.keyToggleTrackedPlayersInWorld) {
+            this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.TRACKED_PLAYERS_IN_WORLD);
          } else if (kb == ModSettings.keyTogglePacChunkClaims) {
             if (this.modMain.getSupportMods().worldmap() && this.modMain.getSupportMods().shouldUseWorldMapChunks()) {
                this.modMain.getSupportMods().worldmapSupport.toggleChunkClaims();

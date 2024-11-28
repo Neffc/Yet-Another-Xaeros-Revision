@@ -90,9 +90,12 @@ public class ModSettings {
    public static class_304 keyReverseEntityRadar = new class_304("gui.xaero_reverse_entity_radar", -1, "Xaero's Minimap");
    public static class_304 keyManualCaveMode = new class_304("gui.xaero_toggle_manual_cave_mode", -1, "Xaero's Minimap");
    public static class_304 keyAlternativeListPlayers = new class_304("gui.xaero_alternative_list_players", -1, "Xaero's Minimap");
-   public static class_304 keyToggleTrackedPlayers = new class_304("gui.xaero_toggle_tracked_players", -1, "Xaero's Minimap");
+   public static class_304 keyToggleTrackedPlayersOnMap = new class_304("gui.xaero_toggle_tracked_players_on_map", -1, "Xaero's Minimap");
+   public static class_304 keyToggleTrackedPlayersInWorld = new class_304("gui.xaero_toggle_tracked_players_in_world", -1, "Xaero's Minimap");
    @Deprecated
-   public static class_304 keyTogglePacPlayers = keyToggleTrackedPlayers;
+   public static class_304 keyToggleTrackedPlayers = keyToggleTrackedPlayersOnMap;
+   @Deprecated
+   public static class_304 keyTogglePacPlayers = keyToggleTrackedPlayersOnMap;
    public static class_304 keyTogglePacChunkClaims = new class_304("gui.xaero_toggle_pac_chunk_claims", -1, "Xaero's Minimap");
    public static String minimapItemId = null;
    public static class_1792 minimapItem = null;
@@ -125,7 +128,7 @@ public class ModSettings {
    private int waypointsIngameNameScale = 0;
    private static final float DEFAULT_SCALE = 0.8F;
    private static final float MINECRAFT_SCALE = 0.02666667F;
-   private static final double WAYPOINT_ICON_WORLD_SIZE = 0.19200003F;
+   private static final double WAYPOINT_ICON_WORLD_SCALE = 0.021333335F;
    private double dotNameScale = 1.0;
    public static boolean settingsButton = false;
    public static boolean updateNotification = true;
@@ -236,7 +239,8 @@ public class ModSettings {
    public static final String[] RADAR_OVER_MAP_OPTIONS = new String[]{
       "gui.xaero_radar_over_map_never", "gui.xaero_radar_over_map_list", "gui.xaero_radar_over_map_always", "-"
    };
-   public boolean displayTrackedPlayers = true;
+   public boolean displayTrackedPlayersOnMap = true;
+   public boolean displayTrackedPlayersInWorld = true;
    private boolean displayClaims = true;
    public boolean displayCurrentClaim = true;
    private int claimsFillOpacity = 46;
@@ -251,6 +255,9 @@ public class ModSettings {
    private boolean biomeBlending = true;
    public boolean allowInternetAccess = true;
    public boolean dimensionScaledMaxWaypointDistance = true;
+   private int trackedPlayerWorldIconScale;
+   private int trackedPlayerWorldNameScale;
+   private int trackedPlayerMinimapIconScale;
    private static int[] OLD_MINIMAP_SIZES = new int[]{57, 85, 113, 169};
 
    public ModSettings(IXaeroMinimap modMain) {
@@ -281,7 +288,8 @@ public class ModSettings {
          && kb != keyToggleRadar
          && kb != keyReverseEntityRadar
          && kb != keyManualCaveMode
-         && kb != keyToggleTrackedPlayers
+         && kb != keyToggleTrackedPlayersOnMap
+         && kb != keyToggleTrackedPlayersInWorld
          && kb != keyTogglePacChunkClaims;
    }
 
@@ -432,11 +440,23 @@ public class ModSettings {
       return this.waypointsIngameNameScale <= 0 ? (int)Math.ceil((double)(scale / 2)) : scale;
    }
 
+   public float getTrackedPlayerWorldIconScale() {
+      return this.getUIScale(this.trackedPlayerWorldIconScale, 0, 17);
+   }
+
+   public float getTrackedPlayerWorldNameScale() {
+      return this.getUIScale(this.trackedPlayerWorldNameScale, 0, 17);
+   }
+
+   public float getTrackedPlayerMinimapIconScale() {
+      return this.getUIScale(this.trackedPlayerMinimapIconScale, 0, 17);
+   }
+
    public double getWaypointsClampDepth(double fov, int height) {
-      int baseIconHeight = (int)(this.getWaypointsIngameIconScale() * 9.0F);
-      double worldSizeAtClampDepth = this.waypointsIngameCloseScale * 0.19200003F * (double)height / (double)baseIconHeight;
+      int baseIconScale = (int)this.getWaypointsIngameIconScale();
+      double frameSizeAtClampDepth = this.waypointsIngameCloseScale * 0.021333335F * (double)height / (double)baseIconScale;
       double fovMultiplier = 2.0 * Math.tan(Math.toRadians(fov / 2.0));
-      return worldSizeAtClampDepth / fovMultiplier;
+      return frameSizeAtClampDepth / fovMultiplier;
    }
 
    public double getDotNameScale() {
@@ -680,8 +700,12 @@ public class ModSettings {
       writer.println("caveModeToggleTimer:" + this.caveModeToggleTimer);
       writer.println("legibleCaveMaps:" + this.legibleCaveMaps);
       writer.println("biomeBlending:" + this.biomeBlending);
-      writer.println("displayTrackedPlayers:" + this.displayTrackedPlayers);
+      writer.println("displayTrackedPlayersOnMap:" + this.displayTrackedPlayersOnMap);
+      writer.println("displayTrackedPlayersInWorld:" + this.displayTrackedPlayersInWorld);
       writer.println("dimensionScaledMaxWaypointDistance:" + this.dimensionScaledMaxWaypointDistance);
+      writer.println("trackedPlayerWorldIconScale:" + this.trackedPlayerWorldIconScale);
+      writer.println("trackedPlayerWorldNameScale:" + this.trackedPlayerWorldNameScale);
+      writer.println("trackedPlayerMinimapIconScale:" + this.trackedPlayerMinimapIconScale);
       writer.println("displayClaims:" + this.displayClaims);
       writer.println("displayCurrentClaim:" + this.displayCurrentClaim);
       writer.println("claimsFillOpacity:" + this.claimsFillOpacity);
@@ -974,9 +998,19 @@ public class ModSettings {
          } else if (args[0].equalsIgnoreCase("biomeBlending")) {
             this.biomeBlending = args[1].equals("true");
          } else if (args[0].equalsIgnoreCase("displayPacPlayers") || args[0].equalsIgnoreCase("displayTrackedPlayers")) {
-            this.displayTrackedPlayers = valueString.equals("true");
+            this.displayTrackedPlayersOnMap = this.displayTrackedPlayersInWorld = valueString.equals("true");
+         } else if (args[0].equalsIgnoreCase("displayTrackedPlayersOnMap")) {
+            this.displayTrackedPlayersOnMap = valueString.equals("true");
+         } else if (args[0].equalsIgnoreCase("displayTrackedPlayersInWorld")) {
+            this.displayTrackedPlayersInWorld = valueString.equals("true");
          } else if (args[0].equalsIgnoreCase("dimensionScaledMaxWaypointDistance")) {
             this.dimensionScaledMaxWaypointDistance = args[1].equals("true");
+         } else if (args[0].equalsIgnoreCase("trackedPlayerWorldIconScale")) {
+            this.trackedPlayerWorldIconScale = Integer.parseInt(args[1]);
+         } else if (args[0].equalsIgnoreCase("trackedPlayerWorldNameScale")) {
+            this.trackedPlayerWorldNameScale = Integer.parseInt(args[1]);
+         } else if (args[0].equalsIgnoreCase("trackedPlayerMinimapIconScale")) {
+            this.trackedPlayerMinimapIconScale = Integer.parseInt(args[1]);
          } else if (args[0].equalsIgnoreCase("displayClaims")) {
             this.displayClaims = valueString.equals("true");
          } else if (args[0].equalsIgnoreCase("displayCurrentClaim")) {
@@ -1333,7 +1367,9 @@ public class ModSettings {
                            : settingValue
                      )
                );
-         } else {
+         } else if (par1EnumOptions != ModOptions.TRACKED_PLAYER_WORLD_ICON_SCALE
+            && par1EnumOptions != ModOptions.TRACKED_PLAYER_WORLD_NAME_SCALE
+            && par1EnumOptions != ModOptions.TRACKED_PLAYER_MINIMAP_ICON_SCALE) {
             if (par1EnumOptions == ModOptions.HEADS_SCALE) {
                return s + this.getRadarSettingOptionName(EntityRadarCategorySettings.ICON_SCALE);
             }
@@ -1382,6 +1418,23 @@ public class ModSettings {
 
                s = s + (this.compassDirectionScale <= 0 ? class_1074.method_4662("gui.xaero_compass_scale_auto", new Object[0]) : this.compassDirectionScale);
             }
+         } else {
+            int settingValue = par1EnumOptions == ModOptions.TRACKED_PLAYER_WORLD_ICON_SCALE
+               ? this.trackedPlayerWorldIconScale
+               : (par1EnumOptions == ModOptions.TRACKED_PLAYER_WORLD_NAME_SCALE ? this.trackedPlayerWorldNameScale : this.trackedPlayerMinimapIconScale);
+            s = s
+               + (
+                  settingValue <= 0
+                     ? class_1074.method_4662("gui.xaero_ui_scale_auto", new Object[0]) + " (" + this.getAutoUIScale() + ")"
+                     : (
+                        (double)settingValue == par1EnumOptions.getValueMax()
+                           ? class_1074.method_4662("gui.xaero_ui_scale_mc", new Object[0])
+                              + " ("
+                              + (int)class_310.method_1551().method_22683().method_4495()
+                              + ")"
+                           : settingValue
+                     )
+               );
          }
       } else {
          int settingValue = par1EnumOptions == ModOptions.WAYPOINTS_ICON_SCALE ? this.waypointsIngameIconScale : this.waypointsIngameDistanceScale;
@@ -1560,8 +1613,10 @@ public class ModSettings {
          return this.legibleCaveMaps;
       } else if (o == ModOptions.BIOME_BLENDING) {
          return this.biomeBlending;
-      } else if (o == ModOptions.TRACKED_PLAYERS) {
-         return this.displayTrackedPlayers;
+      } else if (o == ModOptions.TRACKED_PLAYERS_ON_MAP) {
+         return this.displayTrackedPlayersOnMap;
+      } else if (o == ModOptions.TRACKED_PLAYERS_IN_WORLD) {
+         return this.displayTrackedPlayersInWorld;
       } else if (o == ModOptions.SCALED_MAX_WAYPOINT_DISTANCE) {
          return this.dimensionScaledMaxWaypointDistance;
       } else if (o == ModOptions.PAC_CLAIMS) {
@@ -1763,17 +1818,17 @@ public class ModSettings {
                }
 
                if (par1EnumOptions == ModOptions.UPDATE_NOTIFICATION) {
-                  updateNotification = !updateNotification;
+                  updateNotification = (Boolean)value;
                } else if (par1EnumOptions == ModOptions.ADJUST_HEIGHT_FOR_SHORT_BLOCKS) {
-                  this.adjustHeightForCarpetLikeBlocks = !this.adjustHeightForCarpetLikeBlocks;
+                  this.adjustHeightForCarpetLikeBlocks = (Boolean)value;
                } else if (par1EnumOptions == ModOptions.PARTIAL_Y_TELEPORTATION) {
-                  this.partialYTeleportation = !this.partialYTeleportation;
+                  this.partialYTeleportation = (Boolean)value;
                } else if (par1EnumOptions == ModOptions.DELETE_REACHED_DEATHPOINTS) {
-                  this.deleteReachedDeathpoints = !this.deleteReachedDeathpoints;
+                  this.deleteReachedDeathpoints = (Boolean)value;
                } else if (par1EnumOptions == ModOptions.HIDE_MINIMAP_UNDER_SCREEN) {
-                  this.hideMinimapUnderScreen = !this.hideMinimapUnderScreen;
+                  this.hideMinimapUnderScreen = (Boolean)value;
                } else if (par1EnumOptions == ModOptions.HIDE_MINIMAP_UNDER_F3) {
-                  this.hideMinimapUnderF3 = !this.hideMinimapUnderF3;
+                  this.hideMinimapUnderF3 = (Boolean)value;
                } else {
                   if (par1EnumOptions == ModOptions.RADAR_OVER_FRAME) {
                      this.setOptionIndexForRadarSetting(EntityRadarCategorySettings.RENDER_OVER_MINIMAP, (Integer)value);
@@ -1781,29 +1836,31 @@ public class ModSettings {
                   }
 
                   if (par1EnumOptions == ModOptions.TEMPORARY_WAYPOINTS_GLOBAL) {
-                     this.temporaryWaypointsGlobal = !this.temporaryWaypointsGlobal;
+                     this.temporaryWaypointsGlobal = (Boolean)value;
                   } else if (par1EnumOptions == ModOptions.KEEP_ENLARGED_UNLOCKED) {
-                     this.keepUnlockedWhenEnlarged = !this.keepUnlockedWhenEnlarged;
+                     this.keepUnlockedWhenEnlarged = (Boolean)value;
                   } else if (par1EnumOptions == ModOptions.TOGGLED_ENLARGED) {
-                     this.enlargedMinimapAToggle = !this.enlargedMinimapAToggle;
+                     this.enlargedMinimapAToggle = (Boolean)value;
                   } else if (par1EnumOptions == ModOptions.DISPLAY_STAINED_GLASS) {
-                     this.displayStainedGlass = !this.displayStainedGlass;
+                     this.displayStainedGlass = (Boolean)value;
                      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
                      if (minimapSession != null) {
                         minimapSession.getMinimapProcessor().setToResetImage(true);
                      }
                   } else if (par1EnumOptions == ModOptions.SWITCH_TO_AUTO_ON_DEATH) {
-                     this.switchToAutoOnDeath = !this.switchToAutoOnDeath;
+                     this.switchToAutoOnDeath = (Boolean)value;
                   } else if (par1EnumOptions == ModOptions.LEGIBLE_CAVE_MAPS) {
-                     this.legibleCaveMaps = !this.legibleCaveMaps;
+                     this.legibleCaveMaps = (Boolean)value;
                      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
                      if (minimapSession != null) {
                         minimapSession.getMinimapProcessor().setToResetImage(true);
                      }
                   } else if (par1EnumOptions == ModOptions.BIOME_BLENDING) {
-                     this.biomeBlending = !this.biomeBlending;
-                  } else if (par1EnumOptions == ModOptions.TRACKED_PLAYERS) {
-                     this.displayTrackedPlayers = !this.displayTrackedPlayers;
+                     this.biomeBlending = (Boolean)value;
+                  } else if (par1EnumOptions == ModOptions.TRACKED_PLAYERS_ON_MAP) {
+                     this.displayTrackedPlayersOnMap = (Boolean)value;
+                  } else if (par1EnumOptions == ModOptions.TRACKED_PLAYERS_IN_WORLD) {
+                     this.displayTrackedPlayersInWorld = (Boolean)value;
                   } else if (par1EnumOptions == ModOptions.SCALED_MAX_WAYPOINT_DISTANCE) {
                      this.dimensionScaledMaxWaypointDistance = !this.dimensionScaledMaxWaypointDistance;
                   } else if (par1EnumOptions == ModOptions.PAC_CLAIMS) {
@@ -1960,24 +2017,52 @@ public class ModSettings {
                   this.setOptionIndexForRadarSetting(EntityRadarCategorySettings.HEIGHT_LIMIT, (int)d);
                } else if (options == ModOptions.START_FADING_AT) {
                   this.setOptionIndexForRadarSetting(EntityRadarCategorySettings.START_FADING_AT, (int)d);
-               } else if (options == ModOptions.AUTO_CONVERT_TO_KM) {
-                  this.autoConvertWaypointDistanceToKmThreshold = d <= 0.0 ? (int)d : (int)Math.pow(10.0, d - 1.0);
-               } else if (options == ModOptions.WP_DISTANCE_PRECISION) {
-                  this.waypointDistancePrecision = (int)d;
-               } else if (options == ModOptions.MAIN_DOT_SIZE) {
-                  this.mainDotSize = (int)d;
-               } else if (options == ModOptions.MANUAL_CAVE_MODE_START) {
-                  this.manualCaveModeStart = (int)d * 8 - 65;
-                  this.manualCaveModeStartAuto = (int)d == 0;
-               } else if (options == ModOptions.CHUNK_GRID_LINE_WIDTH) {
-                  this.chunkGridLineWidth = (int)d;
-               } else if (options == ModOptions.WAYPOINT_ONMAP_SCALE) {
-                  this.waypointOnMapScale = (int)d;
-               } else if (options == ModOptions.INFO_DISPLAY_BG_OPACITY) {
-                  this.infoDisplayBackgroundOpacity = (int)d;
-               } else if (options == ModOptions.CAVE_MODE_TOGGLE_TIMER) {
-                  this.caveModeToggleTimer = (int)d;
                } else {
+                  if (options == ModOptions.AUTO_CONVERT_TO_KM) {
+                     this.autoConvertWaypointDistanceToKmThreshold = d <= 0.0 ? (int)d : (int)Math.pow(10.0, d - 1.0);
+                  }
+
+                  if (options == ModOptions.WP_DISTANCE_PRECISION) {
+                     this.waypointDistancePrecision = (int)d;
+                  }
+
+                  if (options == ModOptions.MAIN_DOT_SIZE) {
+                     this.mainDotSize = (int)d;
+                  }
+
+                  if (options == ModOptions.MANUAL_CAVE_MODE_START) {
+                     this.manualCaveModeStart = (int)d * 8 - 65;
+                     this.manualCaveModeStartAuto = (int)d == 0;
+                  }
+
+                  if (options == ModOptions.CHUNK_GRID_LINE_WIDTH) {
+                     this.chunkGridLineWidth = (int)d;
+                  }
+
+                  if (options == ModOptions.WAYPOINT_ONMAP_SCALE) {
+                     this.waypointOnMapScale = (int)d;
+                  }
+
+                  if (options == ModOptions.INFO_DISPLAY_BG_OPACITY) {
+                     this.infoDisplayBackgroundOpacity = (int)d;
+                  }
+
+                  if (options == ModOptions.CAVE_MODE_TOGGLE_TIMER) {
+                     this.caveModeToggleTimer = (int)d;
+                  }
+
+                  if (options == ModOptions.TRACKED_PLAYER_WORLD_ICON_SCALE) {
+                     this.trackedPlayerWorldIconScale = (int)d;
+                  }
+
+                  if (options == ModOptions.TRACKED_PLAYER_WORLD_NAME_SCALE) {
+                     this.trackedPlayerWorldNameScale = (int)d;
+                  }
+
+                  if (options == ModOptions.TRACKED_PLAYER_MINIMAP_ICON_SCALE) {
+                     this.trackedPlayerMinimapIconScale = (int)d;
+                  }
+
                   if (options == ModOptions.PAC_CLAIMS_BORDER_OPACITY) {
                      this.claimsBorderOpacity = (int)d;
                      if (this.displayClaims) {
@@ -2101,6 +2186,12 @@ public class ModSettings {
          return (double)this.infoDisplayBackgroundOpacity;
       } else if (options == ModOptions.CAVE_MODE_TOGGLE_TIMER) {
          return (double)this.caveModeToggleTimer;
+      } else if (options == ModOptions.TRACKED_PLAYER_WORLD_ICON_SCALE) {
+         return (double)this.trackedPlayerWorldIconScale;
+      } else if (options == ModOptions.TRACKED_PLAYER_WORLD_NAME_SCALE) {
+         return (double)this.trackedPlayerWorldNameScale;
+      } else if (options == ModOptions.TRACKED_PLAYER_MINIMAP_ICON_SCALE) {
+         return (double)this.trackedPlayerMinimapIconScale;
       } else if (options == ModOptions.PAC_CLAIMS_BORDER_OPACITY) {
          return (double)this.claimsBorderOpacity;
       } else {

@@ -36,7 +36,11 @@ public class GuiEntityRadarSettings extends GuiMinimapSettings {
          new ConfigSettingEntry(ModOptions.ARROW_COLOUR),
          new ConfigSettingEntry(ModOptions.PLAYER_ARROW_OPACITY),
          new ConfigSettingEntry(ModOptions.RADAR_OVER_FRAME),
-         new ConfigSettingEntry(ModOptions.TRACKED_PLAYERS)
+         new ConfigSettingEntry(ModOptions.TRACKED_PLAYERS_ON_MAP),
+         new ConfigSettingEntry(ModOptions.TRACKED_PLAYERS_IN_WORLD),
+         new ConfigSettingEntry(ModOptions.TRACKED_PLAYER_MINIMAP_ICON_SCALE),
+         new ConfigSettingEntry(ModOptions.TRACKED_PLAYER_WORLD_ICON_SCALE),
+         new ConfigSettingEntry(ModOptions.TRACKED_PLAYER_WORLD_NAME_SCALE)
       };
    }
 }

@@ -1,6 +1,7 @@
 package xaero.common.minimap.waypoints.render;
 
+import xaero.hud.minimap.waypoint.render.WaypointMapRenderContext;
+
 @Deprecated
-public class WaypointGuiRenderContext extends xaero.hud.minimap.waypoint.render.WaypointGuiRenderContext {
-   public final WaypointFilterParams filterParams = (WaypointFilterParams)this.filterParams;
+public class WaypointGuiRenderContext extends WaypointMapRenderContext {
 }
