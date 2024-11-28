@@ -214,7 +214,6 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
          (float)b / 255.0F,
          (float)a / 255.0F
       );
-      matrixStack.method_22904(0.0, 0.0, 0.05);
       if (w.getWaypointType() != 1) {
          Misc.drawNormalText(matrixStack, w.getSymbol(), (float)(drawX + 1 - initialsWidth / 2), (float)(drawY - 3), -1, true, renderTypeBuffer);
       } else {

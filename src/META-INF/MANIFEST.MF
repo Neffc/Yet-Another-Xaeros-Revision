@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Implementation-Title: Xaero's Minimap
-Implementation-Version: 23.8.0
+Implementation-Version: 23.8.1
 
