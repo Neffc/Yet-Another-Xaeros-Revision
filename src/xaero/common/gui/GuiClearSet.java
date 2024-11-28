@@ -6,7 +6,7 @@ import net.minecraft.class_2561;
 import net.minecraft.class_310;
 import net.minecraft.class_410;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.WaypointSet;
@@ -19,7 +19,7 @@ public class GuiClearSet extends class_410 {
       String name,
       GuiWaypoints parent,
       class_437 escapeScreen,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       XaeroMinimapSession minimapSession
    ) {
       super(
@@ -36,7 +36,7 @@ public class GuiClearSet extends class_410 {
       String name,
       GuiWaypoints parent,
       class_437 escapeScreen,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       XaeroMinimapSession minimapSession
    ) {
       if (p_confirmResult_1_) {

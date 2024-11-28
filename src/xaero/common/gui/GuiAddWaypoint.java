@@ -16,7 +16,7 @@ import net.minecraft.class_364;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_5481;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.graphics.CursorBox;
 import xaero.common.gui.dropdown.DropDownWidget;
@@ -93,7 +93,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    private boolean canBeLabyMod = true;
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
@@ -106,7 +106,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
@@ -141,7 +141,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       ArrayList<Waypoint> waypointsEdited,
@@ -153,7 +153,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
@@ -167,7 +167,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
@@ -244,7 +244,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
@@ -278,7 +278,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointsManager waypointsManager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,

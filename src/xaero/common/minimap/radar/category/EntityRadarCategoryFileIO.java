@@ -10,18 +10,18 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import javax.annotation.Nonnull;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.minimap.radar.category.serialization.EntityRadarCategorySerializationHandler;
 import xaero.common.misc.Misc;
 
 public final class EntityRadarCategoryFileIO {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final Path saveLocationPath;
    private final EntityRadarCategorySerializationHandler serializationHandler;
 
    private EntityRadarCategoryFileIO(
-      @Nonnull AXaeroMinimap modMain, @Nonnull Path saveLocationPath, @Nonnull EntityRadarCategorySerializationHandler serializationHandler
+      @Nonnull IXaeroMinimap modMain, @Nonnull Path saveLocationPath, @Nonnull EntityRadarCategorySerializationHandler serializationHandler
    ) {
       this.modMain = modMain;
       this.saveLocationPath = saveLocationPath;
@@ -86,11 +86,11 @@ public final class EntityRadarCategoryFileIO {
    }
 
    public static final class Builder {
-      private final AXaeroMinimap modMain;
+      private final IXaeroMinimap modMain;
       private Path saveLocationPath;
       private final EntityRadarCategorySerializationHandler.Builder serializationHandlerBuilder;
 
-      public Builder(AXaeroMinimap modMain, EntityRadarCategorySerializationHandler.Builder serializationHandlerBuilder) {
+      public Builder(IXaeroMinimap modMain, EntityRadarCategorySerializationHandler.Builder serializationHandlerBuilder) {
          this.modMain = modMain;
          this.serializationHandlerBuilder = serializationHandlerBuilder;
       }
@@ -114,7 +114,7 @@ public final class EntityRadarCategoryFileIO {
       }
 
       public static EntityRadarCategoryFileIO.Builder getDefault(
-         AXaeroMinimap modMain, EntityRadarCategorySerializationHandler.Builder serializationHandlerBuilder
+         IXaeroMinimap modMain, EntityRadarCategorySerializationHandler.Builder serializationHandlerBuilder
       ) {
          return new EntityRadarCategoryFileIO.Builder(modMain, serializationHandlerBuilder).setDefault();
       }

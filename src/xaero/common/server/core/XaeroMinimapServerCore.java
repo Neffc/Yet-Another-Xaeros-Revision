@@ -2,14 +2,18 @@ package xaero.common.server.core;
 
 import net.minecraft.class_1657;
 import net.minecraft.class_3222;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 
 public class XaeroMinimapServerCore {
-   public static AXaeroMinimap modMain;
+   public static IXaeroMinimap modMain;
 
    public static void onServerWorldInfo(class_1657 player) {
       if (modMain != null) {
          modMain.getCommonEvents().onPlayerWorldJoin((class_3222)player);
       }
+   }
+
+   public static boolean isModLoaded() {
+      return modMain != null && modMain.isLoadedServer();
    }
 }

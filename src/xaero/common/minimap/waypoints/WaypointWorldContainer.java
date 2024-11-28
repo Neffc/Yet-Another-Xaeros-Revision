@@ -9,13 +9,13 @@ import java.util.Map.Entry;
 import net.minecraft.class_1937;
 import net.minecraft.class_2960;
 import net.minecraft.class_5321;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.file.SimpleBackup;
 
 public class WaypointWorldContainer {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private XaeroMinimapSession minimapSession;
    protected String key;
    public HashMap<String, WaypointWorldContainer> subContainers;
@@ -23,7 +23,7 @@ public class WaypointWorldContainer {
    private HashMap<String, String> multiworldNames;
    private final WaypointWorldRootContainer rootContainer;
 
-   public WaypointWorldContainer(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key, WaypointWorldRootContainer rootContainer) {
+   public WaypointWorldContainer(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key, WaypointWorldRootContainer rootContainer) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.key = key;

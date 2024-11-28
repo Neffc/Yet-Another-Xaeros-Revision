@@ -5,7 +5,7 @@ import java.util.UUID;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_4587;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.highlight.HighlighterRegistry;
 import xaero.common.mods.pac.highlight.ClaimsHighlighter;
 import xaero.common.mods.pac.party.OPACPlayerTrackerSystem;
@@ -29,13 +29,13 @@ import xaero.pac.common.parties.party.api.IPartyPlayerInfoAPI;
 import xaero.pac.common.parties.party.member.api.IPartyMemberAPI;
 
 public class SupportOpenPartiesAndClaims {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final OpenPACClientAPI api;
    private final IClientClaimsManagerAPI<IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>>, IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI>> claimsManager;
    private final IClientPartyStorageAPI<IClientPartyAPI<IPartyMemberAPI, IPartyPlayerInfoAPI, IPartyAllyAPI>, IClientPartyMemberDynamicInfoSyncableStorageAPI<IPartyMemberDynamicInfoSyncableAPI>> partyStorage;
    private final IPlayerConfigClientStorageManagerAPI<IPlayerConfigClientStorageAPI<IPlayerConfigStringableOptionClientStorageAPI<?>>> playerConfigs;
 
-   public SupportOpenPartiesAndClaims(AXaeroMinimap modMain) {
+   public SupportOpenPartiesAndClaims(IXaeroMinimap modMain) {
       this.modMain = modMain;
       this.api = OpenPACClientAPI.get();
       this.claimsManager = this.api.getClaimsManager();
@@ -73,7 +73,7 @@ public class SupportOpenPartiesAndClaims {
       highlightRegistry.register(new ClaimsHighlighter(this.modMain, this.claimsManager));
    }
 
-   public AXaeroMinimap getModMain() {
+   public IXaeroMinimap getModMain() {
       return this.modMain;
    }
 

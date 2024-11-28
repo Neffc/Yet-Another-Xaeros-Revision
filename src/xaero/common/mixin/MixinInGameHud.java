@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.core.XaeroMinimapCore;
-import xaero.common.events.ForgeEventHandler;
+import xaero.common.events.ClientEventsFabric;
 
 @Mixin({class_329.class})
 public class MixinInGameHud {
@@ -21,7 +21,10 @@ public class MixinInGameHud {
       method = {"render"}
    )
    public void onRender(class_332 guiGraphics, float float_1, CallbackInfo info) {
-      AXaeroMinimap.INSTANCE.getEvents().handleRenderGameOverlayEventPre(guiGraphics, float_1);
+      if (XaeroMinimapCore.isModLoaded()) {
+         HudMod.INSTANCE.getEvents().handleRenderGameOverlayEventPre(guiGraphics, float_1);
+         HudMod.INSTANCE.getModEvents().handleRenderModOverlay(guiGraphics, float_1);
+      }
    }
 
    @Inject(
@@ -29,7 +32,9 @@ public class MixinInGameHud {
       method = {"render"}
    )
    public void onRenderEnd(class_332 guiGraphics, float float_1, CallbackInfo info) {
-      AXaeroMinimap.INSTANCE.getEvents().handleRenderGameOverlayEventPost();
+      if (XaeroMinimapCore.isModLoaded()) {
+         HudMod.INSTANCE.getEvents().handleRenderGameOverlayEventPost();
+      }
    }
 
    @Inject(
@@ -38,18 +43,7 @@ public class MixinInGameHud {
       cancellable = true
    )
    public void onRenderCrosshair(class_332 guiGraphics, CallbackInfo info) {
-      if (!ForgeEventHandler.renderCrosshairs) {
-         info.cancel();
-      }
-   }
-
-   @Inject(
-      at = {@At("HEAD")},
-      method = {"renderEffects"},
-      cancellable = true
-   )
-   public void onRenderStatusEffectOverlay(class_332 guiGraphics, CallbackInfo info) {
-      if (AXaeroMinimap.INSTANCE.getEvents().handleRenderStatusEffectOverlay(guiGraphics)) {
+      if (!ClientEventsFabric.renderCrosshairs) {
          info.cancel();
       }
    }
@@ -68,5 +62,18 @@ public class MixinInGameHud {
    )
    public void onRenderStart(class_332 guiGraphics, float float_1, CallbackInfo info) {
       XaeroMinimapCore.beforeIngameGuiRender(float_1);
+   }
+
+   @Inject(
+      at = {@At("HEAD")},
+      method = {"renderEffects"},
+      cancellable = true
+   )
+   public void onRenderStatusEffectOverlay(class_332 guiGraphics, CallbackInfo info) {
+      if (XaeroMinimapCore.isModLoaded()) {
+         if (HudMod.INSTANCE.getEvents().handleRenderStatusEffectOverlay(guiGraphics)) {
+            info.cancel();
+         }
+      }
    }
 }

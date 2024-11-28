@@ -4,14 +4,14 @@ import net.minecraft.class_332;
 import net.minecraft.class_339;
 import net.minecraft.class_437;
 import net.minecraft.class_4587;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.gui.widget.WidgetScreen;
 import xaero.common.patreon.GuiUpdateAll;
 
 public class GuiWidgetUpdateAll extends GuiUpdateAll implements WidgetScreen {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
 
-   public GuiWidgetUpdateAll(AXaeroMinimap modMain) {
+   public GuiWidgetUpdateAll(IXaeroMinimap modMain) {
       this.modMain = modMain;
    }
 

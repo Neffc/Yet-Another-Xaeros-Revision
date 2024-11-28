@@ -1,6 +1,5 @@
 package xaero.common.message.basic;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.class_2487;
 import net.minecraft.class_2540;
 import xaero.common.message.MinimapMessage;
@@ -32,7 +31,7 @@ public class ClientboundRulesPacket extends MinimapMessage<ClientboundRulesPacke
    }
 
    public static class ClientHandler implements ClientMessageConsumer<ClientboundRulesPacket> {
-      public void handle(ClientboundRulesPacket message, PacketSender responseSender) {
+      public void handle(ClientboundRulesPacket message) {
          MinimapClientWorldDataHelper.getCurrentWorldData().setSyncedRules(message);
       }
    }

@@ -21,7 +21,7 @@ import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_4587;
 import org.apache.commons.io.FileUtils;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CursorBox;
@@ -52,7 +52,7 @@ public class GuiWaypointsOptions extends ScreenBase {
    public CursorBox connectionTooltip = new CursorBox("gui.xaero_world_connection_tooltip");
 
    public GuiWaypointsOptions(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       XaeroMinimapSession minimapSession,
       class_437 parent,
       class_437 escapeScreen,

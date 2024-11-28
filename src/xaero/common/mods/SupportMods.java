@@ -2,18 +2,15 @@ package xaero.common.mods;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.effect.Effects;
 import xaero.common.mods.pac.SupportOpenPartiesAndClaims;
-import xaero.minimap.XaeroMinimap;
-import xaero.pvp.BetterPVP;
 
-public class SupportMods {
+public abstract class SupportMods {
    public SupportXaeroWorldmap worldmapSupport = null;
-   public SupportAmecs amecs = null;
    public SupportOpenPartiesAndClaims xaeroPac;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    public boolean optifine;
    public boolean vivecraft;
    public boolean iris;
@@ -41,27 +38,22 @@ public class SupportMods {
       return this.supportFramedBlocks != null;
    }
 
-   public boolean amecs() {
-      return this.amecs != null;
-   }
-
-   public static void checkForMinimapDuplicates() {
+   public static void checkForMinimapDuplicates(String otherModMainClass) {
       try {
-         if (XaeroMinimap.instance != null && BetterPVP.instance != null) {
-            throw new RuntimeException("Better PVP contains Xaero's Minimap by default. Do not install Better PVP and Xaero's Minimap together!");
-         }
-      } catch (NoClassDefFoundError var1) {
+         Class.forName(otherModMainClass);
+         throw new RuntimeException("Better PVP contains Xaero's Minimap by default. Do not install Better PVP and Xaero's Minimap together!");
+      } catch (ClassNotFoundException var2) {
       }
    }
 
-   public SupportMods(AXaeroMinimap modMain) {
+   public SupportMods(IXaeroMinimap modMain) {
       this.modMain = modMain;
 
       try {
          Class wmClassTest = Class.forName("xaero.map.WorldMap");
          this.worldmapSupport = new SupportXaeroWorldmap(modMain);
          MinimapLogs.LOGGER.info("Xaero's Minimap: World Map found!");
-      } catch (ClassNotFoundException var16) {
+      } catch (ClassNotFoundException var15) {
       }
 
       try {
@@ -69,22 +61,16 @@ public class SupportMods {
          this.xaeroPac = new SupportOpenPartiesAndClaims(modMain);
          this.xaeroPac.register();
          MinimapLogs.LOGGER.info("Xaero's Minimap: Open Parties And Claims found!");
-      } catch (ClassNotFoundException var15) {
+      } catch (ClassNotFoundException var14) {
       }
 
       try {
          Class optifineClassTest = Class.forName("optifine.Patcher");
          this.optifine = true;
          MinimapLogs.LOGGER.info("Optifine!");
-      } catch (ClassNotFoundException var14) {
+      } catch (ClassNotFoundException var13) {
          this.optifine = false;
          MinimapLogs.LOGGER.info("No Optifine!");
-      }
-
-      try {
-         Class mmClassTest = Class.forName("de.siphalor.amecs.api.KeyModifiers");
-         this.amecs = new SupportAmecs(MinimapLogs.LOGGER);
-      } catch (ClassNotFoundException var13) {
       }
 
       try {

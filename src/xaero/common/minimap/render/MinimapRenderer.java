@@ -21,7 +21,7 @@ import net.minecraft.class_293.class_5596;
 import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
@@ -41,7 +41,7 @@ import xaero.common.settings.ModSettings;
 public abstract class MinimapRenderer {
    public static final int black = -16777216;
    public static final int slime = -2142047936;
-   protected AXaeroMinimap modMain;
+   protected IXaeroMinimap modMain;
    protected class_310 mc;
    protected MinimapInterface minimapInterface;
    protected MinimapRendererHelper helper;
@@ -54,7 +54,7 @@ public abstract class MinimapRenderer {
    private double lastPlayerDimDiv = 1.0;
 
    public MinimapRenderer(
-      AXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
+      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
    ) {
       this.modMain = modMain;
       this.mc = mc;

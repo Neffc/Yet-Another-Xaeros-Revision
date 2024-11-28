@@ -7,7 +7,7 @@ import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.shader.MinimapShaders;
@@ -22,12 +22,12 @@ public class InterfaceRenderer {
    public static final class_2960 guiTextures = new class_2960("xaerobetterpvp", "gui/guis.png");
    public static final class_2960 minimapFrameTextures = new class_2960("xaerobetterpvp", "gui/minimap_frame.png");
    private CustomVertexConsumers customVertexConsumers;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private final int disabled = 1354612157;
    private final int enabled = 1694498815;
    private final int selected = -2097152001;
 
-   public InterfaceRenderer(AXaeroMinimap modMain) {
+   public InterfaceRenderer(IXaeroMinimap modMain) {
       this.modMain = modMain;
       this.customVertexConsumers = new CustomVertexConsumers();
    }

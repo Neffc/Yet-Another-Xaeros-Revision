@@ -5,10 +5,10 @@ import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 
 public class GuiInstructions extends ScreenBase {
-   public GuiInstructions(AXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escape) {
+   public GuiInstructions(IXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escape) {
       super(modMain, par1GuiScreen, escape, class_2561.method_43471("gui.xaero_instructions"));
    }
 

@@ -16,7 +16,7 @@ import net.minecraft.class_437;
 import net.minecraft.class_6381;
 import net.minecraft.class_6382;
 import net.minecraft.class_4280.class_4281;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.minimap.info.InfoDisplay;
 import xaero.common.minimap.info.InfoDisplayManager;
@@ -34,7 +34,7 @@ public class GuiInfoDisplayEdit extends ScreenBase {
    private int subSelected;
    private final Map<String, GuiInfoDisplayEdit.MoveableEntry> moveableEntries;
 
-   protected GuiInfoDisplayEdit(AXaeroMinimap modMain, class_437 parent, class_437 escape) {
+   protected GuiInfoDisplayEdit(IXaeroMinimap modMain, class_437 parent, class_437 escape) {
       super(modMain, parent, escape, class_2561.method_43471("gui.xaero_minimap_info_display_manager"));
       this.manager = modMain.getInterfaces().getMinimapInterface().getInfoDisplayManager();
       this.currentOrder = new ArrayList<>();

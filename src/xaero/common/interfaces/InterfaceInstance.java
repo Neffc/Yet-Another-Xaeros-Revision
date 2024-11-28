@@ -49,4 +49,7 @@ public class InterfaceInstance {
 
    public void cleanup() {
    }
+
+   public void onPostGameOverlay() {
+   }
 }

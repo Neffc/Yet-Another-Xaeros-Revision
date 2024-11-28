@@ -8,7 +8,7 @@ import net.minecraft.class_327;
 import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import net.minecraft.class_4597.class_4598;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.element.render.MinimapElementReader;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
@@ -36,7 +36,7 @@ public final class MinimapElementMapRendererHandler extends MinimapElementRender
       boolean cave,
       float partialTicks,
       class_276 framebuffer,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       MinimapRendererHelper helper,
       class_4598 renderTypeBuffers,
       class_327 font,

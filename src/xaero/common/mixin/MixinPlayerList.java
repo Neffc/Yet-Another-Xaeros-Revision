@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.server.core.XaeroMinimapServerCore;
 
 @Mixin({class_3324.class})
@@ -18,7 +18,9 @@ public class MixinPlayerList {
       method = {"placeNewPlayer"}
    )
    public void onPlaceNewPlayer(class_2535 connection, class_3222 serverPlayer, CallbackInfo info) {
-      AXaeroMinimap.INSTANCE.getCommonEvents().onPlayerLogIn(serverPlayer);
+      if (XaeroMinimapServerCore.isModLoaded()) {
+         HudMod.INSTANCE.getCommonEvents().onPlayerLogIn(serverPlayer);
+      }
    }
 
    @Inject(

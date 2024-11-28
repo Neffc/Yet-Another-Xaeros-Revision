@@ -10,7 +10,7 @@ import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_4587;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.core.IXaeroMinimapMinecraftClient;
 import xaero.common.effect.Effects;
@@ -39,7 +39,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
    private MinimapTexture mapTexture = new MinimapTexture(mapTextures);
 
    public MinimapSafeModeRenderer(
-      AXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
+      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
    ) throws IOException {
       super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
    }

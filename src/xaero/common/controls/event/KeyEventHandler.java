@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.class_304;
 import net.minecraft.class_310;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 
 public class KeyEventHandler {
@@ -64,7 +64,7 @@ public class KeyEventHandler {
       }
    }
 
-   public void onKeyInput(class_310 mc, AXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public void onKeyInput(class_310 mc, IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
       if (mc.field_1755 == null) {
          List<class_304> kbs = modMain.getControlsRegister().keybindings;
          List<class_304> vkbs = modMain.getControlsRegister().vanillaKeyBindings;

@@ -2,13 +2,13 @@ package xaero.common.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.KeySortableByOther;
 
 public class GuiWaypointContainers extends GuiDropdownHelper {
-   public GuiWaypointContainers(AXaeroMinimap modMain, WaypointsManager waypointsManager, String currentContainer, String autoContainer) {
+   public GuiWaypointContainers(IXaeroMinimap modMain, WaypointsManager waypointsManager, String currentContainer, String autoContainer) {
       String c = currentContainer;
       String a = autoContainer == null ? null : autoContainer.split("/")[0];
       this.current = -1;

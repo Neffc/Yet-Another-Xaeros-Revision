@@ -10,7 +10,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.PatternSyntaxException;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_1297;
 import net.minecraft.class_1299;
 import net.minecraft.class_1657;
@@ -21,11 +20,12 @@ import xaero.common.category.rule.ObjectCategoryListRuleType;
 import xaero.common.minimap.radar.category.serialization.data.EntityRadarCategoryData;
 import xaero.common.misc.ListFactory;
 import xaero.common.misc.MapFactory;
+import xaero.common.platform.Services;
 
 public final class EntityRadarCategoryConstants {
    public static final ListFactory LIST_FACTORY = ArrayList::new;
    public static final MapFactory MAP_FACTORY = HashMap::new;
-   public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("xaerominimap_entities.json");
+   public static final Path CONFIG_PATH = Services.PLATFORM.getConfigDir().resolve("xaerominimap_entities.json");
    public static final Path DEFAULT_CONFIG_PATH = CONFIG_PATH.getParent().resolveSibling("defaultconfigs").resolve(CONFIG_PATH.toFile().getName());
    public static final Supplier<EntityRadarCategoryData.Builder> DATA_BUILDER_FACTORY = EntityRadarCategoryData.Builder::getDefault;
    public static final Supplier<EntityRadarCategory.Builder> CATEGORY_BUILDER_FACTORY = EntityRadarCategory.Builder::getDefault;

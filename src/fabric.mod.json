@@ -1,46 +1,44 @@
 {
-	"schemaVersion": 1,
-	"breaks": {
-		"openpartiesandclaims": "<0.14.0"
-	},
-	"depends": {
-		"minecraft": [
-			"1.20", 
-			"1.20.0", 
-			"1.20.1"
-		],
-		"fabric-api": ">=0.43.1",
-		"fabricloader": ">=0.13.0"
-	},
-	"icon": "assets/xaerominimap/icon.png",
-	"description": "The most vanilla-looking minimap for Minecraft.",
-	"version": "23.9.7",
-	"license": "All rights reserved",
-	"suggests": {
-		"flamingo": "*"
-	},
-	"environment": "*",
-	"mixins": [
-		"xaerominimap.mixins.json"
-	],
-	"contact": {
-		"issues": "https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/issues",
-		"homepage": "https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap"
-	},
-	"name": "Xaero's Minimap",
-	"entrypoints": {
-		"server": [
-			"xaero.minimap.XaeroMinimap"
-		],
-		"modmenu": [
-			"xaero.common.XaeroMinimapModMenu"
-		],
-		"client": [
-			"xaero.minimap.XaeroMinimap"
-		]
-	},
-	"id": "xaerominimap",
-	"authors": [
-		"Xaero96"
-	]
+    "schemaVersion": 1,
+    "id": "xaerominimap",
+    "version": "24.0.1",
+    "name": "Xaero's Minimap",
+    "description": "The most vanilla-looking minimap for Minecraft.",
+    "authors": [
+        "xaero96"
+    ],
+    "contact": {
+        "homepage": "https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap",
+        "issues": "https://www.curseforge.com/minecraft/mc-mods/xaeros-minimap/issues"
+    },
+    "license": "All Rights Reserved",
+    "icon": "assets/xaerominimap/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "client": [
+            "xaero.minimap.XaeroMinimapFabric"
+        ],
+        "server": [
+            "xaero.minimap.XaeroMinimapFabric"
+        ],
+        "modmenu" : [
+            "xaero.common.XaeroHudModMenu"
+        ]
+    },
+    "mixins": [
+        "xaerohud.mixins.json",
+        "xaerominimap.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.13.0",
+        "fabric-api": ">=0.43.1",
+        "minecraft": ">=1.20 <=1.20.1"
+    },
+    "suggests": {
+    },
+    "breaks" : {
+        "openpartiesandclaims": "<0.14.0",
+        "xaeroworldmap": "<1.38.1"
+    }
 }
+  

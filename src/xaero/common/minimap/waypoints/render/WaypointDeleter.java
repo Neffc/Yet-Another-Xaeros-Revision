@@ -5,18 +5,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
 
 public class WaypointDeleter {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final List<Waypoint> toDeleteList;
    private boolean started;
 
-   public WaypointDeleter(AXaeroMinimap modMain) {
+   public WaypointDeleter(IXaeroMinimap modMain) {
       this.modMain = modMain;
       this.toDeleteList = new ArrayList<>();
    }

@@ -13,7 +13,7 @@ import net.minecraft.class_4587;
 import net.minecraft.class_640;
 import net.minecraft.class_742;
 import net.minecraft.class_4597.class_4598;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
 import xaero.common.minimap.element.render.MinimapElementRenderer;
@@ -22,11 +22,11 @@ import xaero.common.minimap.render.MinimapRendererHelper;
 public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRenderer<PlayerTrackerMinimapElement<?>, PlayerTrackerMinimapElementRenderContext> {
    private final PlayerTrackerMinimapElementCollector elementCollector;
    private final PlayerTrackerIconRenderer playerTrackerIconRenderer;
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
 
    private PlayerTrackerMinimapElementRenderer(
       PlayerTrackerMinimapElementCollector elementCollector,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       PlayerTrackerMinimapElementRenderContext context,
       PlayerTrackerMinimapElementRenderProvider<PlayerTrackerMinimapElementRenderContext> provider,
       PlayerTrackerMinimapElementReader reader,
@@ -55,7 +55,7 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
       double renderX,
       double renderY,
       double renderZ,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       class_4598 renderTypeBuffers,
       MultiTextureRenderTypeRendererProvider rendererProvider
    ) {
@@ -80,7 +80,7 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
       double renderX,
       double renderY,
       double renderZ,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       class_4598 renderTypeBuffers,
       MultiTextureRenderTypeRendererProvider rendererProvider
    ) {
@@ -151,9 +151,9 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
    }
 
    public static final class Builder {
-      private final AXaeroMinimap modMain;
+      private final IXaeroMinimap modMain;
 
-      private Builder(AXaeroMinimap modMain) {
+      private Builder(IXaeroMinimap modMain) {
          this.modMain = modMain;
       }
 
@@ -173,7 +173,7 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
          );
       }
 
-      public static PlayerTrackerMinimapElementRenderer.Builder begin(AXaeroMinimap modMain) {
+      public static PlayerTrackerMinimapElementRenderer.Builder begin(IXaeroMinimap modMain) {
          return new PlayerTrackerMinimapElementRenderer.Builder(modMain).setDefault();
       }
    }

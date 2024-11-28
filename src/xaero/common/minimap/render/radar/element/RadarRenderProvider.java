@@ -4,6 +4,7 @@ import java.util.Iterator;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
 import net.minecraft.class_310;
+import net.minecraft.class_437;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.element.render.MinimapElementRenderProvider;
@@ -25,7 +26,10 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
       MinimapProcessor minimap = minimapSession.getMinimapProcessor();
       context.minimapRadar = minimap.getEntityRadar();
       context.reversedOrder = ModSettings.keyReverseEntityRadar.method_1434();
+      class_437 screenBU = class_310.method_1551().field_1755;
+      class_310.method_1551().field_1755 = null;
       this.playerListDown = class_310.method_1551().field_1690.field_1907.method_1434() || ModSettings.keyAlternativeListPlayers.method_1434();
+      class_310.method_1551().field_1755 = screenBU;
       double playerDimDiv = minimapSession.getModMain().getInterfaces().getMinimapInterface().getMinimapFBORenderer().getLastPlayerDimDiv();
       this.maxDistanceSquared = context.minimapRadar.getMaxDistance(minimap, minimapSession.getModMain().getSettings().minimapShape == 1)
          * playerDimDiv

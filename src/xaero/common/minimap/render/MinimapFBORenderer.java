@@ -14,7 +14,7 @@ import net.minecraft.class_630;
 import net.minecraft.class_4587.class_4665;
 import net.minecraft.class_4597.class_4598;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
@@ -50,7 +50,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
    private boolean loadedFBO;
 
    public MinimapFBORenderer(
-      AXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
+      IXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
    ) {
       super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
    }

@@ -16,7 +16,7 @@ import net.minecraft.class_583;
 import net.minecraft.class_630;
 import net.minecraft.class_630.class_628;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.misc.Misc;
@@ -30,15 +30,15 @@ public class EntityIconModelPartsRenderer {
    private EntityIconModelPartsRenderer.VertexConsumerWrapper vertexConsumerWrapper;
    private boolean testedRenderEngineWrapperCompatibility;
    private boolean renderEngineIsWrapperCompatible;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
 
-   public EntityIconModelPartsRenderer(AXaeroMinimap modMain) {
+   public EntityIconModelPartsRenderer(IXaeroMinimap modMain) {
       this.modMain = modMain;
-      this.ageableModelHeadPartsMethod = Misc.getMethodReflection(class_4592.class, "method_22946", "()Ljava/lang/Iterable;");
-      this.ageableModelBodyPartsMethod = Misc.getMethodReflection(class_4592.class, "method_22948", "()Ljava/lang/Iterable;");
-      this.segmentedModelPartsMethod = Misc.getMethodReflection(class_4595.class, "method_22960", "()Ljava/lang/Iterable;");
-      this.cubeListField = Misc.getFieldReflection(class_630.class, "field_3663", "Ljava/util/List;");
-      this.childModelsField = Misc.getFieldReflection(class_630.class, "field_3661", "Ljava/util/Map;");
+      this.ageableModelHeadPartsMethod = Misc.getMethodReflection(class_4592.class, "headParts", "method_22946", "()Ljava/lang/Iterable;", "m_5607_");
+      this.ageableModelBodyPartsMethod = Misc.getMethodReflection(class_4592.class, "bodyParts", "method_22948", "()Ljava/lang/Iterable;", "m_5608_");
+      this.segmentedModelPartsMethod = Misc.getMethodReflection(class_4595.class, "parts", "method_22960", "()Ljava/lang/Iterable;", "m_6195_");
+      this.cubeListField = Misc.getFieldReflection(class_630.class, "cubes", "field_3663", "Ljava/util/List;", "f_104212_");
+      this.childModelsField = Misc.getFieldReflection(class_630.class, "children", "field_3661", "Ljava/util/Map;", "f_104213_");
       this.vertexConsumerWrapper = new EntityIconModelPartsRenderer.VertexConsumerWrapper();
    }
 

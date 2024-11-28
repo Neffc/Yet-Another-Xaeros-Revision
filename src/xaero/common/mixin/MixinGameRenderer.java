@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.core.XaeroMinimapCore;
-import xaero.common.events.FMLEventHandler;
-import xaero.common.events.ForgeEventHandler;
+import xaero.common.core.XaeroMinimapCoreFabric;
+import xaero.common.events.ClientEvents;
 
 @Mixin({class_757.class})
 public class MixinGameRenderer {
@@ -24,9 +24,11 @@ public class MixinGameRenderer {
       method = {"render"}
    )
    public void onRenderStart(float float_1, long long_1, boolean boolean_1, CallbackInfo info) {
-      FMLEventHandler fmlEvents = AXaeroMinimap.INSTANCE.getFMLEvents();
-      if (fmlEvents != null) {
-         fmlEvents.handleRenderTickStart();
+      if (XaeroMinimapCore.isModLoaded()) {
+         ClientEvents fmlEvents = HudMod.INSTANCE.getEvents();
+         if (fmlEvents != null) {
+            fmlEvents.handleRenderTickStart();
+         }
       }
    }
 
@@ -35,10 +37,12 @@ public class MixinGameRenderer {
       method = {"render"}
    )
    public void onRenderEnd(float float_1, long long_1, boolean boolean_1, CallbackInfo info) {
-      if (!this.field_4015.field_1743 && this.field_4015.method_18506() == null && this.field_4015.field_1755 != null) {
-         ForgeEventHandler events = AXaeroMinimap.INSTANCE.getEvents();
-         if (events != null) {
-            events.handleDrawScreenEventPost(this.field_4015.field_1755);
+      if (XaeroMinimapCore.isModLoaded()) {
+         if (!this.field_4015.field_1743 && this.field_4015.method_18506() == null && this.field_4015.field_1755 != null) {
+            ClientEvents events = HudMod.INSTANCE.getEvents();
+            if (events != null) {
+               events.handleDrawScreenEventPost(this.field_4015.field_1755);
+            }
          }
       }
    }
@@ -48,7 +52,7 @@ public class MixinGameRenderer {
       method = {"resetProjectionMatrix"}
    )
    public void onLoadProjectionMatrixStart(Matrix4f matrix, CallbackInfo info) {
-      XaeroMinimapCore.onResetProjectionMatrix(matrix);
+      XaeroMinimapCoreFabric.onResetProjectionMatrix(matrix);
    }
 
    @Inject(
@@ -56,7 +60,7 @@ public class MixinGameRenderer {
       method = {"renderLevel"}
    )
    public void onRenderWorldStart(float tickDelta, long limitTime, class_4587 matrix, CallbackInfo info) {
-      XaeroMinimapCore.beforeRenderWorld();
+      XaeroMinimapCoreFabric.beforeRenderWorld();
    }
 
    @Inject(

@@ -7,7 +7,7 @@ import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_342;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.settings.ModSettings;
@@ -21,11 +21,11 @@ public class GuiWorldTpCommand extends ScreenBase {
    private String rotationCommandFormat;
    private WaypointWorldRootContainer rootContainer;
 
-   public GuiWorldTpCommand(AXaeroMinimap modMain, class_437 parent, class_437 escape, WaypointWorld world) {
+   public GuiWorldTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape, WaypointWorld world) {
       this(modMain, parent, escape, world.getContainer().getRootContainer());
    }
 
-   public GuiWorldTpCommand(AXaeroMinimap modMain, class_437 parent, class_437 escape, WaypointWorldRootContainer rootContainer) {
+   public GuiWorldTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape, WaypointWorldRootContainer rootContainer) {
       super(modMain, parent, escape, class_2561.method_43471("gui.xaero_world_teleport_command"));
       this.rootContainer = rootContainer;
       this.commandFormat = rootContainer.getServerTeleportCommandFormat() == null

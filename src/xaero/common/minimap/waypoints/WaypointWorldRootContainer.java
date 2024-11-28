@@ -13,15 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Map.Entry;
+import net.minecraft.class_1132;
 import net.minecraft.class_1937;
 import net.minecraft.class_2874;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
+import net.minecraft.class_3218;
 import net.minecraft.class_5321;
 import net.minecraft.class_638;
 import net.minecraft.class_7134;
 import net.minecraft.class_7924;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 
@@ -41,7 +43,7 @@ public class WaypointWorldRootContainer extends WaypointWorldContainer {
    private Map<class_5321<class_1937>, class_2960> dimensionTypeIds;
    private Map<class_5321<class_1937>, class_2874> dimensionTypes;
 
-   public WaypointWorldRootContainer(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key) {
+   public WaypointWorldRootContainer(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key) {
       super(modMain, minimapSession, key, null);
       this.updateConnectionsField(minimapSession);
       this.dimensionTypeIds = new HashMap<>();
@@ -285,7 +287,18 @@ public class WaypointWorldRootContainer extends WaypointWorldContainer {
                dimensionTypeId = class_7134.field_37670;
             } else {
                if (dimId != class_1937.field_25181) {
-                  return null;
+                  class_1132 integratedServer = class_310.method_1551().method_1576();
+                  if (integratedServer == null) {
+                     return null;
+                  }
+
+                  class_3218 serverLevel = integratedServer.method_3847(dimId);
+                  if (serverLevel == null) {
+                     return null;
+                  }
+
+                  this.dimensionTypes.put(dimId, serverLevel.method_8597());
+                  return serverLevel.method_8597();
                }
 
                dimensionTypeId = class_7134.field_37672;

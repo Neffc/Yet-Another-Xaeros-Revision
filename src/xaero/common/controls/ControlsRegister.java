@@ -3,11 +3,11 @@ package xaero.common.controls;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import java.util.function.Consumer;
 import net.minecraft.class_304;
 import xaero.common.settings.ModSettings;
 
-public class ControlsRegister {
+public abstract class ControlsRegister {
    public final List<class_304> keybindings = Lists.newArrayList(
       new class_304[]{
          ModSettings.keySwitchSet,
@@ -34,13 +34,11 @@ public class ControlsRegister {
    );
    public final List<class_304> vanillaKeyBindings = new ArrayList<>();
 
-   public ControlsRegister() {
-      this.registerKeybindings();
-   }
-
-   protected void registerKeybindings() {
+   public void registerKeybindings(Consumer<class_304> registry) {
       for (class_304 kb : this.keybindings) {
-         KeyBindingHelper.registerKeyBinding(kb);
+         registry.accept(kb);
       }
    }
+
+   public abstract void onStage2();
 }

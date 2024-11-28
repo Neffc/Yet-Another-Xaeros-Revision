@@ -3,14 +3,14 @@ package xaero.minimap.controls;
 import net.minecraft.class_304;
 import net.minecraft.class_310;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.controls.ControlsHandler;
 import xaero.common.gui.GuiMinimapMain;
 import xaero.common.gui.ScreenBase;
 
 public class MinimapControlsHandler extends ControlsHandler {
-   public MinimapControlsHandler(AXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public MinimapControlsHandler(IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
       super(modMain, minimapSession);
    }
 

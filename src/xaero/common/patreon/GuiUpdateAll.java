@@ -16,7 +16,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_156;
 import net.minecraft.class_2561;
 import net.minecraft.class_310;
@@ -25,6 +24,7 @@ import net.minecraft.class_410;
 import net.minecraft.class_4185;
 import org.apache.commons.codec.binary.Hex;
 import xaero.common.MinimapLogs;
+import xaero.common.platform.Services;
 
 public class GuiUpdateAll extends class_410 {
    public GuiUpdateAll() {
@@ -165,7 +165,7 @@ public class GuiUpdateAll extends class_410 {
             InputStream var23 = new BufferedInputStream(input);
             DigestInputStream digestInput = new DigestInputStream(var23, digestMD5);
             BufferedOutputStream output = new BufferedOutputStream(
-               new FileOutputStream(FabricLoader.getInstance().getGameDir().resolve("xaero_autoupdater.jar").toFile())
+               new FileOutputStream(Services.PLATFORM.getGameDir().resolve("xaero_autoupdater.jar").toFile())
             );
             download(output, digestInput, true);
             byte[] digest = digestMD5.digest();

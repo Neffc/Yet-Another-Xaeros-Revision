@@ -45,7 +45,7 @@ import net.minecraft.class_4587.class_4665;
 import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.exception.OpenGLException;
 import xaero.common.graphics.CustomRenderTypes;
@@ -67,7 +67,7 @@ public class EntityIconPrerenderer {
    private static final Object[] ONE_OBJECT_ARRAY = new Object[1];
    private static final boolean TEST_ALL_FIELDS = false;
    private static ArrayList<String> failedFields = new ArrayList<>();
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private ImprovedFramebuffer modelRenderFramebuffer;
    private ImprovedFramebuffer iconRenderFramebuffer;
    private ImprovedFramebuffer atlasRenderFramebuffer;
@@ -102,7 +102,7 @@ public class EntityIconPrerenderer {
    private Class<?> irisRenderLayerWrapperClass;
    private Method irisRenderLayerWrapperUnwrapMethod;
 
-   public EntityIconPrerenderer(AXaeroMinimap modMain) {
+   public EntityIconPrerenderer(IXaeroMinimap modMain) {
       this.modMain = modMain;
       this.modelRenderFramebuffer = new ImprovedFramebuffer(512, 512, true);
       OpenGLException.checkGLError();
@@ -138,37 +138,57 @@ public class EntityIconPrerenderer {
       OpenGLException.checkGLError();
       GlStateManager._bindTexture(0);
       this.modelRenderDetectionList = new ArrayList<>();
-      this.enderDragonModelField = Misc.getFieldReflection(class_895.class, "field_21008", "Lnet/minecraft/class_895$class_625;");
+      this.enderDragonModelField = Misc.getFieldReflection(class_895.class, "model", "field_21008", "Lnet/minecraft/class_895$class_625;", "f_114183_");
 
       try {
-         this.lastRenderTypeField = Misc.getFieldReflection(class_4598.class, "field_20954", "Ljava/util/Optional;");
+         this.lastRenderTypeField = Misc.getFieldReflection(class_4598.class, "lastState", "field_20954", "Ljava/util/Optional;", "f_109906_");
       } catch (Exception var8) {
-         this.lastRenderTypeField = Misc.getFieldReflection(class_4598.class, "c", "Ljava/util/Optional;");
+         this.lastRenderTypeField = Misc.getFieldReflection(class_4598.class, "lastState", "c", "Ljava/util/Optional;", "f_109906_");
       }
 
       try {
-         this.renderTypeTypeClass = Misc.getClassForName("net.minecraft.class_1921$class_4687");
-         this.renderStateField = Misc.getFieldReflection(this.renderTypeTypeClass, "field_21403", "Lnet/minecraft/class_1921$class_4688;");
+         this.renderTypeTypeClass = Misc.getClassForName("net.minecraft.class_1921$class_4687", "net.minecraft.client.renderer.RenderType$CompositeRenderType");
+         this.renderStateField = Misc.getFieldReflection(this.renderTypeTypeClass, "state", "field_21403", "Lnet/minecraft/class_1921$class_4688;", "f_110511_");
       } catch (ClassNotFoundException var7) {
          throw new RuntimeException(var7);
       }
 
       try {
-         Class<?> multiPhaseParametersClass = Misc.getClassForName("net.minecraft.class_1921$class_4688");
-         this.renderPhaseTextureClass = Misc.getClassForName("net.minecraft.class_4668$class_4683");
-         this.renderStateTextureStateField = Misc.getFieldReflection(multiPhaseParametersClass, "field_21406", "Lnet/minecraft/class_4668$class_5939;");
-         this.renderStateTextureStateTextureField = Misc.getFieldReflection(this.renderPhaseTextureClass, "field_21397", "Ljava/util/Optional;");
-         this.renderStateTransparencyStateField = Misc.getFieldReflection(multiPhaseParametersClass, "field_21407", "Lnet/minecraft/class_4668$class_4685;");
-         this.renderStateDepthTestStateField = Misc.getFieldReflection(multiPhaseParametersClass, "field_21411", "Lnet/minecraft/class_4668$class_4672;");
-         this.renderStateWriteMaskStateField = Misc.getFieldReflection(multiPhaseParametersClass, "field_21419", "Lnet/minecraft/class_4668$class_4686;");
-         this.renderStateCullStateField = Misc.getFieldReflection(multiPhaseParametersClass, "field_21412", "Lnet/minecraft/class_4668$class_4671;");
-         this.renderStateShaderStateField = Misc.getFieldReflection(multiPhaseParametersClass, "field_29461", "Lnet/minecraft/class_4668$class_5942;");
+         Class<?> multiPhaseParametersClass = Misc.getClassForName(
+            "net.minecraft.class_1921$class_4688", "net.minecraft.client.renderer.RenderType$CompositeState"
+         );
+         this.renderPhaseTextureClass = Misc.getClassForName(
+            "net.minecraft.class_4668$class_4683", "net.minecraft.client.renderer.RenderStateShard$TextureStateShard"
+         );
+         this.renderStateTextureStateField = Misc.getFieldReflection(
+            multiPhaseParametersClass, "textureState", "field_21406", "Lnet/minecraft/class_4668$class_5939;", "f_110576_"
+         );
+         this.renderStateTextureStateTextureField = Misc.getFieldReflection(
+            this.renderPhaseTextureClass, "texture", "field_21397", "Ljava/util/Optional;", "f_110328_"
+         );
+         this.renderStateTransparencyStateField = Misc.getFieldReflection(
+            multiPhaseParametersClass, "transparencyState", "field_21407", "Lnet/minecraft/class_4668$class_4685;", "f_110577_"
+         );
+         this.renderStateDepthTestStateField = Misc.getFieldReflection(
+            multiPhaseParametersClass, "depthTestState", "field_21411", "Lnet/minecraft/class_4668$class_4672;", "f_110581_"
+         );
+         this.renderStateWriteMaskStateField = Misc.getFieldReflection(
+            multiPhaseParametersClass, "writeMaskState", "field_21419", "Lnet/minecraft/class_4668$class_4686;", "f_110589_"
+         );
+         this.renderStateCullStateField = Misc.getFieldReflection(
+            multiPhaseParametersClass, "cullState", "field_21412", "Lnet/minecraft/class_4668$class_4671;", "f_110582_"
+         );
+         this.renderStateShaderStateField = Misc.getFieldReflection(
+            multiPhaseParametersClass, "shaderState", "field_29461", "Lnet/minecraft/class_4668$class_5942;", "f_173274_"
+         );
       } catch (ClassNotFoundException var6) {
          throw new RuntimeException(var6);
       }
 
-      this.vanillaEntityVertexConsumersField = Misc.getFieldReflection(class_4599.class, "field_20958", "Lnet/minecraft/class_4597$class_4598;");
-      this.spriteCoordinateExpanderSpriteField = Misc.getFieldReflection(class_4723.class, "field_21731", "Lnet/minecraft/class_1058;");
+      this.vanillaEntityVertexConsumersField = Misc.getFieldReflection(
+         class_4599.class, "bufferSource", "field_20958", "Lnet/minecraft/class_4597$class_4598;", "f_110094_"
+      );
+      this.spriteCoordinateExpanderSpriteField = Misc.getFieldReflection(class_4723.class, "sprite", "field_21731", "Lnet/minecraft/class_1058;", "f_110796_");
 
       try {
          try {
@@ -177,7 +197,9 @@ public class EntityIconPrerenderer {
             this.irisRenderLayerWrapperClass = Class.forName("net.coderbot.iris.layer.IrisRenderLayerWrapper");
          }
 
-         this.irisRenderLayerWrapperUnwrapMethod = Misc.getMethodReflection(this.irisRenderLayerWrapperClass, "unwrap", "()Lnet/minecraft/class_1921;");
+         this.irisRenderLayerWrapperUnwrapMethod = Misc.getMethodReflection(
+            this.irisRenderLayerWrapperClass, "unwrap", "unwrap", "()Lnet/minecraft/class_1921;", "unwrap"
+         );
          MinimapLogs.LOGGER.info("Old Iris!");
       } catch (Exception var5) {
       }

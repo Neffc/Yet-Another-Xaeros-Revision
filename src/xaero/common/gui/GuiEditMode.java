@@ -8,7 +8,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_4587;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.interfaces.Interface;
 import xaero.common.interfaces.InterfaceManager;
@@ -18,7 +18,7 @@ public class GuiEditMode extends ScreenBase {
    private boolean instructions;
    public boolean mouseDown;
 
-   public GuiEditMode(AXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escScreen, String message, boolean instructions) {
+   public GuiEditMode(IXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escScreen, String message, boolean instructions) {
       super(modMain, par1GuiScreen, escScreen, class_2561.method_43471("gui.xaero_edit_mode"));
       this.message = message;
       this.instructions = instructions;

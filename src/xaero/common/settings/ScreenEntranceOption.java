@@ -2,12 +2,12 @@ package xaero.common.settings;
 
 import net.minecraft.class_339;
 import net.minecraft.class_4185;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 
 public class ScreenEntranceOption extends Option {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
 
-   public ScreenEntranceOption(String key, AXaeroMinimap modMain, ModOptions option) {
+   public ScreenEntranceOption(String key, IXaeroMinimap modMain, ModOptions option) {
       super(option);
       this.modMain = modMain;
    }

@@ -1,12 +1,12 @@
 package xaero.common.server;
 
 import net.minecraft.server.MinecraftServer;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.server.radar.tracker.SyncedPlayerTracker;
 import xaero.common.server.radar.tracker.SyncedPlayerTrackerSystemManager;
 
 public class MineraftServerDataInitializer {
-   public void init(MinecraftServer server, AXaeroMinimap modMain) {
+   public void init(MinecraftServer server, IXaeroMinimap modMain) {
       SyncedPlayerTrackerSystemManager syncedPlayerTrackerSystemManager = new SyncedPlayerTrackerSystemManager();
       if (modMain.getSupportServerMods().hasFtbTeams()) {
          syncedPlayerTrackerSystemManager.register("ftb_teams", modMain.getSupportServerMods().getFtbTeams().getSyncedPlayerTrackerSystem());

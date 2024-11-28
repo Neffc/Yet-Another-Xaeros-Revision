@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import net.minecraft.class_2561;
 import net.minecraft.class_310;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.category.setting.ObjectCategoryDefaultSettingsSetter;
 import xaero.common.category.ui.GuiCategorySettings;
@@ -23,7 +23,7 @@ public class GuiEntityRadarCategorySettings
    extends GuiCategorySettings<EntityRadarCategory, GuiEntityRadarCategoryUIEditorData, EntityRadarCategory.Builder, GuiEntityRadarCategoryUIEditorSettingsData<?>, GuiEntityRadarCategoryUIEditorSettingsData.Builder, GuiEntityRadarCategoryUIEditorData.Builder> {
    private final EntityRadarCategoryManager entityRadarCategoryManager;
 
-   protected GuiEntityRadarCategorySettings(AXaeroMinimap modMain, class_437 parent, class_437 escape) {
+   protected GuiEntityRadarCategorySettings(IXaeroMinimap modMain, class_437 parent, class_437 escape) {
       super(
          modMain,
          parent,

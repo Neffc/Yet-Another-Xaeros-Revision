@@ -4,8 +4,8 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import xaero.common.gui.GuiSettings;
 
-public class XaeroMinimapModMenu implements ModMenuApi {
+public class XaeroHudModMenu implements ModMenuApi {
    public ConfigScreenFactory<GuiSettings> getModConfigScreenFactory() {
-      return screen -> AXaeroMinimap.INSTANCE.getGuiHelper().getMainSettingsScreen(screen);
+      return screen -> HudMod.INSTANCE.getGuiHelper().getMainSettingsScreen(screen);
    }
 }

@@ -2,7 +2,7 @@ package xaero.minimap.gui;
 
 import net.minecraft.class_310;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.gui.GuiEditMode;
 import xaero.common.gui.GuiHelper;
 import xaero.common.gui.GuiMinimapMain;
@@ -11,7 +11,7 @@ import xaero.common.gui.MyOptions;
 import xaero.common.gui.ScreenBase;
 
 public class MinimapGuiHelper extends GuiHelper {
-   public MinimapGuiHelper(AXaeroMinimap modMain) {
+   public MinimapGuiHelper(IXaeroMinimap modMain) {
       super(modMain);
    }
 

@@ -6,13 +6,13 @@ import net.minecraft.class_2540;
 import net.minecraft.class_310;
 import net.minecraft.class_634;
 import xaero.common.message.MinimapMessage;
-import xaero.common.message.MinimapMessageHandler;
+import xaero.common.message.MinimapMessageHandlerFabric;
 import xaero.common.message.MinimapMessageType;
 
 public class ClientMinimapPacketConsumer implements PlayChannelHandler {
-   private final MinimapMessageHandler messageHandler;
+   private final MinimapMessageHandlerFabric messageHandler;
 
-   public ClientMinimapPacketConsumer(MinimapMessageHandler messageHandler) {
+   public ClientMinimapPacketConsumer(MinimapMessageHandlerFabric messageHandler) {
       this.messageHandler = messageHandler;
    }
 
@@ -27,7 +27,7 @@ public class ClientMinimapPacketConsumer implements PlayChannelHandler {
    ) {
       if (type != null && type.getClientHandler() != null) {
          T message = (T)type.getDecoder().apply(buffer);
-         class_310.method_1551().method_18858(() -> type.getClientHandler().handle(message, responseSender));
+         class_310.method_1551().method_18858(() -> type.getClientHandler().handle(message));
       }
    }
 }

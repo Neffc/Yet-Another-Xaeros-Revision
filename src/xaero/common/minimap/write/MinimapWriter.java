@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.imageio.ImageIO;
 import net.minecraft.class_1047;
@@ -62,7 +63,7 @@ import net.minecraft.class_7924;
 import net.minecraft.class_2338.class_2339;
 import net.minecraft.class_2902.class_2903;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.cache.BlockStateShortShapeCache;
@@ -85,7 +86,7 @@ import xaero.common.misc.OptimizedMath;
 import xaero.common.mods.SupportMods;
 import xaero.common.settings.ModSettings;
 
-public class MinimapWriter {
+public abstract class MinimapWriter {
    private static final int VOID_COLOR = -16121833;
    private static final float DEFAULT_AMBIENT_LIGHT = 0.7F;
    private static final float DEFAULT_AMBIENT_LIGHT_COLORED = 0.2F;
@@ -98,11 +99,11 @@ public class MinimapWriter {
    public static final int SUN_MINIMUM = 9;
    public static final int NO_Y_VALUE = Integer.MAX_VALUE;
    private static final int MAX_TRANSPARENCY_BLEND_DEPTH = 5;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private XaeroMinimapSession minimapSession;
    private MinimapWriterHelper helper;
    private MinimapInterface minimapInterface;
-   private class_5819 usedRandom = class_5819.method_43049(0L);
+   protected final class_5819 usedRandom = class_5819.method_43049(0L);
    private int loadingSideInChunks;
    private int updateRadius;
    private MinimapChunk[][] loadingBlocks;
@@ -186,7 +187,7 @@ public class MinimapWriter {
    private final HashMap<Integer, Integer> blockColours;
    private final Object2IntMap<class_2680> blockTintIndices;
    private final CachedFunction<class_2688<?, ?>, Boolean> transparentCache;
-   private final CachedFunction<class_2680, Boolean> glowingCache;
+   private final Map<class_2680, Boolean> glowingCache;
    private long lastWrite = -1L;
    private long lastWriteTry = -1L;
    private boolean forcedRefresh;
@@ -242,7 +243,7 @@ public class MinimapWriter {
    private DimensionHighlighterHandler dimensionHighlightHandler;
 
    public MinimapWriter(
-      AXaeroMinimap modMain, XaeroMinimapSession minimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
+      IXaeroMinimap modMain, XaeroMinimapSession minimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
    ) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
@@ -272,23 +273,17 @@ public class MinimapWriter {
       this.pixelBlockLights = new ArrayList<>();
       this.transparentCache = new CachedFunction<>(
          state -> {
-            if (!(state instanceof class_2680 blockState)) {
+            if (state instanceof class_2680 blockState) {
+               return !(blockState.method_26204() instanceof class_2189) && !(blockState.method_26204() instanceof class_2368)
+                  ? this.blockStateHasTranslucentRenderType(blockState)
+                  : true;
+            } else {
                class_3610 fluidState = (class_3610)state;
                return class_4696.method_23680(fluidState) == class_1921.method_23583();
-            } else {
-               return blockState.method_26204() instanceof class_2189
-                  || blockState.method_26204() instanceof class_2368
-                  || class_4696.method_23679(blockState) == class_1921.method_23583();
             }
          }
       );
-      this.glowingCache = new CachedFunction<>(state -> {
-         try {
-            return state.method_26213() > 0;
-         } catch (Exception var2) {
-            return false;
-         }
-      });
+      this.glowingCache = new HashMap<>();
       this.minimapInterface = modMain.getInterfaces().getMinimapInterface();
       this.buggedStates = new ArrayList<>();
       this.detectedChunkChanges = new ArrayList<>();
@@ -299,6 +294,10 @@ public class MinimapWriter {
       this.highlighterRegistry = highlighterRegistry;
       this.blockTintIndices = new Object2IntOpenHashMap();
    }
+
+   protected abstract boolean blockStateHasTranslucentRenderType(class_2680 var1);
+
+   protected abstract int getBlockStateLightEmission(class_2680 var1, class_1937 var2, class_2338 var3);
 
    public void setupDimensionHighlightHandler(class_5321<class_1937> dimension) {
       this.dimensionHighlightHandler = new DimensionHighlighterHandler(dimension, this.highlighterRegistry, this);
@@ -907,7 +906,7 @@ public class MinimapWriter {
          class_2339 mutableBlockPos3 = this.mutableBlockPos3;
          Long loadingSlimeSeed = this.loadingSlimeSeed;
          int loadedLevels = this.loadedLevels;
-         AXaeroMinimap modMain = this.modMain;
+         IXaeroMinimap modMain = this.modMain;
          MinimapWriterHelper helper = this.helper;
          int loadingColours = this.loadingColours;
          boolean loadingRedstone = this.loadingRedstone;
@@ -1119,7 +1118,7 @@ public class MinimapWriter {
       class_2339 mutableBlockPos2,
       Long loadingSlimeSeed,
       int loadedLevels,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       MinimapWriterHelper helper,
       int loadingColours,
       boolean loadingRedstone,
@@ -1964,7 +1963,20 @@ public class MinimapWriter {
    }
 
    private boolean isGlowing(class_2680 state, class_1937 world, class_2338 pos) {
-      return this.glowingCache.apply(state);
+      Boolean cachedValue = this.glowingCache.get(state);
+      if (cachedValue != null) {
+         return cachedValue;
+      } else {
+         boolean isGlowing = false;
+
+         try {
+            isGlowing = this.getBlockStateLightEmission(state, world, pos) > 0;
+         } catch (Exception var7) {
+         }
+
+         this.glowingCache.put(state, isGlowing);
+         return isGlowing;
+      }
    }
 
    private void applyTransparentLayer(
@@ -2033,6 +2045,10 @@ public class MinimapWriter {
       this.currentTransparencyMultiplier *= 1.0F - transparency;
    }
 
+   protected abstract List<class_777> getQuads(class_1087 var1, class_2680 var2, class_2350 var3);
+
+   protected abstract class_1058 getParticleIcon(class_773 var1, class_1087 var2, class_2680 var3);
+
    private int loadBlockColourFromTexture(class_1937 world, class_2680 state, class_2248 b, class_2338 pos, boolean convert) {
       if (state == this.lastBlockStateForTextureColor) {
          return this.lastBlockStateForTextureColorResult;
@@ -2052,7 +2068,7 @@ public class MinimapWriter {
                class_773 bms = class_310.method_1551().method_1541().method_3351();
                class_1087 model = bms.method_3335(state);
                if (convert) {
-                  upQuads = model.method_4707(state, class_2350.field_11036, this.usedRandom);
+                  upQuads = this.getQuads(model, state, class_2350.field_11036);
                }
 
                class_1058 missingTexture = class_310.method_1551().method_1554().method_24153(class_1059.field_5275).method_4608(class_1047.method_4539());
@@ -2061,12 +2077,12 @@ public class MinimapWriter {
                   texture = upQuads.get(0).method_35788();
                   tintIndex = upQuads.get(0).method_3359();
                } else {
-                  texture = bms.method_3339(state);
+                  texture = this.getParticleIcon(bms, model, state);
                   tintIndex = 0;
                   if (texture == missingTexture) {
                      for (int i = class_2350.values().length - 1; i >= 0; i--) {
                         if (i != 1) {
-                           List<class_777> quads = model.method_4707(state, class_2350.values()[i], this.usedRandom);
+                           List<class_777> quads = this.getQuads(model, state, class_2350.values()[i]);
                            if (!quads.isEmpty()) {
                               texture = quads.get(0).method_35788();
                               tintIndex = quads.get(0).method_3359();

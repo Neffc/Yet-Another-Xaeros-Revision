@@ -3,7 +3,7 @@ package xaero.common.minimap;
 import java.io.IOException;
 import java.util.ArrayList;
 import net.minecraft.class_310;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.interfaces.Interface;
 import xaero.common.interfaces.InterfaceInstance;
@@ -22,7 +22,7 @@ import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.settings.ModOptions;
 
 public class MinimapInterface extends Interface {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private class_310 mc = class_310.method_1551();
    private WaypointsGuiRenderer waypointsGuiRenderer;
    private WaypointsIngameRenderer waypointsIngameRenderer;
@@ -35,7 +35,7 @@ public class MinimapInterface extends Interface {
    private Throwable crashedWith;
    private MinimapSafeModeRenderer minimapSafeModeRenderer;
 
-   public MinimapInterface(AXaeroMinimap modMain, int id, InterfaceManager interfaces) throws IOException {
+   public MinimapInterface(IXaeroMinimap modMain, int id, InterfaceManager interfaces) throws IOException {
       super(interfaces, "gui.xaero_minimap", id, 128, 128, ModOptions.MINIMAP);
       this.modMain = modMain;
       WaypointDeleter waypointDeleter = new WaypointDeleter(modMain);

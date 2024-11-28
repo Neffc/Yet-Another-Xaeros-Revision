@@ -7,13 +7,13 @@ import net.minecraft.class_3222;
 import net.minecraft.class_3244;
 import net.minecraft.server.MinecraftServer;
 import xaero.common.message.MinimapMessage;
-import xaero.common.message.MinimapMessageHandler;
+import xaero.common.message.MinimapMessageHandlerFabric;
 import xaero.common.message.MinimapMessageType;
 
 public class ServerMinimapPacketConsumer implements PlayChannelHandler {
-   private final MinimapMessageHandler messageHandler;
+   private final MinimapMessageHandlerFabric messageHandler;
 
-   public ServerMinimapPacketConsumer(MinimapMessageHandler messageHandler) {
+   public ServerMinimapPacketConsumer(MinimapMessageHandlerFabric messageHandler) {
       this.messageHandler = messageHandler;
    }
 
@@ -28,7 +28,7 @@ public class ServerMinimapPacketConsumer implements PlayChannelHandler {
    ) {
       if (type != null && type.getServerHandler() != null) {
          T message = (T)type.getDecoder().apply(buffer);
-         server.method_20493(() -> type.getServerHandler().handle(server, player, handler, message, responseSender));
+         server.method_20493(() -> type.getServerHandler().handle(server, player, message));
       }
    }
 }

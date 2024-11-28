@@ -24,7 +24,7 @@ import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
@@ -39,7 +39,7 @@ import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 
 public class WaypointsIngameRenderer {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private class_4587 identityMatrixStack;
    private class_4587 identityMatrixStackOverlay;
    private Vector4f origin4f;
@@ -51,7 +51,7 @@ public class WaypointsIngameRenderer {
    private double workingClosestCos;
    private final WaypointDeleter waypointReachDeleter;
 
-   public WaypointsIngameRenderer(AXaeroMinimap modMain, WaypointDeleter waypointReachDeleter, class_310 mc) {
+   public WaypointsIngameRenderer(IXaeroMinimap modMain, WaypointDeleter waypointReachDeleter, class_310 mc) {
       this.modMain = modMain;
       this.identityMatrixStack = new class_4587();
       this.identityMatrixStackOverlay = new class_4587();
@@ -361,7 +361,7 @@ public class WaypointsIngameRenderer {
       float cameraAnglePitch,
       Vector3f lookVector,
       Waypoint w,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       double depthClamp,
       double d3,
       double d4,

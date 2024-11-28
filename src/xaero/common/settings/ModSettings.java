@@ -33,7 +33,7 @@ import net.minecraft.class_5321;
 import net.minecraft.class_634;
 import net.minecraft.class_7923;
 import net.minecraft.server.MinecraftServer;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.category.setting.ObjectCategorySetting;
@@ -61,7 +61,7 @@ public class ModSettings {
    public static int defaultSettings;
    public static int ignoreUpdate;
    public static final String format = "§";
-   protected AXaeroMinimap modMain;
+   protected IXaeroMinimap modMain;
    private EntityRadarBackwardsCompatibilityConfig entityRadarBackwardsCompatibilityConfig;
    private boolean foundOldRadarSettings;
    public static final String[] ENCHANT_COLORS = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
@@ -269,7 +269,7 @@ public class ModSettings {
    public boolean dimensionScaledMaxWaypointDistance = true;
    private static int[] OLD_MINIMAP_SIZES = new int[]{57, 85, 113, 169};
 
-   public ModSettings(AXaeroMinimap modMain) {
+   public ModSettings(IXaeroMinimap modMain) {
       this.modMain = modMain;
       this.entityRadarBackwardsCompatibilityConfig = new EntityRadarBackwardsCompatibilityConfig();
       defaultSettings = modMain.getVersionID().endsWith("fair") ? 16188159 : Integer.MAX_VALUE;

@@ -5,7 +5,7 @@ import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_342;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 
 public class GuiDefaultTpCommand extends ScreenBase {
@@ -15,7 +15,7 @@ public class GuiDefaultTpCommand extends ScreenBase {
    private String commandFormat;
    private String rotationCommandFormat;
 
-   public GuiDefaultTpCommand(AXaeroMinimap modMain, class_437 parent, class_437 escape) {
+   public GuiDefaultTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape) {
       super(modMain, parent, escape, class_2561.method_43471("gui.xaero_teleport_default_command"));
    }
 

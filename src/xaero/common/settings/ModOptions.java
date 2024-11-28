@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 import net.minecraft.class_1074;
 import net.minecraft.class_2561;
 import net.minecraft.class_3532;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CursorBox;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 
@@ -18,7 +18,7 @@ public class ModOptions {
    private static CursorBox WORLD_MAP_BOX;
    private static CursorBox WORLD_MAP_HARD_BOX;
    private static CursorBox WORLD_MAP_SCREEN_BOX;
-   public static AXaeroMinimap modMain;
+   public static IXaeroMinimap modMain;
    public static ModOptions DEFAULT;
    public static ModOptions MINIMAP;
    public static ModOptions CAVE_MAPS;
@@ -180,7 +180,7 @@ public class ModOptions {
    private CursorBox tooltip;
    private boolean ingameOnly;
 
-   public static void init(AXaeroMinimap modMainIn) {
+   public static void init(IXaeroMinimap modMainIn) {
       modMain = modMainIn;
       DEFAULT = new ModOptions("Default", modMainIn, false);
       MINIMAP = new ModOptions("gui.xaero_minimap", new CursorBox("gui.xaero_box_minimap"), false);
@@ -418,11 +418,11 @@ public class ModOptions {
       WORLD_MAP_SCREEN_BOX = new CursorBox("gui.xaero_uses_worldmap_screen_value");
    }
 
-   private ModOptions(String name, AXaeroMinimap modMain, boolean ingameOnly) {
+   private ModOptions(String name, IXaeroMinimap modMain, boolean ingameOnly) {
       this(name, modMain, null, ingameOnly);
    }
 
-   private ModOptions(String name, AXaeroMinimap modMain, CursorBox tooltip, boolean ingameOnly) {
+   private ModOptions(String name, IXaeroMinimap modMain, CursorBox tooltip, boolean ingameOnly) {
       this.enumString = name;
       this.enumBoolean = false;
       this.enumDouble = false;

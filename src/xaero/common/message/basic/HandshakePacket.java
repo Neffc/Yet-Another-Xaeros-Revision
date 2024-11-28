@@ -1,9 +1,7 @@
 package xaero.common.message.basic;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.class_2540;
 import net.minecraft.class_3222;
-import net.minecraft.class_3244;
 import net.minecraft.server.MinecraftServer;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.message.MinimapMessage;
@@ -31,7 +29,7 @@ public class HandshakePacket extends MinimapMessage<HandshakePacket> {
    }
 
    public static class ClientHandler implements ClientMessageConsumer<HandshakePacket> {
-      public void handle(HandshakePacket message, PacketSender responseSender) {
+      public void handle(HandshakePacket message) {
          XaeroMinimapSession session = XaeroMinimapSession.getCurrentSession();
          if (session != null) {
             session.getMinimapProcessor().setServerModNetworkVersion(message.networkVersion);
@@ -41,7 +39,7 @@ public class HandshakePacket extends MinimapMessage<HandshakePacket> {
    }
 
    public static class ServerHandler implements ServerMessageConsumer<HandshakePacket> {
-      public void handle(MinecraftServer server, class_3222 player, class_3244 handler, HandshakePacket message, PacketSender responseSender) {
+      public void handle(MinecraftServer server, class_3222 player, HandshakePacket message) {
          ServerPlayerData playerData = ServerPlayerData.get(player);
          playerData.setClientModNetworkVersion(message.networkVersion);
       }

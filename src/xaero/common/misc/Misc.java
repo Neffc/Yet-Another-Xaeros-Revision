@@ -11,9 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.class_1041;
 import net.minecraft.class_1291;
 import net.minecraft.class_1297;
@@ -33,9 +30,11 @@ import net.minecraft.class_327.class_6415;
 import net.minecraft.class_3675.class_307;
 import net.minecraft.class_4597.class_4598;
 import org.joml.Matrix4f;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
+import xaero.common.controls.IKeyBindingHelper;
 import xaero.common.gui.IScreenBase;
+import xaero.common.platform.Services;
 
 public class Misc {
    public static double getMouseX(class_310 mc, boolean raw) {
@@ -167,15 +166,16 @@ public class Misc {
       }
    }
 
-   public static boolean inputMatchesKeyBinding(AXaeroMinimap modMain, class_307 type, int code, class_304 kb) {
+   public static boolean inputMatchesKeyBinding(IXaeroMinimap modMain, class_307 type, int code, class_304 kb, int keyConflictContext) {
+      IKeyBindingHelper keyBindingHelper = Services.PLATFORM.getKeyBindingHelper();
       return kb != null
          && code != -1
-         && KeyBindingHelper.getBoundKeyOf(kb).method_1442() == type
-         && KeyBindingHelper.getBoundKeyOf(kb).method_1444() == code
-         && (!modMain.getSupportMods().amecs() || modMain.getSupportMods().amecs.modifiersArePressed(kb));
+         && keyBindingHelper.getBoundKeyOf(kb).method_1442() == type
+         && keyBindingHelper.getBoundKeyOf(kb).method_1444() == code
+         && keyBindingHelper.modifiersAreActive(kb, keyConflictContext);
    }
 
-   public static boolean screenShouldSkipWorldRender(AXaeroMinimap modMain, class_437 screen, boolean checkOtherMod) {
+   public static boolean screenShouldSkipWorldRender(IXaeroMinimap modMain, class_437 screen, boolean checkOtherMod) {
       return screen instanceof IScreenBase && ((IScreenBase)screen).shouldSkipWorldRender()
          || checkOtherMod && modMain.getSupportMods().worldmap() && modMain.getSupportMods().worldmapSupport.screenShouldSkipWorldRender(screen);
    }
@@ -184,33 +184,14 @@ public class Misc {
       return chunk.method_12004().method_8324();
    }
 
-   private static String fixFabricFieldMapping(Class<?> clazz, String name, String descriptor) {
-      MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
-      String owner = mappingResolver.unmapClassName("intermediary", clazz.getName());
-      return mappingResolver.mapFieldName("intermediary", owner, name, descriptor);
+   public static Class<?> getClassForName(String obfuscatedName, String deobfName) throws ClassNotFoundException {
+      IObfuscatedReflection obfuscatedReflection = Services.PLATFORM.getObfuscatedReflection();
+      return obfuscatedReflection.getClassForName(obfuscatedName, deobfName);
    }
 
-   private static String fixFabricMethodMapping(Class<?> clazz, String name, String descriptor) {
-      MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
-      String owner = mappingResolver.unmapClassName("intermediary", clazz.getName());
-      return mappingResolver.mapMethodName("intermediary", owner, name, descriptor);
-   }
-
-   public static Class<?> getClassForName(String obfuscatedName) throws ClassNotFoundException {
-      MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
-      String name = mappingResolver.mapClassName("intermediary", obfuscatedName);
-      return Class.forName(name);
-   }
-
-   public static Field getFieldReflection(Class<?> c, String obfuscatedName, String descriptor) {
-      String name = fixFabricFieldMapping(c, obfuscatedName, descriptor);
-      Field field = null;
-
-      try {
-         return c.getDeclaredField(name);
-      } catch (NoSuchFieldException var6) {
-         throw new RuntimeException(var6);
-      }
+   public static Field getFieldReflection(Class<?> c, String deobfName, String obfuscatedNameFabric, String descriptor, String obfuscatedNameForge) {
+      IObfuscatedReflection obfuscatedReflection = Services.PLATFORM.getObfuscatedReflection();
+      return obfuscatedReflection.getFieldReflection(c, deobfName, obfuscatedNameFabric, descriptor, obfuscatedNameForge);
    }
 
    public static <A, B> B getReflectFieldValue(A parentObject, Field field) {
@@ -241,15 +222,11 @@ public class Misc {
       field.setAccessible(accessibleBU);
    }
 
-   public static Method getMethodReflection(Class<?> c, String obfuscatedName, String descriptor, Class<?>... parameters) {
-      String name = fixFabricMethodMapping(c, obfuscatedName, descriptor);
-      Method method = null;
-
-      try {
-         return c.getDeclaredMethod(name, parameters);
-      } catch (NoSuchMethodException var7) {
-         throw new RuntimeException(var7);
-      }
+   public static Method getMethodReflection(
+      Class<?> c, String deobfName, String obfuscatedNameFabric, String descriptor, String obfuscatedNameForge, Class<?>... parameters
+   ) {
+      IObfuscatedReflection obfuscatedReflection = Services.PLATFORM.getObfuscatedReflection();
+      return obfuscatedReflection.getMethodReflection(c, deobfName, obfuscatedNameFabric, descriptor, obfuscatedNameForge, parameters);
    }
 
    public static <A, B> B getReflectMethodValue(A parentObject, Method method, Object... arguments) {

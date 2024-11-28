@@ -9,18 +9,18 @@ import net.minecraft.class_265;
 import net.minecraft.class_2680;
 import net.minecraft.class_310;
 import net.minecraft.class_2350.class_2351;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.cache.placeholder.PlaceholderBlockGetter;
 
 public class BlockStateShortShapeCache {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private Map<class_2680, Boolean> shortBlockStates;
    private class_2680 lastShortChecked = null;
    private boolean lastShortCheckedResult = false;
    private PlaceholderBlockGetter placeholderBlockGetter;
 
-   public BlockStateShortShapeCache(AXaeroMinimap modMain) {
+   public BlockStateShortShapeCache(IXaeroMinimap modMain) {
       this.modMain = modMain;
       this.shortBlockStates = new HashMap<>();
       this.placeholderBlockGetter = new PlaceholderBlockGetter();

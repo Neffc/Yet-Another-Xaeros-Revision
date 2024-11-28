@@ -59,13 +59,13 @@ public class RadarUtils {
       Field foxTrustMainField = null;
 
       try {
-         foxTrustSecondaryField = Misc.getFieldReflection(class_4019.class, "field_17951", "Lnet/minecraft/class_2940;");
+         foxTrustSecondaryField = Misc.getFieldReflection(class_4019.class, "DATA_TRUSTED_ID_0", "field_17951", "Lnet/minecraft/class_2940;", "f_28439_");
       } catch (Exception var6) {
          MinimapLogs.LOGGER.error("suppressed exception", var6);
       }
 
       try {
-         foxTrustMainField = Misc.getFieldReflection(class_4019.class, "field_17952", "Lnet/minecraft/class_2940;");
+         foxTrustMainField = Misc.getFieldReflection(class_4019.class, "DATA_TRUSTED_ID_1", "field_17952", "Lnet/minecraft/class_2940;", "f_28440_");
       } catch (Exception var5) {
          MinimapLogs.LOGGER.error("suppressed exception", var5);
       }

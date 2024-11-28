@@ -13,7 +13,7 @@ import net.minecraft.class_4587;
 import net.minecraft.class_6381;
 import net.minecraft.class_6382;
 import net.minecraft.class_4280.class_4281;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.category.ObjectCategory;
 import xaero.common.category.ui.data.GuiCategoryUIEditorCategoryData;
 import xaero.common.category.ui.data.GuiCategoryUIEditorExpandableData;
@@ -37,7 +37,7 @@ public abstract class GuiCategorySettings<C extends ObjectCategory<?, C>, ED ext
    protected ED cutCategorySuper;
 
    protected GuiCategorySettings(
-      AXaeroMinimap modMain, class_437 parent, class_437 escape, class_2561 title, GuiCategoryUIEditorDataConverter<C, ED, CB, SD, SDB, EDB> dataConverter
+      IXaeroMinimap modMain, class_437 parent, class_437 escape, class_2561 title, GuiCategoryUIEditorDataConverter<C, ED, CB, SD, SDB, EDB> dataConverter
    ) {
       super(modMain, parent, escape, title);
       this.dataConverter = dataConverter;

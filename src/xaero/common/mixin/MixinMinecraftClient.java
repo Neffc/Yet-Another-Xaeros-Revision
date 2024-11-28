@@ -8,8 +8,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.core.IXaeroMinimapMinecraftClient;
+import xaero.common.core.XaeroMinimapCore;
 
 @Mixin({class_310.class})
 public class MixinMinecraftClient implements IXaeroMinimapMinecraftClient {
@@ -25,8 +26,13 @@ public class MixinMinecraftClient implements IXaeroMinimapMinecraftClient {
       method = {"tick"}
    )
    public void onTickStart(CallbackInfo info) {
-      AXaeroMinimap.INSTANCE.tryLoadLater();
-      AXaeroMinimap.INSTANCE.getFMLEvents().handleClientTickStart();
+      if (HudMod.INSTANCE != null) {
+         HudMod.INSTANCE.tryLoadLater();
+      }
+
+      if (XaeroMinimapCore.isModLoaded()) {
+         HudMod.INSTANCE.getEvents().handleClientTickStart();
+      }
    }
 
    @Inject(
@@ -35,8 +41,8 @@ public class MixinMinecraftClient implements IXaeroMinimapMinecraftClient {
       cancellable = true
    )
    public void onOpenScreen(class_437 screen_1, CallbackInfo info) {
-      if (AXaeroMinimap.INSTANCE != null && AXaeroMinimap.INSTANCE.isLoaded()) {
-         class_437 resultScreen = AXaeroMinimap.INSTANCE.getEvents().handleGuiOpen(screen_1);
+      if (XaeroMinimapCore.isModLoaded()) {
+         class_437 resultScreen = HudMod.INSTANCE.getEvents().handleGuiOpen(screen_1);
          if (screen_1 != resultScreen) {
             ((class_310)this).method_1507(resultScreen);
             info.cancel();
@@ -50,7 +56,11 @@ public class MixinMinecraftClient implements IXaeroMinimapMinecraftClient {
    )
    public void onDisconnect(class_437 screen_1, CallbackInfo info) {
       if (this.field_1687 != null) {
-         AXaeroMinimap.INSTANCE.getEvents().worldUnload(this.field_1687);
+         if (!XaeroMinimapCore.isModLoaded()) {
+            return;
+         }
+
+         HudMod.INSTANCE.getEvents().worldUnload(this.field_1687);
       }
    }
 
@@ -60,7 +70,11 @@ public class MixinMinecraftClient implements IXaeroMinimapMinecraftClient {
    )
    public void onJoinWorld(class_638 newWorld, CallbackInfo info) {
       if (this.field_1687 != null) {
-         AXaeroMinimap.INSTANCE.getEvents().worldUnload(this.field_1687);
+         if (!XaeroMinimapCore.isModLoaded()) {
+            return;
+         }
+
+         HudMod.INSTANCE.getEvents().worldUnload(this.field_1687);
       }
    }
 

@@ -8,18 +8,18 @@ import net.minecraft.class_310;
 import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_4597.class_4598;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 
 public class CompassRenderer {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final class_310 mc;
    private double[] partialDest;
 
-   public CompassRenderer(AXaeroMinimap modMain, class_310 mc) {
+   public CompassRenderer(IXaeroMinimap modMain, class_310 mc) {
       this.modMain = modMain;
       this.mc = mc;
       this.partialDest = new double[2];

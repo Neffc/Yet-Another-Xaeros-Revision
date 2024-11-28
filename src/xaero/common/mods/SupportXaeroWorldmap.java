@@ -18,7 +18,7 @@ import net.minecraft.class_5321;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
@@ -51,14 +51,14 @@ public class SupportXaeroWorldmap {
    private static final HashMap<MapTileChunk, Long> seedsUsed = new HashMap<>();
    public static final int black = -16777216;
    public static final int slime = -2142047936;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private int destinationCaving = Integer.MAX_VALUE;
    private long lastDestinationCavingSwitch;
    private int previousRenderedCaveLayer = Integer.MAX_VALUE;
    private int lastRenderedCaveLayer = Integer.MAX_VALUE;
    private ArrayList<MapRegion> regionBuffer = new ArrayList<>();
 
-   public SupportXaeroWorldmap(AXaeroMinimap modMain) {
+   public SupportXaeroWorldmap(IXaeroMinimap modMain) {
       this.modMain = modMain;
 
       try {

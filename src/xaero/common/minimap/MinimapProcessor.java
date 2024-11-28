@@ -6,7 +6,7 @@ import net.minecraft.class_1937;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_638;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.anim.OldAnimation;
 import xaero.common.graphics.CustomVertexConsumers;
@@ -23,7 +23,7 @@ import xaero.common.settings.ModSettings;
 public class MinimapProcessor {
    public static final boolean DEBUG = false;
    public static final int FRAME = 9;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private XaeroMinimapSession minimapSession;
    private MinimapWriter minimapWriter;
    private MinimapRadar entityRadar;
@@ -38,7 +38,7 @@ public class MinimapProcessor {
    private boolean fairPlayOnlyMessageReceived;
 
    public MinimapProcessor(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       XaeroMinimapSession minimapSession,
       MinimapWriter minimapWriter,
       MinimapRadar entityRadar,
@@ -182,7 +182,6 @@ public class MinimapProcessor {
          }
       } catch (Throwable var13) {
          this.minimapInterface.setCrashedWith(var13);
-         this.minimapInterface.checkCrashes();
       }
    }
 

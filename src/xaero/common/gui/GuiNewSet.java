@@ -6,7 +6,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_342;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.WaypointWorld;
@@ -19,11 +19,11 @@ public class GuiNewSet extends ScreenBase {
    private WaypointWorld waypointWorld;
    private class_4185 confirmButton;
 
-   public GuiNewSet(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, WaypointWorld waypointWorld) {
+   public GuiNewSet(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, WaypointWorld waypointWorld) {
       this(modMain, minimapSession, par1GuiScreen, null, waypointWorld);
    }
 
-   public GuiNewSet(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, class_437 escapeScreen, WaypointWorld waypointWorld) {
+   public GuiNewSet(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, class_437 escapeScreen, WaypointWorld waypointWorld) {
       super(modMain, par1GuiScreen, escapeScreen, class_2561.method_43471("gui.xaero_create_set"));
       this.minimapSession = minimapSession;
       this.waypointsManager = minimapSession.getWaypointsManager();

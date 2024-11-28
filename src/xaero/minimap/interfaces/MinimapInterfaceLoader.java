@@ -1,7 +1,7 @@
 package xaero.minimap.interfaces;
 
 import java.io.IOException;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.interfaces.IInterfaceLoader;
 import xaero.common.interfaces.Interface;
 import xaero.common.interfaces.InterfaceManager;
@@ -43,7 +43,7 @@ public class MinimapInterfaceLoader implements IInterfaceLoader {
    }
 
    @Override
-   public void load(AXaeroMinimap modMain, InterfaceManager interfaces) throws IOException {
+   public void load(IXaeroMinimap modMain, InterfaceManager interfaces) throws IOException {
       for (int i = 0; i < 4; i++) {
          interfaces.add(new Interface(interfaces, "dummy", interfaces.getNextId(), 0, 0, ModOptions.DEFAULT) {
          });

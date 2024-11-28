@@ -1,6 +1,5 @@
 package xaero.common.message.tracker;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.class_2540;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.message.MinimapMessage;
@@ -15,7 +14,7 @@ public class ClientboundPlayerTrackerResetPacket extends MinimapMessage<Clientbo
    }
 
    public static class Handler implements ClientMessageConsumer<ClientboundPlayerTrackerResetPacket> {
-      public void handle(ClientboundPlayerTrackerResetPacket t, PacketSender responseSender) {
+      public void handle(ClientboundPlayerTrackerResetPacket t) {
          XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
          if (minimapSession != null) {
             minimapSession.getMinimapProcessor().getClientSyncedTrackedPlayerManager().reset();

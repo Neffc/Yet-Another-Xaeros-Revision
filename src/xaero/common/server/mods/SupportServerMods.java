@@ -1,6 +1,6 @@
 package xaero.common.server.mods;
 
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.server.mods.argonauts.SupportArgonautsServer;
 import xaero.common.server.mods.ftbteams.SupportFTBTeamsServer;
 
@@ -10,7 +10,7 @@ public class SupportServerMods {
    private SupportOPACServer opac;
    private SupportWorldMapServer worldmap;
 
-   public void check(AXaeroMinimap modMain) {
+   public void check(IXaeroMinimap modMain) {
       try {
          Class.forName("dev.ftb.mods.ftbteams.api.FTBTeamsAPI");
          this.ftbTeams = new SupportFTBTeamsServer();

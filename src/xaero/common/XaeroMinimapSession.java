@@ -26,7 +26,7 @@ import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 import xaero.common.minimap.write.MinimapWriter;
 
 public class XaeroMinimapSession {
-   protected AXaeroMinimap modMain;
+   protected IXaeroMinimap modMain;
    protected WaypointsManager waypointsManager;
    protected WaypointSharingHandler waypointSharing;
    protected ControlsHandler controls;
@@ -38,7 +38,7 @@ public class XaeroMinimapSession {
    private MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers;
    private boolean usable;
 
-   public XaeroMinimapSession(AXaeroMinimap modMain) {
+   public XaeroMinimapSession(IXaeroMinimap modMain) {
       this.modMain = modMain;
    }
 
@@ -57,7 +57,9 @@ public class XaeroMinimapSession {
       }
 
       highlighterRegistry.end();
-      MinimapWriter minimapWriter = new MinimapWriter(this.modMain, this, new BlockStateShortShapeCache(this.modMain), highlighterRegistry);
+      MinimapWriter minimapWriter = this.modMain
+         .getPlatformContext()
+         .createMinimapWriter(this.modMain, this, new BlockStateShortShapeCache(this.modMain), highlighterRegistry);
       MinimapRadar entityRadar = new MinimapRadar(this.modMain, this, this.modMain.getEntityRadarCategoryManager());
       ClientSyncedTrackedPlayerManager clientSyncedTrackedPlayerManager = new ClientSyncedTrackedPlayerManager();
       this.minimap = new MinimapProcessor(this.modMain, this, minimapWriter, entityRadar, clientSyncedTrackedPlayerManager);
@@ -133,7 +135,7 @@ public class XaeroMinimapSession {
       return this.multiTextureRenderTypeRenderers;
    }
 
-   public AXaeroMinimap getModMain() {
+   public IXaeroMinimap getModMain() {
       return this.modMain;
    }
 }

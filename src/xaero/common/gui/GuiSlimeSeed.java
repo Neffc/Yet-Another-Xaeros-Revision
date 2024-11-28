@@ -7,7 +7,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_342;
 import net.minecraft.class_437;
 import org.apache.commons.lang3.StringUtils;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.settings.ModOptions;
@@ -16,7 +16,7 @@ public class GuiSlimeSeed extends GuiSettings {
    public class_342 seedTextField;
    private final String fullWorldID;
 
-   public GuiSlimeSeed(AXaeroMinimap modMain, WaypointsManager waypointsManager, class_437 parent, class_437 escape) {
+   public GuiSlimeSeed(IXaeroMinimap modMain, WaypointsManager waypointsManager, class_437 parent, class_437 escape) {
       super(modMain, class_2561.method_43471("gui.xaero_slime_chunks"), parent, escape);
       this.entries = entriesFromOptions(new ModOptions[]{ModOptions.SLIME_CHUNKS, ModOptions.OPEN_SLIME_SETTINGS});
       this.fullWorldID = waypointsManager.getCurrentContainerAndWorldID();

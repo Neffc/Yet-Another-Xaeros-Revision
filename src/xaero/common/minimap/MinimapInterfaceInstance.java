@@ -4,7 +4,7 @@ import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_408;
 import net.minecraft.class_418;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomVertexConsumers;
@@ -15,9 +15,9 @@ import xaero.common.misc.Misc;
 
 public class MinimapInterfaceInstance extends InterfaceInstance {
    private XaeroMinimapSession minimapSession;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
 
-   public MinimapInterfaceInstance(MinimapInterface inter, AXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public MinimapInterfaceInstance(MinimapInterface inter, IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
       super(inter);
       this.minimapSession = minimapSession;
       this.modMain = modMain;

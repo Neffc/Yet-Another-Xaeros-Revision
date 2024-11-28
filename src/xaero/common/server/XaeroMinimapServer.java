@@ -2,16 +2,16 @@ package xaero.common.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.server.events.ServerEvents;
 
 public class XaeroMinimapServer {
    public static int SERVER_COMPATIBILITY = 1;
    private final Logger LOGGER = LogManager.getLogger();
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private ServerEvents serverEvents;
 
-   public XaeroMinimapServer(AXaeroMinimap modMain) {
+   public XaeroMinimapServer(IXaeroMinimap modMain) {
       this.modMain = modMain;
    }
 
@@ -23,7 +23,7 @@ public class XaeroMinimapServer {
    public void loadLater() {
    }
 
-   public AXaeroMinimap getModMain() {
+   public IXaeroMinimap getModMain() {
       return this.modMain;
    }
 

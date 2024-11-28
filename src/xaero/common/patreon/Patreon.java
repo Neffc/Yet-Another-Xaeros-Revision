@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import javax.crypto.Cipher;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_742;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.patreon.decrypt.DecryptInputStream;
+import xaero.common.platform.Services;
 
 public class Patreon {
    private static boolean hasAutoUpdates;
@@ -41,7 +41,7 @@ public class Patreon {
       checkPatreon(null);
    }
 
-   public static void checkPatreon(AXaeroMinimap modMain) {
+   public static void checkPatreon(IXaeroMinimap modMain) {
       if (modMain == null || modMain.getSettings().allowInternetAccess) {
          synchronized (mods) {
             if (!loaded) {
@@ -236,6 +236,6 @@ public class Patreon {
          MinimapLogs.LOGGER.error("suppressed exception", var4);
       }
 
-      optionsFile = FabricLoader.getInstance().getGameDir().resolve("config").resolve("xaeropatreon.txt").toFile();
+      optionsFile = Services.PLATFORM.getGameDir().resolve("config").resolve("xaeropatreon.txt").toFile();
    }
 }

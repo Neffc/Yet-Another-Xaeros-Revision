@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xaero.common.AXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.server.IMinecraftServer;
 import xaero.common.server.MinecraftServerData;
 
@@ -21,7 +21,9 @@ public class MixinMinecraftServer implements IMinecraftServer {
    )
    public void onTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
       if (this instanceof class_3176) {
-         AXaeroMinimap.INSTANCE.tryLoadLaterServer();
+         if (HudMod.INSTANCE != null) {
+            HudMod.INSTANCE.tryLoadLaterServer();
+         }
       }
    }
 

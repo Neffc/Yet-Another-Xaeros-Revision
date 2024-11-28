@@ -1,7 +1,7 @@
 package xaero.common.gui;
 
 import net.minecraft.class_339;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CursorBox;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.Option;
@@ -52,7 +52,7 @@ public class ConfigSettingEntry implements ISettingEntry {
       return obj instanceof ConfigSettingEntry && ((ConfigSettingEntry)obj).option == this.option;
    }
 
-   public boolean usesWorldMapHardValue(AXaeroMinimap modMain) {
+   public boolean usesWorldMapHardValue(IXaeroMinimap modMain) {
       return modMain.getSettings().usesWorldMapHardValue(this.option);
    }
 }

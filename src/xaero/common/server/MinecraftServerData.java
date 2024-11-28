@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.server.MinecraftServer;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.server.level.LevelMapProperties;
 import xaero.common.server.level.LevelMapPropertiesIO;
 import xaero.common.server.radar.tracker.SyncedPlayerTracker;
@@ -17,9 +17,9 @@ public class MinecraftServerData {
    private final SyncedPlayerTracker syncedPlayerTracker;
    private final Map<Path, LevelMapProperties> levelProperties;
    private final LevelMapPropertiesIO propertiesIO;
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
 
-   public MinecraftServerData(SyncedPlayerTrackerSystemManager syncedPlayerTrackerSystemManager, SyncedPlayerTracker syncedPlayerTracker, AXaeroMinimap modMain) {
+   public MinecraftServerData(SyncedPlayerTrackerSystemManager syncedPlayerTrackerSystemManager, SyncedPlayerTracker syncedPlayerTracker, IXaeroMinimap modMain) {
       this.syncedPlayerTrackerSystemManager = syncedPlayerTrackerSystemManager;
       this.syncedPlayerTracker = syncedPlayerTracker;
       this.levelProperties = new HashMap<>();
@@ -58,7 +58,7 @@ public class MinecraftServerData {
       return ((IMinecraftServer)server).getXaeroMinimapServerData();
    }
 
-   public AXaeroMinimap getModMain() {
+   public IXaeroMinimap getModMain() {
       return this.modMain;
    }
 }

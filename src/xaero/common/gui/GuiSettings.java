@@ -14,7 +14,7 @@ import net.minecraft.class_364;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_3675.class_307;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.widget.WidgetScreen;
@@ -38,7 +38,7 @@ public abstract class GuiSettings extends ScreenBase implements WidgetScreen {
    private boolean shouldRefocusSearch;
    private boolean shouldSaveRadar;
 
-   public GuiSettings(AXaeroMinimap modMain, class_2561 title, class_437 backScreen, class_437 escScreen) {
+   public GuiSettings(IXaeroMinimap modMain, class_2561 title, class_437 backScreen, class_437 escScreen) {
       super(modMain, backScreen, escScreen, title);
    }
 
@@ -242,7 +242,7 @@ public abstract class GuiSettings extends ScreenBase implements WidgetScreen {
    public boolean method_25404(int par1, int par2, int par3) {
       if (!super.method_25404(par1, par2, par3) && (!(this.method_25399() instanceof class_342) || !((class_342)this.method_25399()).method_25370())) {
          if (Misc.inputMatchesKeyBinding(
-            this.modMain, par1 != -1 ? class_307.field_1668 : class_307.field_1671, par1 != -1 ? par1 : par2, (class_304)this.modMain.getSettingsKey()
+            this.modMain, par1 != -1 ? class_307.field_1668 : class_307.field_1671, par1 != -1 ? par1 : par2, (class_304)this.modMain.getSettingsKey(), 0
          )) {
             this.method_25419();
             return true;
@@ -264,7 +264,7 @@ public abstract class GuiSettings extends ScreenBase implements WidgetScreen {
          .getWidgetScreenHandler()
          .handleClick(this, this.field_22789, this.field_22790, (int)p_mouseClicked_1_, (int)p_mouseClicked_3_, this.field_22787.method_22683().method_4495());
       if (!super.method_25402(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_)) {
-         if (Misc.inputMatchesKeyBinding(this.modMain, class_307.field_1672, p_mouseClicked_5_, (class_304)this.modMain.getSettingsKey())) {
+         if (Misc.inputMatchesKeyBinding(this.modMain, class_307.field_1672, p_mouseClicked_5_, (class_304)this.modMain.getSettingsKey(), 0)) {
             this.goBack();
             return true;
          } else {

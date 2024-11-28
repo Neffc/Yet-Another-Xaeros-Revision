@@ -101,74 +101,93 @@ public class EntityIconDefinitions {
          String modelClassPath = class_553.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3321"));
+         result.add(String.format("%s;%s", modelClassPath, "f_102184_"));
       } else if (model instanceof class_555) {
          String modelClassPath = class_555.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3329"));
+         result.add(String.format("%s;%s", modelClassPath, "f_102245_"));
       } else if (model instanceof class_611) {
          String modelClassPath = class_611.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3583"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103852_"));
       } else if (model instanceof class_562) {
          String modelClassPath = class_562.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3360"));
+         result.add(String.format("%s;%s", modelClassPath, "f_102451_"));
       } else if (model instanceof class_578) {
          String modelClassPath = class_578.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_27443"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103031_"));
       } else if (model instanceof class_584) {
          String modelClassPath = class_584.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3452"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103188_"));
       } else if (model instanceof class_596) {
          String modelClassPath = class_596.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_27486"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103523_"));
       } else if (model instanceof class_571) {
          String modelClassPath = class_571.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3386"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103598_"));
       } else if (model instanceof class_574) {
          String modelClassPath = class_574.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3415"));
+         result.add(String.format("%s;%s", modelClassPath, "f_102936_"));
       } else if (model instanceof class_608) {
          String modelClassPath = class_608.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3568"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103839_"));
       } else if (model instanceof class_625) {
          String modelClassPath = class_625.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3630"));
+         result.add(String.format("%s;%s", modelClassPath, "f_114235_"));
       } else if (model instanceof class_602) {
          String modelClassPath = class_602.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_3554"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103724_"));
       } else if (model instanceof class_609) {
          result.add(String.format("%s;%s", class_630.class.getName(), String.format("children['%s']", "cube")));
          result.add(String.format("%s;%s", class_630.class.getName(), String.format("field_3661['%s']", "cube")));
+         result.add(String.format("%s;%s", class_630.class.getName(), String.format("f_104213_['%s']", "cube")));
       } else if (model instanceof class_5772) {
          String modelClassPath = class_5772.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_28379"));
+         result.add(String.format("%s;%s", modelClassPath, "f_170365_"));
       } else if (model instanceof class_576) {
          result.add(String.format("%s;%s", class_630.class.getName(), "children['inside_cube']"));
          result.add(String.format("%s;%s", class_630.class.getName(), "field_3661['inside_cube']"));
+         result.add(String.format("%s;%s", class_630.class.getName(), "f_104213_['inside_cube']"));
       } else if (model instanceof class_610 || model instanceof class_567 || model instanceof class_4997 || model instanceof class_588) {
          result.add(String.format("%s;%s", class_630.class.getName(), String.format("children['%s']", "body")));
          result.add(String.format("%s;%s", class_630.class.getName(), String.format("field_3661['%s']", "body")));
+         result.add(String.format("%s;%s", class_630.class.getName(), String.format("f_104213_['%s']", "body")));
       } else if (model instanceof class_7280 || model instanceof class_7198) {
          result.add(String.format("%s;%s", class_630.class.getName(), String.format("children['%s']", "head")));
          result.add(String.format("%s;%s", class_630.class.getName(), String.format("field_3661['%s']", "head")));
+         result.add(String.format("%s;%s", class_630.class.getName(), String.format("f_104213_['%s']", "head")));
       } else if (model instanceof class_8185) {
          String modelClassPath = class_8185.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_43085"));
+         result.add(String.format("%s;%s", modelClassPath, "f_273862_"));
       } else if (model instanceof class_7751) {
          String modelClassPath = class_7751.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "head"));
          result.add(String.format("%s;%s", modelClassPath, "field_40464"));
+         result.add(String.format("%s;%s", modelClassPath, "f_243837_"));
       }
 
       return result;
@@ -180,10 +199,13 @@ public class EntityIconDefinitions {
          String modelClassPath = class_596.class.getName();
          result.add(String.format("%s;%s", modelClassPath, "rightEar"));
          result.add(String.format("%s;%s", modelClassPath, "field_27487"));
+         result.add(String.format("%s;%s", modelClassPath, "f_170877_"));
          result.add(String.format("%s;%s", modelClassPath, "leftEar"));
          result.add(String.format("%s;%s", modelClassPath, "field_27488"));
+         result.add(String.format("%s;%s", modelClassPath, "f_170878_"));
          result.add(String.format("%s;%s", modelClassPath, "nose"));
          result.add(String.format("%s;%s", modelClassPath, "field_3530"));
+         result.add(String.format("%s;%s", modelClassPath, "f_103527_"));
       }
 
       return result;

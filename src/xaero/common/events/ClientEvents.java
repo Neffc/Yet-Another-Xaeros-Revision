@@ -1,13 +1,13 @@
 package xaero.common.events;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.systems.RenderSystem;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import net.minecraft.class_1074;
+import net.minecraft.class_1657;
+import net.minecraft.class_1936;
 import net.minecraft.class_1937;
 import net.minecraft.class_2338;
-import net.minecraft.class_2556;
 import net.minecraft.class_2561;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
@@ -20,31 +20,30 @@ import net.minecraft.class_4439;
 import net.minecraft.class_4877;
 import net.minecraft.class_500;
 import net.minecraft.class_638;
+import net.minecraft.class_2556.class_7602;
 import org.apache.commons.lang3.StringUtils;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.anim.OldAnimation;
 import xaero.common.effect.Effects;
 import xaero.common.gui.GuiAddWaypoint;
 import xaero.common.gui.GuiEditMode;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.GuiWidgetUpdateAll;
 import xaero.common.minimap.MinimapProcessor;
+import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.patreon.Patreon;
 import xaero.common.settings.ModSettings;
 
-public class ForgeEventHandler {
-   private AXaeroMinimap modMain;
+public class ClientEvents {
+   protected IXaeroMinimap modMain;
    private class_437 lastGuiOpen;
    private Field realmsTaskField;
    private Field realmsTaskServerField;
-   private boolean crosshairDisabledByThisMod = false;
-   public static boolean renderCrosshairs = true;
    public class_4877 latestRealm;
 
-   public ForgeEventHandler(AXaeroMinimap modMain) {
+   public ClientEvents(IXaeroMinimap modMain) {
       this.modMain = modMain;
    }
 
@@ -71,12 +70,12 @@ public class ForgeEventHandler {
       if (gui instanceof class_4398) {
          try {
             if (this.realmsTaskField == null) {
-               this.realmsTaskField = Misc.getFieldReflection(class_4398.class, "field_19919", "Lnet/minecraft/class_4358;");
+               this.realmsTaskField = Misc.getFieldReflection(class_4398.class, "queuedTasks", "field_19919", "Lnet/minecraft/class_4358;", "f_88773_");
                this.realmsTaskField.setAccessible(true);
             }
 
             if (this.realmsTaskServerField == null) {
-               this.realmsTaskServerField = Misc.getFieldReflection(class_4439.class, "field_20224", "Lnet/minecraft/class_4877;");
+               this.realmsTaskServerField = Misc.getFieldReflection(class_4439.class, "server", "field_20224", "Lnet/minecraft/class_4877;", "f_90327_");
                this.realmsTaskServerField.setAccessible(true);
             }
 
@@ -99,61 +98,32 @@ public class ForgeEventHandler {
       return gui;
    }
 
-   public boolean handleRenderStatusEffectOverlay(class_332 guiGraphics) {
-      return false;
-   }
-
-   protected void handleRenderGameOverlayEventPreOverridable(class_332 guiGraphics, float partialTicks) {
-      RenderSystem.clear(256, class_310.field_1703);
-      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-      if (minimapSession != null) {
-         this.modMain.getInterfaceRenderer().renderInterfaces(minimapSession, guiGraphics, partialTicks);
-         this.modMain
-            .getInterfaces()
-            .getMinimapInterface()
-            .getWaypointsGuiRenderer()
-            .drawSetChange(minimapSession.getWaypointsManager(), guiGraphics, class_310.method_1551().method_22683());
-         if (renderCrosshairs && minimapSession.getMinimapProcessor().isEnlargedMap() && this.modMain.getSettings().centeredEnlarged) {
-            renderCrosshairs = false;
-            this.crosshairDisabledByThisMod = true;
-         }
-      }
-
-      OldAnimation.tick();
-   }
-
    public void handleRenderGameOverlayEventPre(class_332 guiGraphics, float partialTicks) {
       if (class_3675.method_15987(class_310.method_1551().method_22683().method_4490(), 256)) {
          GuiEditMode.cancel(this.modMain.getInterfaces());
       }
-
-      this.handleRenderGameOverlayEventPreOverridable(guiGraphics, partialTicks);
    }
 
    public void handleRenderGameOverlayEventPost() {
-      if (this.crosshairDisabledByThisMod) {
-         renderCrosshairs = true;
-         this.crosshairDisabledByThisMod = false;
-      }
+      this.modMain.getInterfaces().onPostGameOverlay();
    }
 
-   public String handleClientSendChatEvent(String message) {
+   public boolean handleClientSendChatEvent(String message) {
       if (message.startsWith("xaero_waypoint_add:")) {
          String[] args = message.split(":");
-         message = "";
          XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
          minimapSession.getWaypointSharing().onWaypointAdd(args);
+         return true;
       } else if (message.equals("xaero_tp_anyway")) {
-         message = "";
          XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
          minimapSession.getWaypointsManager().teleportAnyway();
+         return true;
+      } else {
+         return false;
       }
-
-      return message;
    }
 
-   public boolean handleClientPlayerChatReceivedEvent(class_2556 chatType, class_2561 component, GameProfile gameProfile) {
+   public boolean handleClientPlayerChatReceivedEvent(class_7602 chatType, class_2561 component, GameProfile gameProfile) {
       return component == null
          ? false
          : this.handleChatMessage(
@@ -221,11 +191,64 @@ public class ForgeEventHandler {
       return this.lastGuiOpen;
    }
 
-   public void worldUnload(class_638 world) {
+   public void worldUnload(class_1936 world) {
+      if (world instanceof class_638) {
+         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+         if (minimapSession != null) {
+            MinimapProcessor minimap = minimapSession.getMinimapProcessor();
+            minimap.getEntityRadar().updateRadar(null, null, null, minimap);
+         }
+      }
+   }
+
+   public void handleClientTickStart() {
       XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
       if (minimapSession != null) {
          MinimapProcessor minimap = minimapSession.getMinimapProcessor();
-         minimap.getEntityRadar().updateRadar(null, null, null, minimap);
+         minimap.onClientTick();
+         if (class_310.method_1551().field_1755 == null) {
+            minimapSession.getKeyEventHandler().onKeyInput(class_310.method_1551(), this.modMain, minimapSession);
+         }
       }
+   }
+
+   public void handlePlayerTickStart(class_1657 player) {
+      if (player == class_310.method_1551().field_1724) {
+         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+         if (minimapSession != null) {
+            try {
+               MinimapProcessor minimap = minimapSession.getMinimapProcessor();
+               WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
+               waypointsManager.updateWorldIds();
+               minimap.onPlayerTick();
+               waypointsManager.updateWaypoints();
+               class_310 mc = class_310.method_1551();
+               minimapSession.getKeyEventHandler().handleEvents(mc, minimapSession);
+               this.modMain.getForgeEventHandlerListener().playerTickPost(minimapSession);
+            } catch (Throwable var6) {
+               this.modMain.getInterfaces().getMinimapInterface().setCrashedWith(var6);
+            }
+         }
+      }
+   }
+
+   public void handleRenderTickStart() {
+      if (class_310.method_1551().field_1724 != null) {
+         this.modMain.getInterfaces().getMinimapInterface().checkCrashes();
+         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+         if (minimapSession != null) {
+            MinimapProcessor minimap = minimapSession.getMinimapProcessor();
+            minimap.getMinimapWriter().onRender();
+         }
+      }
+   }
+
+   public boolean handleRenderStatusEffectOverlay(class_332 guiGraphics) {
+      return this.modMain.getForgeEventHandlerListener().handleRenderStatusEffectOverlay(guiGraphics);
+   }
+
+   protected boolean handleRenderCrosshairOverlay(class_332 guiGraphics) {
+      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+      return minimapSession == null ? false : minimapSession.getMinimapProcessor().isEnlargedMap() && this.modMain.getSettings().centeredEnlarged;
    }
 }

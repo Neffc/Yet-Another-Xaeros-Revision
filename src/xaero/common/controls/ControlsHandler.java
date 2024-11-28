@@ -2,14 +2,13 @@ package xaero.common.controls;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.class_304;
 import net.minecraft.class_310;
 import net.minecraft.class_3675;
 import net.minecraft.class_437;
 import net.minecraft.class_3675.class_307;
 import org.lwjgl.glfw.GLFW;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
@@ -22,16 +21,17 @@ import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
+import xaero.common.platform.Services;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
 
 public class ControlsHandler {
-   protected AXaeroMinimap modMain;
+   protected IXaeroMinimap modMain;
    protected XaeroMinimapSession minimapSession;
    protected WaypointsManager waypointsManager;
    protected MinimapProcessor minimap;
 
-   public ControlsHandler(AXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public ControlsHandler(IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.waypointsManager = minimapSession.getWaypointsManager();
@@ -39,17 +39,18 @@ public class ControlsHandler {
    }
 
    public void setKeyState(class_304 kb, boolean pressed) {
-      class_304.method_1416(KeyBindingHelper.getBoundKeyOf(kb), pressed);
+      class_304.method_1416(Services.PLATFORM.getKeyBindingHelper().getBoundKeyOf(kb), pressed);
    }
 
    public boolean isDown(class_304 kb) {
-      if (KeyBindingHelper.getBoundKeyOf(kb).method_1444() == -1) {
+      IKeyBindingHelper keyBindingHelper = Services.PLATFORM.getKeyBindingHelper();
+      if (keyBindingHelper.getBoundKeyOf(kb).method_1444() == -1) {
          return false;
-      } else if (KeyBindingHelper.getBoundKeyOf(kb).method_1442() == class_307.field_1672) {
-         return GLFW.glfwGetMouseButton(class_310.method_1551().method_22683().method_4490(), KeyBindingHelper.getBoundKeyOf(kb).method_1444()) == 1;
+      } else if (keyBindingHelper.getBoundKeyOf(kb).method_1442() == class_307.field_1672) {
+         return GLFW.glfwGetMouseButton(class_310.method_1551().method_22683().method_4490(), keyBindingHelper.getBoundKeyOf(kb).method_1444()) == 1;
       } else {
-         return KeyBindingHelper.getBoundKeyOf(kb).method_1442() == class_307.field_1668
-            ? class_3675.method_15987(class_310.method_1551().method_22683().method_4490(), KeyBindingHelper.getBoundKeyOf(kb).method_1444())
+         return keyBindingHelper.getBoundKeyOf(kb).method_1442() == class_307.field_1668
+            ? class_3675.method_15987(class_310.method_1551().method_22683().method_4490(), keyBindingHelper.getBoundKeyOf(kb).method_1444())
             : false;
       }
    }

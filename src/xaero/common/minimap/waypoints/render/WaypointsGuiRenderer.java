@@ -17,7 +17,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_4597.class_4598;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
@@ -34,11 +34,11 @@ import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 
 public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint, WaypointGuiRenderContext> {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final WaypointDeleter waypointReachDeleter;
 
    private WaypointsGuiRenderer(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       WaypointReader elementReader,
       WaypointRenderProvider provider,
       WaypointGuiRenderContext context,
@@ -108,7 +108,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       double renderX,
       double renderY,
       double renderZ,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       class_4598 renderTypeBuffers,
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
@@ -127,7 +127,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       double renderX,
       double renderY,
       double renderZ,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       class_4598 renderTypeBuffers,
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
@@ -137,7 +137,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       this.waypointReachDeleter.deleteCollected(waypointsManager.getCurrentWorld(), modMain.getSettings().renderAllSets);
    }
 
-   public void updateWaypointCollection(double renderX, double renderY, double renderZ, AXaeroMinimap modMain) {
+   public void updateWaypointCollection(double renderX, double renderY, double renderZ, IXaeroMinimap modMain) {
       XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
       WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
       List<Waypoint> sortingList = this.context.sortingList;
@@ -271,9 +271,9 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
 
    public static final class Builder {
       private WaypointDeleter waypointDeleter;
-      private final AXaeroMinimap modMain;
+      private final IXaeroMinimap modMain;
 
-      private Builder(AXaeroMinimap modMain) {
+      private Builder(IXaeroMinimap modMain) {
          this.modMain = modMain;
       }
 
@@ -318,7 +318,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
          }
       }
 
-      public static WaypointsGuiRenderer.Builder begin(AXaeroMinimap modMain) {
+      public static WaypointsGuiRenderer.Builder begin(IXaeroMinimap modMain) {
          return new WaypointsGuiRenderer.Builder(modMain).setDefault();
       }
    }

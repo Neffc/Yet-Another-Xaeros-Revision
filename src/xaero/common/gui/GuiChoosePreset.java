@@ -5,13 +5,13 @@ import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.interfaces.Preset;
 
 public class GuiChoosePreset extends ScreenBase {
    protected String screenTitle;
 
-   public GuiChoosePreset(AXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escape) {
+   public GuiChoosePreset(IXaeroMinimap modMain, class_437 par1GuiScreen, class_437 escape) {
       super(modMain, par1GuiScreen, escape, class_2561.method_43471("gui.xaero_choose_a_preset"));
    }
 

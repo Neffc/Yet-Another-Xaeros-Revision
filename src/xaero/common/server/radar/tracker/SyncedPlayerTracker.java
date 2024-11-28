@@ -5,15 +5,15 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.class_3222;
 import net.minecraft.server.MinecraftServer;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.message.tracker.ClientboundTrackedPlayerPacket;
 import xaero.common.server.MinecraftServerData;
 import xaero.common.server.player.ServerPlayerData;
 
 public class SyncedPlayerTracker {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
 
-   public SyncedPlayerTracker(AXaeroMinimap modMain) {
+   public SyncedPlayerTracker(IXaeroMinimap modMain) {
       this.modMain = modMain;
    }
 
@@ -60,6 +60,7 @@ public class SyncedPlayerTracker {
                      }
                   }
 
+                  tracked = true;
                   boolean alreadySynced = syncedPlayers.contains(otherPlayer.method_5667());
                   if (!tracked) {
                      if (alreadySynced) {

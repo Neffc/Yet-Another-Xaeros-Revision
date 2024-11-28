@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Predicate;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.class_1074;
 import net.minecraft.class_2561;
 import net.minecraft.class_332;
@@ -18,9 +16,10 @@ import net.minecraft.class_4587;
 import net.minecraft.class_3675.class_307;
 import net.minecraft.class_4280.class_4281;
 import net.minecraft.class_4597.class_4598;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.core.IAbstractSelectionList;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.gui.dropdown.IDropDownWidgetCallback;
@@ -30,7 +29,6 @@ import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
 import xaero.common.misc.Misc;
-import xaero.common.mixin.MixinEntryListWidgetAccessor;
 import xaero.common.settings.ModSettings;
 
 public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback {
@@ -64,11 +62,11 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    private class_4185 clearButton;
    private class_4185 shareButton;
 
-   public GuiWaypoints(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen) {
+   public GuiWaypoints(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen) {
       this(modMain, minimapSession, par1GuiScreen, null);
    }
 
-   public GuiWaypoints(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, class_437 escapeScreen) {
+   public GuiWaypoints(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, class_437 escapeScreen) {
       super(modMain, par1GuiScreen, escapeScreen, class_2561.method_43471("gui.xaero_waypoints"));
       this.minimapSession = minimapSession;
       this.waypointsManager = minimapSession.getWaypointsManager();
@@ -336,7 +334,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    @Override
    public boolean method_25402(double par1, double par2, int par3) {
       if (this.openDropdown == null) {
-         if (Misc.inputMatchesKeyBinding(this.modMain, class_307.field_1672, par3, ModSettings.keyWaypoints)) {
+         if (Misc.inputMatchesKeyBinding(this.modMain, class_307.field_1672, par3, ModSettings.keyWaypoints, 0)) {
             this.goBack();
             return true;
          }
@@ -432,7 +430,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             this.draggingFromSlot = toSlot;
          }
 
-         int fromCenter = this.draggingFromX - ((MixinEntryListWidgetAccessor)this.list).getWidth() / 2;
+         int fromCenter = this.draggingFromX - ((IAbstractSelectionList)this.list).getWidth() / 2;
          this.list.drawWaypointSlot(guiGraphics, this.draggingWaypoint, mouseX - 108 - fromCenter, mouseY - this.list.getItemHeight() / 4);
       }
    }
@@ -589,7 +587,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    public boolean method_25404(int par1, int par2, int par3) {
       if (!super.method_25404(par1, par2, par3)) {
          if (Misc.inputMatchesKeyBinding(
-            this.modMain, par1 != -1 ? class_307.field_1668 : class_307.field_1671, par1 != -1 ? par1 : par2, ModSettings.keyWaypoints
+            this.modMain, par1 != -1 ? class_307.field_1668 : class_307.field_1671, par1 != -1 ? par1 : par2, ModSettings.keyWaypoints, 0
          )) {
             this.goBack();
             return true;
@@ -753,7 +751,6 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
          return entry == null ? -1 : entry.index;
       }
 
-      @Environment(EnvType.CLIENT)
       public class WaypointEntry extends class_4281<GuiWaypoints.List.WaypointEntry> {
          private int index;
 

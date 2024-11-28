@@ -303,7 +303,7 @@ public class CustomRenderTypes extends class_1921 {
       }
    }
 
-   private static class MultiPhaseRenderType extends CustomRenderTypes {
+   private static class MultiPhaseRenderType extends class_1921 {
       public MultiPhaseRenderType(
          String name,
          class_293 vertexFormat,

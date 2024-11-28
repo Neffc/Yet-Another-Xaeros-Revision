@@ -9,7 +9,7 @@ import net.minecraft.class_364;
 import net.minecraft.class_3675;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.GuiEditMode;
 import xaero.common.interfaces.pushbox.BossHealthPushBox;
@@ -22,7 +22,7 @@ import xaero.common.interfaces.pushbox.PushBox;
 import xaero.common.minimap.MinimapInterface;
 
 public class InterfaceManager {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private class_310 mc;
    private ArrayList<Preset> presets;
    private ArrayList<Interface> list;
@@ -38,7 +38,7 @@ public class InterfaceManager {
    private BossHealthPushBox normalBossHealthPushBox;
    private BossHealthShiftPushBox shiftBossHealthPushBox;
 
-   public InterfaceManager(AXaeroMinimap modMain, IInterfaceLoader loader) throws IOException {
+   public InterfaceManager(IXaeroMinimap modMain, IInterfaceLoader loader) throws IOException {
       this.modMain = modMain;
       this.presets = new ArrayList<>();
       this.list = new ArrayList<>();
@@ -344,5 +344,15 @@ public class InterfaceManager {
 
    public void setActionTimer(int actionTimer) {
       this.actionTimer = actionTimer;
+   }
+
+   public void onPostGameOverlay() {
+      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+      if (minimapSession != null) {
+         for (Interface inter : this.list) {
+            InterfaceInstance ii = minimapSession.getInterfaceInstances().get(inter);
+            ii.onPostGameOverlay();
+         }
+      }
    }
 }

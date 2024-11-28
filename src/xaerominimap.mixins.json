@@ -1,43 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "xaero.common.mixin",
-  "compatibilityLevel": "JAVA_16",
-  "mixins": [
-    "MixinMinecraftServer",
-    "MixinPlayerEntity",
-    "MixinPlayerList",
-    "MixinServerPlayer"
-  ],
-  "client": [
-    "MixinAbstractClientPlayerEntity",
-    "MixinAnimalModel",
-    "MixinBossBarHud",
-    "MixinChatListener",
-    "MixinChunkDeltaUpdateS2CPacketAccessor",
-    "MixinClientPlayerEntity",
-    "MixinClientPlayNetworkHandler",
-    "MixinClientWorld",
-    "MixinCompositeEntityModel",
-    "MixinCyclingButtonWidget",
-    "MixinDragonEntityModel",
-    "MixinEntryListWidgetAccessor",
-    "MixinGameRenderer",
-    "MixinInGameHud",
-    "MixinLevelStorageAccess",
-    "MixinLlamaEntityModel",
-    "MixinLocalPlayer",
-    "MixinMinecraftClient",
-    "MixinModelPart",
-    "MixinPlayerClient",
-    "MixinRabbitEntityModel",
-    "MixinSinglePartEntityModel",
-    "MixinSpriteAtlasTexture",
-    "MixinWorldChunk"
-  ],
+  "package": "xaero.minimap.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [],
+  "client": [],
   "server": [],
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "xaero_mod1.20-ref18-refmap.json"
+  "refmap": "xaerominimap.refmap.json"
 }

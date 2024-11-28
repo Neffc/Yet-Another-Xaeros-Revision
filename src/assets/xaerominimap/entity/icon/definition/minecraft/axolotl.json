@@ -62,12 +62,16 @@
 			"modelRootPath" : [
 				[
 					"net.minecraft.class_5772;field_28378",
-					"net.minecraft.client.render.entity.model.AxolotlEntityModel;body"
+					"net.minecraft.client.render.entity.model.AxolotlEntityModel;body",
+					"net.minecraft.client.model.AxolotlModel;f_170364_",
+					"net.minecraft.client.model.AxolotlModel;body"
 				]
 			],
 			"modelMainPartFieldAliases" : [
 				"net.minecraft.class_630;field_3661['head']",
-				"net.minecraft.client.model.ModelPart;children['head']"
+				"net.minecraft.client.model.ModelPart;children['head']",
+				"net.minecraft.client.model.geom.ModelPart;f_104213_['head']",
+				"net.minecraft.client.model.geom.ModelPart;children['head']"
 			]
 		}
 	]

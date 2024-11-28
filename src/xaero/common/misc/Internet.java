@@ -10,7 +10,7 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import javax.crypto.Cipher;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.patreon.Patreon;
 import xaero.common.patreon.decrypt.DecryptInputStream;
@@ -19,7 +19,7 @@ import xaero.common.settings.ModSettings;
 public class Internet {
    public static Cipher cipher = null;
 
-   public static void checkModVersion(AXaeroMinimap modMain) {
+   public static void checkModVersion(IXaeroMinimap modMain) {
       if (modMain.getSettings().allowInternetAccess) {
          String s = modMain.getVersionsURL();
          s = s.replaceAll(" ", "%20");

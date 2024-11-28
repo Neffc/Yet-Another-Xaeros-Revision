@@ -10,7 +10,7 @@ import net.minecraft.class_1937;
 import net.minecraft.class_2561;
 import net.minecraft.class_5250;
 import net.minecraft.class_5321;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.highlight.ChunkHighlighter;
 import xaero.common.minimap.info.render.compile.InfoDisplayCompiler;
 import xaero.common.misc.TextSplitter;
@@ -26,7 +26,7 @@ import xaero.pac.common.server.player.config.PlayerConfig;
 
 public class ClaimsHighlighter extends ChunkHighlighter {
    private final IClientClaimsManagerAPI<IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>>, IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI>> claimsManager;
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final ModSettings settings;
    private List<class_2561> cachedTooltip;
    private IPlayerChunkClaimAPI cachedTooltipFor;
@@ -35,7 +35,7 @@ public class ClaimsHighlighter extends ChunkHighlighter {
    private int cachedForClaimsColor;
 
    public ClaimsHighlighter(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       IClientClaimsManagerAPI<IClientPlayerClaimInfoAPI<IPlayerDimensionClaimsAPI<IPlayerClaimPosListAPI>>, IClientDimensionClaimsManagerAPI<IClientRegionClaimsAPI>> claimsManager
    ) {
       super(true);

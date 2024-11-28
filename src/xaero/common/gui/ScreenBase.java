@@ -13,13 +13,13 @@ import net.minecraft.class_437;
 import net.minecraft.class_4587;
 import net.minecraft.class_6379;
 import org.lwjgl.glfw.GLFW;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CursorBox;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.misc.Misc;
 
 public class ScreenBase extends class_437 implements IScreenBase {
-   protected AXaeroMinimap modMain;
+   protected IXaeroMinimap modMain;
    public class_437 parent;
    public class_437 escape;
    protected boolean canSkipWorldRender;
@@ -27,7 +27,7 @@ public class ScreenBase extends class_437 implements IScreenBase {
    private List<DropDownWidget> dropdowns;
    private static final CursorBox worldmapBox = new CursorBox("gui.xaero_uses_worldmap_value");
 
-   protected ScreenBase(AXaeroMinimap modMain, class_437 parent, class_437 escape, class_2561 titleIn) {
+   protected ScreenBase(IXaeroMinimap modMain, class_437 parent, class_437 escape, class_2561 titleIn) {
       super(titleIn);
       this.modMain = modMain;
       this.parent = parent;

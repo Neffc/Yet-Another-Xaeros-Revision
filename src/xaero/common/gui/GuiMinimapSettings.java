@@ -3,11 +3,11 @@ package xaero.common.gui;
 import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.MinimapInterface;
 
 public abstract class GuiMinimapSettings extends GuiSettings {
-   public GuiMinimapSettings(AXaeroMinimap modMain, class_2561 title, class_437 par1Screen, class_437 escScreen) {
+   public GuiMinimapSettings(IXaeroMinimap modMain, class_2561 title, class_437 par1Screen, class_437 escScreen) {
       super(modMain, title, par1Screen, escScreen);
    }
 

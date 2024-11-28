@@ -2,17 +2,16 @@ package xaero.common.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
+import xaero.common.platform.Services;
 
 public class CommonConfigInit {
-   public void init(AXaeroMinimap modMain, String configFileName) {
+   public void init(IXaeroMinimap modMain, String configFileName) {
       Path configDestinationPath;
-      if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-         configDestinationPath = modMain.getGameDir();
+      if (Services.PLATFORM.isDedicatedServer()) {
+         configDestinationPath = Services.PLATFORM.getGameDir();
       } else {
-         configDestinationPath = FabricLoader.getInstance().getConfigDirectory().toPath();
+         configDestinationPath = Services.PLATFORM.getConfigDir();
       }
 
       Path configPath = configDestinationPath.resolve(configFileName);

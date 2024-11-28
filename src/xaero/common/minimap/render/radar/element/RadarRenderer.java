@@ -13,7 +13,7 @@ import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_4597.class_4598;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
@@ -30,12 +30,12 @@ import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 
 public final class RadarRenderer extends MinimapElementRenderer<class_1297, RadarRenderContext> {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final EntityIconManager entityIconManager;
    private final MinimapInterface minimapInterface;
 
    private RadarRenderer(
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       EntityIconManager entityIconManager,
       MinimapInterface minimapInterface,
       RadarElementReader elementReader,
@@ -56,7 +56,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       double renderX,
       double renderY,
       double renderZ,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       class_4598 renderTypeBuffers,
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
@@ -100,7 +100,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       double renderX,
       double renderY,
       double renderZ,
-      AXaeroMinimap modMain,
+      IXaeroMinimap modMain,
       class_4598 renderTypeBuffers,
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
@@ -464,7 +464,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
    }
 
    public static final class Builder {
-      private AXaeroMinimap modMain;
+      private IXaeroMinimap modMain;
       private EntityIconManager entityIconManager;
       private MinimapInterface minimapInterface;
 
@@ -476,7 +476,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
          return this;
       }
 
-      public RadarRenderer.Builder setModMain(AXaeroMinimap modMain) {
+      public RadarRenderer.Builder setModMain(IXaeroMinimap modMain) {
          this.modMain = modMain;
          return this;
       }

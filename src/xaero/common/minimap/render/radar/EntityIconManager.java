@@ -34,7 +34,7 @@ import net.minecraft.class_7923;
 import net.minecraft.class_897;
 import net.minecraft.class_898;
 import org.lwjgl.opengl.GL11;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.icon.XaeroIcon;
 import xaero.common.minimap.render.MinimapRendererHelper;
@@ -45,7 +45,7 @@ public class EntityIconManager {
    public static final XaeroIcon FAILED = new XaeroIcon(null, 0, 0);
    public static final XaeroIcon DOT = new XaeroIcon(null, 0, 0);
    private EntityIconPrerenderer prerenderer;
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private Map<class_2960, EntityIconDefinition> iconDefinitions;
    private Map<String, XaeroIcon> cachedTextures;
    private boolean canPrerender;
@@ -53,7 +53,7 @@ public class EntityIconManager {
    private StringBuilder entityStringBuilder;
    private EntityIconModelConfig defaultModelConfig;
 
-   public EntityIconManager(AXaeroMinimap modMain, EntityIconPrerenderer prerenderer) {
+   public EntityIconManager(IXaeroMinimap modMain, EntityIconPrerenderer prerenderer) {
       this.modMain = modMain;
       this.prerenderer = prerenderer;
       this.iconDefinitions = new HashMap<>();

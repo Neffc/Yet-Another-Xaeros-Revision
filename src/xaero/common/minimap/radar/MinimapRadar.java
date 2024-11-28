@@ -11,7 +11,7 @@ import net.minecraft.class_1297;
 import net.minecraft.class_1657;
 import net.minecraft.class_270;
 import net.minecraft.class_638;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.category.rule.resolver.ObjectCategoryRuleResolver;
 import xaero.common.effect.Effects;
@@ -26,7 +26,7 @@ import xaero.common.settings.ModSettings;
 public class MinimapRadar {
    public static final int radarPlayers = -1;
    public static final int radarShadow = -16777216;
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private XaeroMinimapSession minimapSession;
    private EntityRadarCategoryManager entityCategoryManager;
    private class_1297 lastRenderViewEntity;
@@ -35,7 +35,7 @@ public class MinimapRadar {
    private List<MinimapRadarList> radarLists;
    private Map<EntityRadarCategory, MinimapRadarList> middleRadarListMap;
 
-   public MinimapRadar(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, EntityRadarCategoryManager entityCategoryManager) throws IOException {
+   public MinimapRadar(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, EntityRadarCategoryManager entityCategoryManager) throws IOException {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.entityCategoryManager = entityCategoryManager;

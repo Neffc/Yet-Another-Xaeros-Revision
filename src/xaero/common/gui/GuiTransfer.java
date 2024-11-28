@@ -5,7 +5,7 @@ import net.minecraft.class_1074;
 import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.dropdown.DropDownWidget;
@@ -31,7 +31,7 @@ public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
    private final String frozenAutoWorldID;
    private boolean dropped = false;
 
-   public GuiTransfer(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1, class_437 escapeScreen) {
+   public GuiTransfer(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1, class_437 escapeScreen) {
       super(modMain, par1, escapeScreen, class_2561.method_43471("gui.xaero_transfer_all"));
       this.minimapSession = minimapSession;
       this.waypointsManager = minimapSession.getWaypointsManager();

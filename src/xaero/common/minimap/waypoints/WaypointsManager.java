@@ -29,7 +29,7 @@ import net.minecraft.class_638;
 import net.minecraft.class_7924;
 import net.minecraft.class_2558.class_2559;
 import net.minecraft.class_2568.class_5247;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.mcworld.MinimapClientWorldData;
@@ -38,7 +38,7 @@ import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 
 public class WaypointsManager {
-   private AXaeroMinimap modMain;
+   private IXaeroMinimap modMain;
    private XaeroMinimapSession minimapSession;
    private class_310 mc;
    private HashMap<String, WaypointWorldContainer> waypointMap = new HashMap<>();
@@ -57,7 +57,7 @@ public class WaypointsManager {
    private Waypoint teleportAnywayWP;
    private WaypointWorld teleportAnywayWorld;
 
-   public WaypointsManager(AXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public WaypointsManager(IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.mc = class_310.method_1551();

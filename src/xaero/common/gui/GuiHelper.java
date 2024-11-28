@@ -2,13 +2,13 @@ package xaero.common.gui;
 
 import net.minecraft.class_310;
 import net.minecraft.class_437;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.settings.ModOptions;
 
 public abstract class GuiHelper {
-   protected AXaeroMinimap modMain;
+   protected IXaeroMinimap modMain;
 
-   public GuiHelper(AXaeroMinimap modMain) {
+   public GuiHelper(IXaeroMinimap modMain) {
       this.modMain = modMain;
    }
 

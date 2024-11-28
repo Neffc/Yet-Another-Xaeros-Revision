@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nonnull;
-import xaero.common.AXaeroMinimap;
+import xaero.common.IXaeroMinimap;
 import xaero.common.category.rule.resolver.ObjectCategoryRuleResolver;
 import xaero.common.category.serialization.data.ObjectCategoryDataGsonSerializer;
 import xaero.common.category.setting.ObjectCategoryDefaultSettingsSetter;
@@ -14,7 +14,7 @@ import xaero.common.minimap.radar.category.serialization.data.EntityRadarCategor
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 
 public final class EntityRadarCategoryManager {
-   private final AXaeroMinimap modMain;
+   private final IXaeroMinimap modMain;
    private final Path mainFilePath;
    private final Path secondaryFilePath;
    private EntityRadarCategoryFileIO mainFileIO;
@@ -23,7 +23,7 @@ public final class EntityRadarCategoryManager {
    private EntityRadarDefaultCategories defaultCategoryConfigurator;
    private ObjectCategoryRuleResolver ruleResolver;
 
-   private EntityRadarCategoryManager(@Nonnull AXaeroMinimap modMain, @Nonnull Path mainFilePath, @Nonnull Path secondaryFilePath) {
+   private EntityRadarCategoryManager(@Nonnull IXaeroMinimap modMain, @Nonnull Path mainFilePath, @Nonnull Path secondaryFilePath) {
       this.modMain = modMain;
       this.mainFilePath = mainFilePath;
       this.secondaryFilePath = secondaryFilePath;
@@ -94,11 +94,11 @@ public final class EntityRadarCategoryManager {
    }
 
    public static final class Builder {
-      private AXaeroMinimap modMain;
+      private IXaeroMinimap modMain;
       private Path mainFilePath;
       private Path secondaryFilePath;
 
-      public EntityRadarCategoryManager.Builder setModMain(AXaeroMinimap modMain) {
+      public EntityRadarCategoryManager.Builder setModMain(IXaeroMinimap modMain) {
          this.modMain = modMain;
          return this;
       }

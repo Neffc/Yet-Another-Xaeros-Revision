@@ -20,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import javax.imageio.ImageIO;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_3298;
@@ -32,6 +31,7 @@ import xaero.common.MinimapLogs;
 import xaero.common.gui.widget.ImageWidgetBuilder;
 import xaero.common.gui.widget.Widget;
 import xaero.common.misc.Misc;
+import xaero.common.platform.Services;
 
 public class ImageWidgetLoader extends ScalableWidgetLoader {
    @Override
@@ -91,7 +91,7 @@ public class ImageWidgetLoader extends ScalableWidgetLoader {
          GL11.glTexParameteri(3553, 10241, tex_min_filter != null ? Integer.parseInt(tex_min_filter) : 9729);
          GL11.glTexParameteri(3553, 10242, tex_wrap_s != null ? Integer.parseInt(tex_wrap_s) : '脯');
          GL11.glTexParameteri(3553, 10243, tex_wrap_t != null ? Integer.parseInt(tex_wrap_t) : '脯');
-         File cacheFolder = FabricLoader.getInstance().getGameDir().resolve("XaeroCache").toFile();
+         File cacheFolder = Services.PLATFORM.getGameDir().resolve("XaeroCache").toFile();
          Path cacheFolderPath = cacheFolder.toPath();
          if (!Files.exists(cacheFolderPath)) {
             Files.createDirectories(cacheFolderPath);

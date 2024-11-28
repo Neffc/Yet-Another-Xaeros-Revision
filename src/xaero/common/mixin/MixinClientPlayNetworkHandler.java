@@ -7,7 +7,6 @@ import net.minecraft.class_2672;
 import net.minecraft.class_2676;
 import net.minecraft.class_2678;
 import net.minecraft.class_2759;
-import net.minecraft.class_310;
 import net.minecraft.class_634;
 import net.minecraft.class_6603;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import xaero.common.AXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.core.IXaeroMinimapClientPlayNetHandler;
 import xaero.common.core.XaeroMinimapCore;
@@ -54,7 +53,7 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       method = {"handleLevelChunkWithLight"}
    )
    public void onHandleLevelChunkWithLight(class_2672 packet, CallbackInfo info) {
-      XaeroMinimapCore.onChunkLightData(packet.method_11523(), packet.method_11524());
+      XaeroMinimapCore.onHandleLevelChunkWithLight(packet);
    }
 
    @Inject(
@@ -66,7 +65,7 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       method = {"handleLightUpdatePacket"}
    )
    public void onHandleLightUpdatePacket(class_2676 packet, CallbackInfo info) {
-      XaeroMinimapCore.onChunkLightData(packet.method_11558(), packet.method_11554());
+      XaeroMinimapCore.onHandleLightUpdatePacket(packet);
    }
 
    @Inject(
@@ -74,7 +73,7 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       method = {"queueLightRemoval"}
    )
    public void onQueueLightRemoval(class_2666 packet, CallbackInfo info) {
-      XaeroMinimapCore.onChunkLightData(packet.method_11487(), packet.method_11485());
+      XaeroMinimapCore.onQueueLightRemoval(packet);
    }
 
    @Inject(
@@ -98,7 +97,7 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       method = {"handleSetSpawn"}
    )
    public void onOnPlayerSpawnPosition(class_2759 packet, CallbackInfo info) {
-      AXaeroMinimap.INSTANCE.getEvents().handlePlayerSetSpawnEvent(packet.method_11870(), class_310.method_1551().field_1687);
+      XaeroMinimapCore.onSpawn(packet);
    }
 
    @Override
@@ -137,9 +136,10 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       cancellable = true
    )
    public void onSendChat(String string_1, CallbackInfo info) {
-      String result = AXaeroMinimap.INSTANCE.getEvents().handleClientSendChatEvent(string_1);
-      if (result == null || result.isEmpty()) {
-         info.cancel();
+      if (XaeroMinimapCore.isModLoaded()) {
+         if (HudMod.INSTANCE.getEvents().handleClientSendChatEvent(string_1)) {
+            info.cancel();
+         }
       }
    }
 
@@ -149,8 +149,7 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       cancellable = true
    )
    public void onSendCommand(String string_1, CallbackInfo info) {
-      String result = AXaeroMinimap.INSTANCE.getEvents().handleClientSendChatEvent(string_1);
-      if (result == null || result.isEmpty()) {
+      if (XaeroMinimapCore.onLocalPlayerCommand(string_1)) {
          info.cancel();
       }
    }
@@ -161,8 +160,7 @@ public class MixinClientPlayNetworkHandler implements IXaeroMinimapClientPlayNet
       cancellable = true
    )
    public void onSendUnsignedCommand(String string_1, CallbackInfoReturnable<Boolean> info) {
-      String result = AXaeroMinimap.INSTANCE.getEvents().handleClientSendChatEvent(string_1);
-      if (result == null || result.isEmpty()) {
+      if (XaeroMinimapCore.onLocalPlayerCommand(string_1)) {
          info.setReturnValue(true);
       }
    }
