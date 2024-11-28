@@ -169,6 +169,7 @@ public class ModOptions {
    public static ModOptions ARMOUR_MAIN_HAND;
    public static ModOptions ARMOUR_OFF_HAND;
    public static ModOptions HELD_ITEMS_CENTERED_POSITION;
+   public static ModOptions SCALED_MAX_WAYPOINT_DISTANCE;
    private final boolean enumDouble;
    public final boolean enumBoolean;
    private final String enumString;
@@ -247,7 +248,7 @@ public class ModOptions {
       );
       FLOWERS = new ModOptions("gui.xaero_show_flowers", false);
       KEEP_WP_NAMES = new ModOptions("gui.xaero_waypoint_names", false);
-      WAYPOINTS_DISTANCE = new ModOptions("gui.xaero_waypoints_distance", 0.0, 20.0, 1.0F, new CursorBox("gui.xaero_box_waypoints_distance"), false);
+      WAYPOINTS_DISTANCE = new ModOptions("gui.xaero_waypoints_distance", 0.0, 20.0, 1.0F, new CursorBox("gui.xaero_box_waypoints_distance2"), false);
       WAYPOINTS_DISTANCE_MIN = new ModOptions("gui.xaero_waypoints_distance_min", 0.0, 100.0, 5.0F, false);
       WAYPOINTS_ALL_SETS = new ModOptions("gui.xaero_render_all_wp_sets", false);
       ARROW_SCALE = new ModOptions("gui.xaero_arrow_scale", 1.0, 2.0, 0.1F, new CursorBox("gui.xaero_box_arrow_scale"), false);
@@ -362,6 +363,9 @@ public class ModOptions {
       LEGIBLE_CAVE_MAPS = new ModOptions("gui.xaero_legible_cave_maps", new CursorBox("gui.xaero_box_legible_cave_maps"), false);
       BIOME_BLENDING = new ModOptions("gui.xaero_biome_blending", new CursorBox("gui.xaero_box_biome_blending"), false);
       TRACKED_PLAYERS = new ModOptions("gui.xaero_tracked_players", new CursorBox("gui.xaero_box_tracked_players"), false);
+      SCALED_MAX_WAYPOINT_DISTANCE = new ModOptions(
+         "gui.xaero_dimension_scaled_max_waypoint_distance", new CursorBox("gui.xaero_box_dimension_scaled_max_waypoint_distance"), false
+      );
       PAC_CLAIMS = new ModOptions("gui.xaero_pac_claims", new CursorBox("gui.xaero_box_pac_claims"), false);
       PAC_CLAIMS_FILL_OPACITY = new ModOptions(
          "gui.xaero_pac_claims_fill_opacity", 1.0, 100.0, 1.0F, new CursorBox("gui.xaero_box_pac_claims_fill_opacity"), false

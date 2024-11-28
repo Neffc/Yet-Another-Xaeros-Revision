@@ -591,5 +591,8 @@
 	"gui.xaero_compass_scale2" : "Compass Scale",
 	"gui.xaero_box_compass_scale2" : "The scale of the cardinal direction letters NESW. For the \"Auto\" option, go all the way to the left.",
 	"gui.xaero_entity_category_friend" : "Friend",
-	"gui.xaero_entity_category_tracked" : "Tracked (e.g. Party/Allies)"
+	"gui.xaero_entity_category_tracked" : "Tracked (e.g. Party/Allies)",
+	"gui.xaero_dimension_scaled_max_waypoint_distance" : "Dimension-scaled Max WP Distance",
+	"gui.xaero_box_dimension_scaled_max_waypoint_distance" : "Scale the maximum waypoint render distance by the current dimension's coordinate scale (e.g. 1/8 in the Nether).",
+	"gui.xaero_box_waypoints_distance2" : "Maximum render distance for local waypoints. Global waypoints are not affected. By default, the maximum distance is scaled by the current dimension's coordinate scale. You can toggle this with \"Dimension-scaled Max WP Distance\"."
 }

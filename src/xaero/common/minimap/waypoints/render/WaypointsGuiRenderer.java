@@ -176,7 +176,8 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
             settings.temporaryWaypointsGlobal,
             settings.getMaxWaypointsDistance(),
             settings.waypointsDistanceMin,
-            0.0
+            0.0,
+            settings.dimensionScaledMaxWaypointDistance
          );
    }
 
@@ -298,7 +299,8 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
                   && (w.getWaypointType() != 1 && w.getWaypointType() != 2 || deathpoints)) {
                   double offx = (double)w.getX(filterParams.dimDiv) + 0.5 - filterParams.cameraX;
                   double offz = (double)w.getZ(filterParams.dimDiv) + 0.5 - filterParams.cameraZ;
-                  double distance = Math.sqrt(offx * offx + offz * offz);
+                  double distanceScale = context.filterParams.dimensionScaleDistance ? class_310.method_1551().field_1687.method_8597().comp_646() : 1.0;
+                  double distance = Math.sqrt(offx * offx + offz * offz) * distanceScale;
                   double waypointsDistance = filterParams.waypointsDistance;
                   return w.isOneoffDestination()
                      || w.getWaypointType() == 1

@@ -112,6 +112,7 @@ public class SupportXaeroWorldmap {
                int maxX = (mapX >> 2) + 4;
                int minZ = (mapZ >> 2) - 4;
                int maxZ = (mapZ >> 2) + 4;
+               boolean wmHasFullReload = compatibilityVersion >= 23;
                int globalRegionCacheHashCode = WorldMap.settings.getRegionCacheHashCode();
                boolean reloadEverything = WorldMap.settings.reloadEverything;
                int globalReloadVersion = WorldMap.settings.reloadVersion;
@@ -135,7 +136,11 @@ public class SupportXaeroWorldmap {
                shouldRequestLoading = false;
                LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
                nextToLoadObj = nextToLoad;
-               if (nextToLoad != null) {
+               if (nextToLoad == null) {
+                  shouldRequestLoading = true;
+               } else if (wmHasFullReload) {
+                  shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
+               } else {
                   synchronized (nextToLoad) {
                      if (!nextToLoad.reloadHasBeenRequested()
                         && !nextToLoad.hasRemovableSourceData()
@@ -143,8 +148,6 @@ public class SupportXaeroWorldmap {
                         shouldRequestLoading = true;
                      }
                   }
-               } else {
-                  shouldRequestLoading = true;
                }
 
                this.regionBuffer.clear();
@@ -224,10 +227,14 @@ public class SupportXaeroWorldmap {
                   MapRegion region = this.regionBuffer.get(i);
                   if (region != nextToLoadObj || this.regionBuffer.size() <= 1) {
                      synchronized (region) {
-                        if (!region.reloadHasBeenRequested()
-                           && !region.recacheHasBeenRequested()
-                           && (!(region instanceof MapRegion) || !region.isRefreshing())
-                           && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())) {
+                        if ((!wmHasFullReload || region.canRequestReload_unsynced())
+                           && (
+                              wmHasFullReload
+                                 || !region.reloadHasBeenRequested()
+                                    && !region.recacheHasBeenRequested()
+                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
+                                    && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
+                           )) {
                            if (region.getLoadState() == 2) {
                               region.requestRefresh(mapProcessor);
                            } else {
@@ -286,6 +293,7 @@ public class SupportXaeroWorldmap {
    ) {
       MapRegion prevRegion = null;
       Matrix4f matrix = matrixStack.method_23760().method_23761();
+      boolean wmHasFullReload = this.compatibilityVersion >= 23;
 
       for (int i = minX; i <= maxX; i++) {
          for (int j = minZ; j <= maxZ; j++) {
@@ -295,9 +303,13 @@ public class SupportXaeroWorldmap {
                   int regionHashCode = region.getCacheHashCode();
                   int regionReloadVersion = region.getReloadVersion();
                   if (shouldRequestLoading
-                     && !region.recacheHasBeenRequested()
-                     && !region.reloadHasBeenRequested()
-                     && (!(region instanceof MapRegion) || !region.isRefreshing())
+                     && (
+                        wmHasFullReload && region.canRequestReload_unsynced()
+                           || !wmHasFullReload
+                              && !region.recacheHasBeenRequested()
+                              && !region.reloadHasBeenRequested()
+                              && (!(region instanceof MapRegion) || !region.isRefreshing())
+                     )
                      && (
                         region.getLoadState() == 0
                            || (region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())

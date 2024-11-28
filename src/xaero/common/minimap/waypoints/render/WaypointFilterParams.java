@@ -13,6 +13,7 @@ public class WaypointFilterParams {
    public double waypointsDistance;
    public double waypointsDistanceMin;
    public double playerY;
+   public boolean dimensionScaleDistance;
 
    public void setParams(
       double cameraX,
@@ -24,7 +25,8 @@ public class WaypointFilterParams {
       boolean temporaryWaypointsGlobal,
       double waypointsDistance,
       double waypointsDistanceMin,
-      double playerY
+      double playerY,
+      boolean dimensionScaleDistance
    ) {
       this.cameraX = cameraX;
       this.cameraY = cameraY;
@@ -36,5 +38,6 @@ public class WaypointFilterParams {
       this.waypointsDistance = waypointsDistance;
       this.waypointsDistanceMin = waypointsDistanceMin;
       this.playerY = playerY;
+      this.dimensionScaleDistance = dimensionScaleDistance;
    }
 }

@@ -76,7 +76,9 @@ public class WaypointsIngameRenderer {
             if (depth <= 0.1) {
                return false;
             } else {
-               double distance2D = Math.sqrt(offX * offX + offZ * offZ);
+               double distanceScale = filterParams.dimensionScaleDistance ? class_310.method_1551().field_1687.method_8597().comp_646() : 1.0;
+               double unscaledDistance2D = Math.sqrt(offX * offX + offZ * offZ);
+               double distance2D = unscaledDistance2D * distanceScale;
                double waypointsDistance = filterParams.waypointsDistance;
                double waypointsDistanceMin = filterParams.waypointsDistanceMin;
                return w.isOneoffDestination()
@@ -87,7 +89,7 @@ public class WaypointsIngameRenderer {
                            || waypointsDistance == 0.0
                            || !(distance2D > waypointsDistance)
                      )
-                     && (waypointsDistanceMin == 0.0 || !(distance2D < waypointsDistanceMin));
+                     && (waypointsDistanceMin == 0.0 || !(unscaledDistance2D < waypointsDistanceMin));
             }
          } else {
             return false;
@@ -183,7 +185,8 @@ public class WaypointsIngameRenderer {
                   settings.temporaryWaypointsGlobal,
                   settings.getMaxWaypointsDistance(),
                   settings.waypointsDistanceMin,
-                  smoothEntityY
+                  smoothEntityY,
+                  settings.dimensionScaledMaxWaypointDistance
                );
             Stream<Waypoint> waypointStream = sortingList.stream().filter(this.filter).sorted();
             class_4598 cvcRenderTypeBuffer = this.modMain.getInterfaceRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();

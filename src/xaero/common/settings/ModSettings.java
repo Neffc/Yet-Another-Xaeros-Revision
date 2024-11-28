@@ -266,6 +266,7 @@ public class ModSettings {
    private boolean legibleCaveMaps;
    private boolean biomeBlending = true;
    public boolean allowInternetAccess = true;
+   public boolean dimensionScaledMaxWaypointDistance = true;
    private static int[] OLD_MINIMAP_SIZES = new int[]{57, 85, 113, 169};
 
    public ModSettings(AXaeroMinimap modMain) {
@@ -1270,6 +1271,7 @@ public class ModSettings {
       writer.println("legibleCaveMaps:" + this.legibleCaveMaps);
       writer.println("biomeBlending:" + this.biomeBlending);
       writer.println("displayTrackedPlayers:" + this.displayTrackedPlayers);
+      writer.println("dimensionScaledMaxWaypointDistance:" + this.dimensionScaledMaxWaypointDistance);
       writer.println("displayClaims:" + this.displayClaims);
       writer.println("displayCurrentClaim:" + this.displayCurrentClaim);
       writer.println("claimsFillOpacity:" + this.claimsFillOpacity);
@@ -1585,6 +1587,8 @@ public class ModSettings {
             this.biomeBlending = args[1].equals("true");
          } else if (args[0].equalsIgnoreCase("displayPacPlayers") || args[0].equalsIgnoreCase("displayTrackedPlayers")) {
             this.displayTrackedPlayers = valueString.equals("true");
+         } else if (args[0].equalsIgnoreCase("dimensionScaledMaxWaypointDistance")) {
+            this.dimensionScaledMaxWaypointDistance = args[1].equals("true");
          } else if (args[0].equalsIgnoreCase("displayClaims")) {
             this.displayClaims = valueString.equals("true");
          } else if (args[0].equalsIgnoreCase("displayCurrentClaim")) {
@@ -2227,6 +2231,8 @@ public class ModSettings {
          return this.biomeBlending;
       } else if (o == ModOptions.TRACKED_PLAYERS) {
          return this.displayTrackedPlayers;
+      } else if (o == ModOptions.SCALED_MAX_WAYPOINT_DISTANCE) {
+         return this.dimensionScaledMaxWaypointDistance;
       } else if (o == ModOptions.PAC_CLAIMS) {
          return this.displayClaims;
       } else {
@@ -2466,6 +2472,8 @@ public class ModSettings {
                      this.biomeBlending = !this.biomeBlending;
                   } else if (par1EnumOptions == ModOptions.TRACKED_PLAYERS) {
                      this.displayTrackedPlayers = !this.displayTrackedPlayers;
+                  } else if (par1EnumOptions == ModOptions.SCALED_MAX_WAYPOINT_DISTANCE) {
+                     this.dimensionScaledMaxWaypointDistance = !this.dimensionScaledMaxWaypointDistance;
                   } else if (par1EnumOptions == ModOptions.PAC_CLAIMS) {
                      this.displayClaims = !this.displayClaims;
                      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
