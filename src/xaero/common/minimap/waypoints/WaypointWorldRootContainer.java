@@ -308,10 +308,11 @@ public class WaypointWorldRootContainer extends WaypointWorldContainer {
 
    public void updateDimensionType(class_638 level) {
       class_5321<class_1937> dimId = level.method_27983();
+      class_5321<class_2874> dimTypeId = level.method_44013();
       class_2874 dimType = level.method_8597();
-      if (!Objects.equals(this.dimensionTypeIds.get(dimId), dimType.comp_655())) {
+      if (!Objects.equals(this.dimensionTypeIds.get(dimId), dimTypeId.method_29177())) {
          this.dimensionTypes.put(dimId, dimType);
-         this.dimensionTypeIds.put(dimId, dimType.comp_655());
+         this.dimensionTypeIds.put(dimId, dimTypeId.method_29177());
          this.saveConfig();
       }
    }

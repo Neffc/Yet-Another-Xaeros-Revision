@@ -134,7 +134,7 @@ public class WaypointsManager {
             return null;
          } else {
             try {
-               Integer.parseInt(idArgs[1]);
+               Integer.parseInt(dimIdPart);
                return null;
             } catch (NumberFormatException var5) {
                return class_5321.method_29179(class_7924.field_41223, new class_2960(idArgs[0], idArgs[1].replace('%', '/')));

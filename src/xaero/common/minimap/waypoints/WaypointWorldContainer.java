@@ -141,11 +141,7 @@ public class WaypointWorldContainer {
                subName = subName.substring(10);
             }
          } else {
-            try {
-               int dimId = Integer.parseInt(subName.substring(4));
-               subName = "Dim. " + dimId;
-            } catch (NumberFormatException var4) {
-            }
+            subName = "Dim. " + subName.substring(4);
          }
       }
 
