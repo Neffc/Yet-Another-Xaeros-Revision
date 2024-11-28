@@ -9,25 +9,34 @@ import net.minecraft.class_437;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
 
 public class GuiNewSet extends ScreenBase {
    private class_342 nameTextField;
-   private XaeroMinimapSession minimapSession;
-   private WaypointsManager waypointsManager;
-   private WaypointWorld waypointWorld;
+   private MinimapSession session;
+   private MinimapWorldManager manager;
+   private MinimapWorld minimapWorld;
    private class_4185 confirmButton;
 
-   public GuiNewSet(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, WaypointWorld waypointWorld) {
-      this(modMain, minimapSession, par1GuiScreen, null, waypointWorld);
+   @Deprecated
+   public GuiNewSet(IXaeroMinimap modMain, XaeroMinimapSession session, class_437 par1GuiScreen, WaypointWorld waypointWorld) {
+      this(modMain, session, par1GuiScreen, null, waypointWorld);
    }
 
-   public GuiNewSet(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, class_437 escapeScreen, WaypointWorld waypointWorld) {
+   @Deprecated
+   public GuiNewSet(IXaeroMinimap modMain, XaeroMinimapSession session, class_437 par1GuiScreen, class_437 escapeScreen, WaypointWorld waypointWorld) {
+      this(modMain, BuiltInHudModules.MINIMAP.getCurrentSession(), par1GuiScreen, escapeScreen, waypointWorld);
+   }
+
+   public GuiNewSet(IXaeroMinimap modMain, MinimapSession session, class_437 par1GuiScreen, class_437 escapeScreen, MinimapWorld minimapWorld) {
       super(modMain, par1GuiScreen, escapeScreen, class_2561.method_43471("gui.xaero_create_set"));
-      this.minimapSession = minimapSession;
-      this.waypointsManager = minimapSession.getWaypointsManager();
-      this.waypointWorld = waypointWorld;
+      this.session = session;
+      this.manager = this.session.getWorldManager();
+      this.minimapWorld = minimapWorld;
       this.canSkipWorldRender = true;
    }
 
@@ -43,12 +52,11 @@ public class GuiNewSet extends ScreenBase {
             200, this.field_22789 / 2 - 155, this.field_22790 / 6 + 168, class_2561.method_43469("gui.xaero_confirm", new Object[0]), b -> {
                if (this.canConfirm()) {
                   String setName = this.nameTextField.method_1882().replace(":", "§§");
-                  this.waypointWorld.setCurrent(setName);
-                  this.waypointWorld.addSet(setName);
-                  this.waypointsManager.updateWaypoints();
+                  this.minimapWorld.setCurrentWaypointSetId(setName);
+                  this.minimapWorld.addWaypointSet(setName);
 
                   try {
-                     this.modMain.getSettings().saveWaypoints(this.waypointWorld);
+                     this.session.getWorldManagerIO().saveWorld(this.minimapWorld);
                   } catch (IOException var4) {
                      MinimapLogs.LOGGER.error("suppressed exception", var4);
                   }
@@ -67,7 +75,7 @@ public class GuiNewSet extends ScreenBase {
    }
 
    private boolean canConfirm() {
-      return this.nameTextField.method_1882().length() > 0 && this.waypointWorld.getSets().get(this.nameTextField.method_1882()) == null;
+      return this.nameTextField.method_1882().length() > 0 && this.minimapWorld.getWaypointSet(this.nameTextField.method_1882()) == null;
    }
 
    private void updateConfirmButton() {

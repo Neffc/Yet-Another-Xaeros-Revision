@@ -3,7 +3,7 @@ package xaero.hud.minimap;
 import java.io.IOException;
 import java.util.ArrayList;
 import net.minecraft.class_310;
-import xaero.common.IXaeroMinimap;
+import xaero.common.HudMod;
 import xaero.common.minimap.element.render.over.MinimapElementOverMapRendererHandler;
 import xaero.common.minimap.info.BuiltInInfoDisplays;
 import xaero.common.minimap.info.InfoDisplayIO;
@@ -17,20 +17,20 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsIngameRenderer;
 
 public class Minimap {
-   private IXaeroMinimap modMain;
-   private class_310 mc = class_310.method_1551();
-   private WaypointsGuiRenderer waypointsGuiRenderer;
-   private WaypointsIngameRenderer waypointsIngameRenderer;
-   private MinimapFBORenderer minimapFBORenderer;
-   private CompassRenderer compassRenderer;
-   private MinimapElementOverMapRendererHandler overMapRendererHandler;
+   private final HudMod modMain;
+   private final class_310 mc = class_310.method_1551();
+   private final WaypointsGuiRenderer waypointsGuiRenderer;
+   private final WaypointsIngameRenderer waypointsIngameRenderer;
+   private final MinimapFBORenderer minimapFBORenderer;
+   private final CompassRenderer compassRenderer;
+   private final MinimapElementOverMapRendererHandler overMapRendererHandler;
    private final InfoDisplayManager infoDisplayManager;
    private final InfoDisplayIO infoDisplayIO;
    private final InfoDisplayRenderer infoDisplayRenderer;
    private Throwable crashedWith;
    private MinimapSafeModeRenderer minimapSafeModeRenderer;
 
-   public Minimap(IXaeroMinimap modMain) throws IOException {
+   public Minimap(HudMod modMain) throws IOException {
       this.modMain = modMain;
       WaypointDeleter waypointDeleter = new WaypointDeleter(modMain);
       this.waypointsGuiRenderer = WaypointsGuiRenderer.Builder.begin(modMain).setWaypointDeleter(waypointDeleter).build();

@@ -8,18 +8,19 @@ import net.minecraft.class_342;
 import net.minecraft.class_437;
 import org.apache.commons.lang3.StringUtils;
 import xaero.common.IXaeroMinimap;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.settings.ModOptions;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.path.XaeroPath;
 
 public class GuiSlimeSeed extends GuiSettings {
    public class_342 seedTextField;
-   private final String fullWorldID;
+   private final XaeroPath fullWorldID;
 
-   public GuiSlimeSeed(IXaeroMinimap modMain, WaypointsManager waypointsManager, class_437 parent, class_437 escape) {
+   public GuiSlimeSeed(IXaeroMinimap modMain, MinimapSession session, class_437 parent, class_437 escape) {
       super(modMain, class_2561.method_43471("gui.xaero_slime_chunks"), parent, escape);
       this.entries = entriesFromOptions(new ModOptions[]{ModOptions.SLIME_CHUNKS, ModOptions.OPEN_SLIME_SETTINGS});
-      this.fullWorldID = waypointsManager.getCurrentContainerAndWorldID();
+      this.fullWorldID = session.getWorldState().getCurrentWorldPath();
    }
 
    @Override

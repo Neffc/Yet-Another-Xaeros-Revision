@@ -9,6 +9,7 @@ import xaero.common.message.MinimapMessageHandler;
 import xaero.common.minimap.highlight.HighlighterRegistry;
 import xaero.common.minimap.write.MinimapWriter;
 import xaero.common.mods.SupportMods;
+import xaero.hud.minimap.module.MinimapSession;
 
 public abstract class PlatformContext {
    public abstract ClientEvents createClientEvents(IXaeroMinimap var1);
@@ -27,7 +28,7 @@ public abstract class PlatformContext {
 
    public abstract ModCommonEvents createModCommonEvents(IXaeroMinimap var1);
 
-   public abstract MinimapWriter createMinimapWriter(IXaeroMinimap var1, XaeroMinimapSession var2, BlockStateShortShapeCache var3, HighlighterRegistry var4);
+   public abstract MinimapWriter createMinimapWriter(IXaeroMinimap var1, MinimapSession var2, BlockStateShortShapeCache var3, HighlighterRegistry var4);
 
    public abstract String getModInfoVersion();
 }

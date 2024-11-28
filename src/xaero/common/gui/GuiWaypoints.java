@@ -16,6 +16,7 @@ import net.minecraft.class_4587;
 import net.minecraft.class_3675.class_307;
 import net.minecraft.class_4280.class_4281;
 import net.minecraft.class_4597.class_4598;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.core.IAbstractSelectionList;
@@ -23,20 +24,23 @@ import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.gui.dropdown.IDropDownWidgetCallback;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.WaypointsSort;
 import xaero.common.misc.KeySortableByOther;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
+import xaero.hud.path.XaeroPath;
 
 public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback {
    private static final int FRAME_TOP_SIZE = 58;
    private static final int FRAME_BOTTOM_SIZE = 61;
    public static double distanceDivided;
    private GuiWaypoints.List list;
-   private WaypointWorld displayedWorld;
+   private MinimapWorld displayedWorld;
    private ConcurrentSkipListSet<Integer> selectedListSet;
    private GuiWaypointContainers containers;
    private GuiWaypointWorlds worlds;
@@ -44,8 +48,8 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    private DropDownWidget containersDD;
    private DropDownWidget worldsDD;
    private DropDownWidget setsDD;
-   private XaeroMinimapSession minimapSession;
-   private WaypointsManager waypointsManager;
+   private MinimapSession session;
+   private MinimapWorldManager manager;
    private int draggingFromX;
    private int draggingFromY;
    private int draggingFromSlot;
@@ -53,8 +57,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    private boolean displayingTeleportableWorld;
    private int shiftSelectFirst;
    private ArrayList<Waypoint> waypointsSorted;
-   private final String frozenAutoContainerID;
-   private final String frozenAutoWorldID;
+   private final XaeroPath frozenAutoWorldPath;
    private class_4185 deleteButton;
    private class_4185 editButton;
    private class_4185 teleportButton;
@@ -62,31 +65,32 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    private class_4185 clearButton;
    private class_4185 shareButton;
 
+   @Deprecated
    public GuiWaypoints(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen) {
       this(modMain, minimapSession, par1GuiScreen, null);
    }
 
+   @Deprecated
    public GuiWaypoints(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1GuiScreen, class_437 escapeScreen) {
+      this((HudMod)modMain, BuiltInHudModules.MINIMAP.getCurrentSession(), par1GuiScreen, escapeScreen);
+   }
+
+   public GuiWaypoints(HudMod modMain, MinimapSession session, class_437 par1GuiScreen, class_437 escapeScreen) {
       super(modMain, par1GuiScreen, escapeScreen, class_2561.method_43471("gui.xaero_waypoints"));
-      this.minimapSession = minimapSession;
-      this.waypointsManager = minimapSession.getWaypointsManager();
+      this.session = session;
+      this.manager = session.getWorldManager();
       this.selectedListSet = new ConcurrentSkipListSet<>();
       this.draggingFromX = -1;
       this.draggingFromY = -1;
       this.draggingFromSlot = -1;
-      this.frozenAutoContainerID = this.waypointsManager.getAutoContainerID();
-      this.frozenAutoWorldID = this.waypointsManager.getAutoWorldID();
-      this.displayedWorld = this.waypointsManager.getCurrentWorld(this.frozenAutoContainerID, this.frozenAutoWorldID);
-      String currentContainer = this.displayedWorld.getContainer().getRootContainer().getKey();
-      this.containers = new GuiWaypointContainers(modMain, this.waypointsManager, currentContainer, this.frozenAutoContainerID);
+      this.frozenAutoWorldPath = session.getWorldState().getAutoWorldPath();
+      this.displayedWorld = this.manager.getCurrentWorld(this.frozenAutoWorldPath);
+      XaeroPath currentContainer = this.displayedWorld.getContainer().getRoot().getPath();
+      this.containers = new GuiWaypointContainers(modMain, this.manager, currentContainer, this.frozenAutoWorldPath);
       this.worlds = new GuiWaypointWorlds(
-         this.waypointsManager.getWorldContainer(this.containers.getCurrentKey()),
-         this.waypointsManager,
-         this.displayedWorld.getFullId(),
-         this.frozenAutoContainerID,
-         this.frozenAutoWorldID
+         this.manager.getRootWorldContainer(this.containers.getCurrentKey()), session, this.displayedWorld.getFullPath(), this.frozenAutoWorldPath
       );
-      this.displayingTeleportableWorld = this.waypointsManager.isWorldTeleportable(this.displayedWorld);
+      this.displayingTeleportableWorld = session.getWaypointSession().getTeleport().isWorldTeleportable(this.displayedWorld);
       this.waypointsSorted = new ArrayList<>();
    }
 
@@ -95,38 +99,36 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
       super.method_25426();
       this.updateSortedList();
       this.list = new GuiWaypoints.List();
-      this.sets = new GuiWaypointSets(true, this.displayedWorld, this.displayedWorld.getCurrent());
+      this.sets = new GuiWaypointSets(true, this.displayedWorld, this.displayedWorld.getCurrentWaypointSetId());
       this.method_25429(this.list);
       this.method_37063(
-         this.deleteButton = new MyTinyButton(
-            this.field_22789 / 2 + 129, this.field_22790 - 53, class_2561.method_43469("gui.xaero_delete", new Object[0]), b -> {
-               if (this.isSomethingSelected()) {
-                  this.undrag();
-                  boolean shouldRestore = true;
+         this.deleteButton = new MyTinyButton(this.field_22789 / 2 + 129, this.field_22790 - 53, class_2561.method_43471("gui.xaero_delete"), b -> {
+            if (this.isSomethingSelected()) {
+               this.undrag();
+               boolean shouldRestore = true;
 
-                  for (int i : this.selectedListSet) {
-                     Waypoint w = this.list.getWaypoint(i);
-                     if (!w.isTemporary()) {
-                        shouldRestore = false;
-                        w.setTemporary(true);
-                     }
-                  }
-
-                  if (shouldRestore) {
-                     for (int ix : this.selectedListSet) {
-                        Waypoint w = this.list.getWaypoint(ix);
-                        w.setTemporary(false);
-                     }
-                  }
-
-                  try {
-                     this.modMain.getSettings().saveWaypoints(this.displayedWorld);
-                  } catch (IOException var6) {
-                     MinimapLogs.LOGGER.error("suppressed exception", var6);
+               for (int i : this.selectedListSet) {
+                  Waypoint w = this.list.getWaypoint(i);
+                  if (!w.isTemporary()) {
+                     shouldRestore = false;
+                     w.setTemporary(true);
                   }
                }
+
+               if (shouldRestore) {
+                  for (int ix : this.selectedListSet) {
+                     Waypoint w = this.list.getWaypoint(ix);
+                     w.setTemporary(false);
+                  }
+               }
+
+               try {
+                  this.session.getWorldManagerIO().saveWorld(this.displayedWorld);
+               } catch (IOException var6) {
+                  MinimapLogs.LOGGER.error("suppressed exception", var6);
+               }
             }
-         )
+         })
       );
       this.method_37063(
          class_4185.method_46430(class_2561.method_43469("gui.done", new Object[0]), b -> this.goBack())
@@ -147,14 +149,14 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                   this.field_22787
                      .method_1507(
                         new GuiAddWaypoint(
-                           this.modMain,
-                           this.waypointsManager,
+                           (HudMod)this.modMain,
+                           this.session,
                            this,
                            this.escape,
                            selectedWaypoints,
-                           this.displayedWorld.getContainer().getRootContainer().getKey(),
+                           this.displayedWorld.getContainer().getRoot().getPath(),
                            this.displayedWorld,
-                           this.displayedWorld.getCurrent(),
+                           this.displayedWorld.getCurrentWaypointSetId(),
                            selectedWaypoints.isEmpty()
                         )
                      );
@@ -170,8 +172,11 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             class_2561.method_43470(class_1074.method_4662("gui.xaero_waypoint_teleport", new Object[0]) + " (T)"),
             b -> {
                if (this.canTeleport()) {
-                  this.displayingTeleportableWorld = this.waypointsManager.isWorldTeleportable(this.displayedWorld);
-                  this.waypointsManager.teleportToWaypoint(this.list.getWaypoint(this.selectedListSet.first()), this.displayedWorld, this);
+                  this.displayingTeleportableWorld = this.session.getWaypointSession().getTeleport().isWorldTeleportable(this.displayedWorld);
+                  this.session
+                     .getWaypointSession()
+                     .getTeleport()
+                     .teleportToWaypoint(this.list.getWaypoint(this.selectedListSet.first()), this.displayedWorld, this);
                }
             }
          )
@@ -183,7 +188,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                   ArrayList<Waypoint> selectedWaypoints = this.getSelectedWaypointsList();
                   if (allWaypointsAre(selectedWaypoints, Waypoint::isTemporary)) {
                      for (Waypoint selected : selectedWaypoints) {
-                        this.displayedWorld.getCurrentSet().getList().remove(selected);
+                        this.displayedWorld.getCurrentWaypointSet().remove(selected);
                      }
 
                      this.selectedListSet.clear();
@@ -200,7 +205,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                   this.updateSortedList();
 
                   try {
-                     this.modMain.getSettings().saveWaypoints(this.displayedWorld);
+                     this.session.getWorldManagerIO().saveWorld(this.displayedWorld);
                   } catch (IOException var5) {
                      MinimapLogs.LOGGER.error("suppressed exception", var5);
                   }
@@ -214,22 +219,14 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             32,
             class_2561.method_43469("gui.xaero_clear", new Object[0]),
             b -> {
-               String[] worldKeys = this.worlds.getCurrentKeys();
+               XaeroPath worldKeys = this.worlds.getCurrentKey();
                String name = this.sets.getOptions()[this.sets.getCurrentSet()];
                if (this.shouldDeleteSet()) {
                   this.field_22787
-                     .method_1507(
-                        new GuiDeleteSet(
-                           class_1074.method_4662(name, new Object[0]), worldKeys[0], worldKeys[1], name, this, this.escape, this.modMain, this.minimapSession
-                        )
-                     );
+                     .method_1507(new GuiDeleteSet(class_1074.method_4662(name, new Object[0]), worldKeys, name, this, this.escape, this.modMain, this.session));
                } else {
                   this.field_22787
-                     .method_1507(
-                        new GuiClearSet(
-                           class_1074.method_4662(name, new Object[0]), worldKeys[0], worldKeys[1], name, this, this.escape, this.modMain, this.minimapSession
-                        )
-                     );
+                     .method_1507(new GuiClearSet(class_1074.method_4662(name, new Object[0]), worldKeys, name, this, this.escape, this.modMain, this.session));
                }
             }
          )
@@ -240,11 +237,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             32,
             class_2561.method_43469("gui.xaero_options", new Object[0]),
             b -> this.field_22787
-                  .method_1507(
-                     new GuiWaypointsOptions(
-                        this.modMain, this.minimapSession, this, this.escape, this.displayedWorld, this.frozenAutoContainerID, this.frozenAutoWorldID
-                     )
-                  )
+                  .method_1507(new GuiWaypointsOptions(this.modMain, this.session, this, this.escape, this.displayedWorld, this.frozenAutoWorldPath))
          )
       );
       this.method_37063(
@@ -253,7 +246,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
                if (this.isOneSelected()) {
                   Waypoint selected = this.selectedListSet.isEmpty() ? null : this.list.getWaypoint(this.selectedListSet.first());
                   if (selected != null) {
-                     this.minimapSession.getWaypointSharing().shareWaypoint(this, selected, this.displayedWorld);
+                     this.session.getWaypointSession().getSharing().shareWaypoint(this, selected, this.displayedWorld);
                   }
                }
             }
@@ -321,7 +314,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    }
 
    public boolean shouldDeleteSet() {
-      return !this.sets.getOptions()[this.sets.getCurrentSet()].equals("gui.xaero_default") && this.displayedWorld.getCurrentSet().getList().isEmpty();
+      return !this.sets.getOptions()[this.sets.getCurrentSet()].equals("gui.xaero_default") && this.displayedWorld.getCurrentWaypointSet().isEmpty();
    }
 
    private void undrag() {
@@ -340,13 +333,11 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
          }
 
          if (par3 == 0) {
-            if (par2 >= 58.0
-               && par2 < (double)(this.field_22790 - 61)
-               && this.displayedWorld.getContainer().getRootContainer().getSortType() == WaypointsSort.NONE) {
+            if (par2 >= 58.0 && par2 < (double)(this.field_22790 - 61) && this.displayedWorld.getContainer().getRoot().getSortType() == WaypointsSort.NONE) {
                this.draggingFromX = (int)par1;
                this.draggingFromY = (int)par2;
                this.draggingFromSlot = this.list.getEntryAt(par1, par2);
-               if (this.draggingFromSlot >= this.displayedWorld.getCurrentSet().getList().size()) {
+               if (this.draggingFromSlot >= this.displayedWorld.getCurrentWaypointSet().size()) {
                   this.draggingFromSlot = -1;
                }
             }
@@ -362,7 +353,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    public boolean method_25406(double par1, double par2, int par3) {
       try {
          if (this.draggingWaypoint != null) {
-            this.modMain.getSettings().saveWaypoints(this.displayedWorld);
+            this.session.getWorldManagerIO().saveWorld(this.displayedWorld);
          }
       } catch (IOException var7) {
          MinimapLogs.LOGGER.error("suppressed exception", var7);
@@ -413,9 +404,9 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
       guiGraphics.method_25300(this.field_22793, class_1074.method_4662("gui.xaero_subworld_dimension", new Object[0]), this.field_22789 / 2 + 102, 5, 16777215);
       if (this.draggingFromSlot != -1) {
          int distance = (int)Math.sqrt(Math.pow((double)(mouseX - this.draggingFromX), 2.0) + Math.pow((double)(mouseY - this.draggingFromY), 2.0));
-         int toSlot = Math.min(this.displayedWorld.getCurrentSet().getList().size() - 1, this.list.getEntryAt((double)mouseX, (double)mouseY));
+         int toSlot = Math.min(this.displayedWorld.getCurrentWaypointSet().size() - 1, this.list.getEntryAt((double)mouseX, (double)mouseY));
          if (distance > 4 && this.draggingWaypoint == null) {
-            this.draggingWaypoint = this.displayedWorld.getCurrentSet().getList().get(this.draggingFromSlot);
+            this.draggingWaypoint = this.displayedWorld.getCurrentWaypointSet().get(this.draggingFromSlot);
             this.list.setSelected(null);
          }
 
@@ -423,11 +414,12 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             int direction = toSlot > this.draggingFromSlot ? 1 : -1;
 
             for (int i = this.draggingFromSlot; i != toSlot; i += direction) {
-               this.displayedWorld.getCurrentSet().getList().set(i, this.displayedWorld.getCurrentSet().getList().get(i + direction));
+               this.displayedWorld.getCurrentWaypointSet().set(i, this.displayedWorld.getCurrentWaypointSet().get(i + direction));
             }
 
-            this.displayedWorld.getCurrentSet().getList().set(toSlot, this.draggingWaypoint);
+            this.displayedWorld.getCurrentWaypointSet().set(toSlot, this.draggingWaypoint);
             this.draggingFromSlot = toSlot;
+            this.updateSortedList();
          }
 
          int fromCenter = this.draggingFromX - ((IAbstractSelectionList)this.list).getWidth() / 2;
@@ -468,7 +460,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
    private boolean canTeleport() {
       return this.isOneSelected()
          && (this.modMain.getSettings().allowWrongWorldTeleportation || this.displayingTeleportableWorld)
-         && this.displayedWorld.getContainer().getRootContainer().isTeleportationEnabled();
+         && this.displayedWorld.getContainer().getRoot().isTeleportationEnabled();
    }
 
    @Override
@@ -478,16 +470,15 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
             this.list.setSelected(null);
             if (selectedIndex == menu.size() - 1) {
                MinimapLogs.LOGGER.info("New waypoint set gui");
-               this.field_22787.method_1507(new GuiNewSet(this.modMain, this.minimapSession, this, this.escape, this.displayedWorld));
+               this.field_22787.method_1507(new GuiNewSet(this.modMain, this.session, this, this.escape, this.displayedWorld));
                return false;
             } else {
                this.sets.setCurrentSet(selectedIndex);
-               this.displayedWorld.setCurrent(this.sets.getCurrentSetKey());
+               this.displayedWorld.setCurrentWaypointSetId(this.sets.getCurrentSetKey());
                this.updateSortedList();
-               this.waypointsManager.updateWaypoints();
 
                try {
-                  this.modMain.getSettings().saveWaypoints(this.displayedWorld);
+                  this.session.getWorldManagerIO().saveWorld(this.displayedWorld);
                } catch (IOException var4) {
                   MinimapLogs.LOGGER.error("suppressed exception", var4);
                }
@@ -501,58 +492,52 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
          if (menu == this.containersDD) {
             this.containers.current = selectedIndex;
             if (this.containers.current != this.containers.auto) {
-               WaypointWorld firstWorld = this.waypointsManager.getWorldContainer(this.containers.getCurrentKey()).getFirstWorld();
-               this.waypointsManager.setCustomContainerID(firstWorld.getContainer().getKey());
-               this.waypointsManager.setCustomWorldID(firstWorld.getId());
+               MinimapWorld firstWorld = this.manager.getRootWorldContainer(this.containers.getCurrentKey()).getFirstWorld();
+               this.session.getWorldState().setCustomWorldPath(firstWorld.getFullPath());
             } else {
-               this.waypointsManager.setCustomContainerID(null);
-               this.waypointsManager.setCustomWorldID(null);
+               this.session.getWorldState().setCustomWorldPath(null);
             }
 
-            this.displayedWorld = this.waypointsManager.getCurrentWorld(this.frozenAutoContainerID, this.frozenAutoWorldID);
+            this.displayedWorld = this.manager.getCurrentWorld(this.frozenAutoWorldPath);
             this.updateSortedList();
             this.worlds = new GuiWaypointWorlds(
-               this.waypointsManager.getWorldContainer(this.containers.getCurrentKey()),
-               this.waypointsManager,
-               this.displayedWorld.getFullId(),
-               this.frozenAutoContainerID,
-               this.frozenAutoWorldID
+               this.manager.getRootWorldContainer(this.containers.getCurrentKey()), this.session, this.displayedWorld.getFullPath(), this.frozenAutoWorldPath
             );
             this.replaceWidget(this.worldsDD, this.worldsDD = this.createWorldsDropdown());
-         } else if (menu == this.worldsDD) {
+         } else {
             this.worlds.current = selectedIndex;
             if (this.worlds.current != this.worlds.auto) {
-               String[] keys = this.worlds.getCurrentKeys();
-               this.waypointsManager.setCustomContainerID(keys[0]);
-               this.waypointsManager.setCustomWorldID(keys[1]);
+               XaeroPath selectedWorldPath = this.worlds.getCurrentKey();
+               this.session.getWorldState().setCustomWorldPath(selectedWorldPath);
             } else {
-               this.waypointsManager.setCustomContainerID(null);
-               this.waypointsManager.setCustomWorldID(null);
+               this.session.getWorldState().setCustomWorldPath(null);
             }
 
-            this.displayedWorld = this.waypointsManager.getCurrentWorld(this.frozenAutoContainerID, this.frozenAutoWorldID);
+            this.displayedWorld = this.manager.getCurrentWorld(this.frozenAutoWorldPath);
             this.updateSortedList();
          }
 
-         this.displayingTeleportableWorld = this.waypointsManager.isWorldTeleportable(this.displayedWorld);
-         this.waypointsManager.updateWaypoints();
+         this.displayingTeleportableWorld = this.session.getWaypointSession().getTeleport().isWorldTeleportable(this.displayedWorld);
          this.list.setSelected(null);
-         this.sets = new GuiWaypointSets(true, this.displayedWorld, this.displayedWorld.getCurrent());
+         this.sets = new GuiWaypointSets(true, this.displayedWorld, this.displayedWorld.getCurrentWaypointSetId());
          this.replaceWidget(this.setsDD, this.setsDD = this.createSetsDropdown());
          return true;
       }
    }
 
    private void updateSortedList() {
-      WaypointsSort sortType = this.displayedWorld.getContainer().getRootContainer().getSortType();
+      WaypointsSort sortType = this.displayedWorld.getContainer().getRoot().getSortType();
+      this.waypointsSorted = new ArrayList<>();
       if (sortType == WaypointsSort.NONE) {
-         this.waypointsSorted = this.displayedWorld.getCurrentSet().getList();
+         for (Waypoint waypoint : this.displayedWorld.getCurrentWaypointSet().getWaypoints()) {
+            this.waypointsSorted.add(waypoint);
+         }
       } else {
-         distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld);
+         distanceDivided = this.session.getDimensionHelper().getDimensionDivision(this.displayedWorld);
          ArrayList<KeySortableByOther<Waypoint>> sortableKeys = new ArrayList<>();
          class_4184 camera = this.field_22787.field_1773.method_19418();
 
-         for (Waypoint w : this.displayedWorld.getCurrentSet().getList()) {
+         for (Waypoint w : this.displayedWorld.getCurrentWaypointSet().getWaypoints()) {
             sortableKeys.add(
                new KeySortableByOther<>(
                   w,
@@ -572,13 +557,12 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
          }
 
          Collections.sort(sortableKeys);
-         this.waypointsSorted = new ArrayList<>();
 
          for (KeySortableByOther<Waypoint> k : sortableKeys) {
             this.waypointsSorted.add(k.getKey());
          }
 
-         if (this.displayedWorld.getContainer().getRootContainer().isSortReversed()) {
+         if (this.displayedWorld.getContainer().getRoot().isSortReversed()) {
             Collections.reverse(this.waypointsSorted);
          }
       }
@@ -615,26 +599,19 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
       }
 
       protected int getWaypointCount() {
-         int size = GuiWaypoints.this.displayedWorld.getCurrentSet().getList().size();
-         if (GuiWaypoints.this.waypointsManager.getServerWaypoints() != null) {
-            size += GuiWaypoints.this.waypointsManager.getServerWaypoints().size();
-         }
-
-         return size;
+         int size = GuiWaypoints.this.displayedWorld.getCurrentWaypointSet().size();
+         return size + GuiWaypoints.this.displayedWorld.getContainer().getServerWaypointManager().size();
       }
 
       private Waypoint getWaypoint(int slotIndex) {
-         Waypoint waypoint = null;
-         if (slotIndex < GuiWaypoints.this.displayedWorld.getCurrentSet().getList().size()) {
-            waypoint = GuiWaypoints.this.waypointsSorted.get(slotIndex);
-         } else if (GuiWaypoints.this.waypointsManager.getServerWaypoints() != null) {
-            int serverWPIndex = slotIndex - GuiWaypoints.this.displayedWorld.getCurrentSet().getList().size();
-            if (serverWPIndex < GuiWaypoints.this.waypointsManager.getServerWaypoints().size()) {
-               waypoint = GuiWaypoints.this.waypointsManager.getServerWaypoints().get(serverWPIndex);
-            }
+         if (slotIndex < GuiWaypoints.this.displayedWorld.getCurrentWaypointSet().size()) {
+            return GuiWaypoints.this.waypointsSorted.get(slotIndex);
+         } else {
+            int serverWPIndex = slotIndex - GuiWaypoints.this.displayedWorld.getCurrentWaypointSet().size();
+            return serverWPIndex < GuiWaypoints.this.displayedWorld.getContainer().getServerWaypointManager().size()
+               ? GuiWaypoints.this.displayedWorld.getContainer().getServerWaypointManager().getBySlot(serverWPIndex)
+               : null;
          }
-
-         return waypoint;
       }
 
       protected boolean method_25332(int p_148131_1_) {

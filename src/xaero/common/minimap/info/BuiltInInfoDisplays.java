@@ -16,7 +16,10 @@ import net.minecraft.class_7924;
 import xaero.common.minimap.info.codec.InfoDisplayCommonStateCodecs;
 import xaero.common.minimap.info.widget.InfoDisplayCommonWidgetFactories;
 import xaero.common.minimap.info.widget.InfoDisplayCycleWidgetFactory;
-import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
 
 public class BuiltInInfoDisplays {
    private static List<InfoDisplay<?>> ALL = new ArrayList<>();
@@ -335,13 +338,13 @@ public class BuiltInInfoDisplays {
       true,
       InfoDisplayCommonStateCodecs.BOOLEAN,
       InfoDisplayCommonWidgetFactories.ALWAYS_ON,
-      (displayInfo, compiler, session, processor, x, y, w, h, scale, size, playerBlockX, playerBlockY, playerBlockZ, playerPos) -> {
+      (displayInfo, compiler, hudSession, processor, x, y, w, h, scale, size, playerBlockX, playerBlockY, playerBlockZ, playerPos) -> {
          if ((Boolean)displayInfo.getState()) {
-            WaypointsManager waypointsManager = session.getWaypointsManager();
-            if (waypointsManager.getCurrentWorld() != null && waypointsManager.getAutoWorld() != waypointsManager.getCurrentWorld()) {
-               compiler.addWords(
-                  size, class_1074.method_4662("gui.xaero_using_custom_subworld", new Object[]{waypointsManager.getCurrentWorld().getContainer().getSubName()})
-               );
+            MinimapSession session = BuiltInHudModules.MINIMAP.getCurrentSession();
+            MinimapWorldManager minimapWorldManager = session.getWorldManager();
+            MinimapWorld currentWorld = minimapWorldManager.getCurrentWorld();
+            if (currentWorld != null && minimapWorldManager.getAutoWorld() != currentWorld) {
+               compiler.addWords(size, class_1074.method_4662("gui.xaero_using_custom_subworld", new Object[]{currentWorld.getContainer().getSubName()}));
             }
          }
       },

@@ -1,12 +1,13 @@
 package xaero.common.message;
 
-import xaero.common.XaeroMinimapSession;
 import xaero.common.message.client.ClientMessageConsumer;
 import xaero.common.server.level.LevelMapProperties;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class LevelMapPropertiesConsumer implements ClientMessageConsumer<LevelMapProperties> {
    public void handle(LevelMapProperties t) {
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-      minimapSession.getWaypointsManager().onServerLevelId(t.getId());
+      MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+      minimapSession.getWorldStateUpdater().onServerLevelId(t.getId());
    }
 }

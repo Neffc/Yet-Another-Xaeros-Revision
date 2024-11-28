@@ -11,7 +11,6 @@ import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.core.IXaeroMinimapMinecraftClient;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomVertexConsumers;
@@ -23,13 +22,13 @@ import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.minimap.region.MinimapChunk;
 import xaero.common.minimap.region.MinimapTile;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.CompassRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class MinimapSafeModeRenderer extends MinimapRenderer {
    private static final class_2960 mapTextures = new class_2960("xaeromaptexture");
@@ -45,7 +44,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
    }
 
    public void updateMapFrameSafeMode(
-      XaeroMinimapSession minimapSession,
+      MinimapSession session,
       MinimapProcessor minimap,
       class_1657 player,
       class_1297 renderEntity,
@@ -79,7 +78,6 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
          byte currentState = this.drawYState;
          double playerX = minimap.getEntityRadar().getEntityX(renderEntity, partial);
          double playerZ = minimap.getEntityRadar().getEntityZ(renderEntity, partial);
-         WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
          boolean terrainMapVisible = !cave
             || !Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS) && !Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS_HARMFUL);
 
@@ -93,7 +91,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
                double offy = ((double)currentY + 0.5) / this.zoom - halfHZoomed;
                if (terrainMapVisible) {
                   this.getLoadedBlockColor(
-                     waypointsManager,
+                     session,
                      minimap,
                      this.tempColor,
                      OptimizedMath.myFloor(playerX + psx + pc * offy),
@@ -111,7 +109,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
          }
 
          MinimapRadar minimapRadar = minimap.getEntityRadar();
-         double maxDistance = minimapRadar.getMaxDistance(minimap, minimapSession.getModMain().getSettings().minimapShape == 1);
+         double maxDistance = minimapRadar.getMaxDistance(minimap, this.modMain.getSettings().minimapShape == 1);
          if (this.modMain.getSettings().getEntityRadar()) {
             Iterator<MinimapRadarList> entityLists = minimapRadar.getRadarListsIterator();
 
@@ -312,7 +310,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
 
    @Override
    protected void renderChunks(
-      XaeroMinimapSession minimapSession,
+      MinimapSession session,
       class_332 guiGraphics,
       MinimapProcessor minimap,
       double playerX,
@@ -336,20 +334,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
    ) {
       class_4587 matrixStack = guiGraphics.method_51448();
       this.updateMapFrameSafeMode(
-         minimapSession,
-         minimap,
-         this.mc.field_1724,
-         this.mc.method_1560(),
-         bufferSize,
-         mapSize,
-         partial,
-         lightLevel,
-         lockedNorth,
-         shape,
-         ps,
-         pc,
-         cave,
-         settings
+         session, minimap, this.mc.field_1724, this.mc.method_1560(), bufferSize, mapSize, partial, lightLevel, lockedNorth, shape, ps, pc, cave, settings
       );
       matrixStack.method_22905(sizeFix, sizeFix, 1.0F);
 
@@ -362,7 +347,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       }
    }
 
-   private void getLoadedBlockColor(WaypointsManager waypointsManager, MinimapProcessor minimap, int[] result, int par1, int par2, int level) {
+   private void getLoadedBlockColor(MinimapSession session, MinimapProcessor minimap, int[] result, int par1, int par2, int level) {
       int tileX = par1 >> 4;
       int tileZ = par2 >> 4;
       int chunkX = (tileX >> 2) - minimap.getMinimapWriter().getLoadedMapChunkX();
@@ -380,12 +365,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
                   int insideX = par1 & 15;
                   int insideZ = par2 & 15;
                   this.chunkOverlay(
-                     waypointsManager,
-                     result,
-                     tile.getRed(level, insideX, insideZ),
-                     tile.getGreen(level, insideX, insideZ),
-                     tile.getBlue(level, insideX, insideZ),
-                     tile
+                     session, result, tile.getRed(level, insideX, insideZ), tile.getGreen(level, insideX, insideZ), tile.getBlue(level, insideX, insideZ), tile
                   );
                   return;
                }
@@ -399,8 +379,8 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       }
    }
 
-   private void chunkOverlay(WaypointsManager waypointsManager, int[] result, int red, int green, int blue, MinimapTile c) {
-      if (this.modMain.getSettings().getSlimeChunks(waypointsManager) && c.isSlimeChunk()) {
+   private void chunkOverlay(MinimapSession session, int[] result, int red, int green, int blue, MinimapTile c) {
+      if (this.modMain.getSettings().getSlimeChunks(session) && c.isSlimeChunk()) {
          this.getHelper().slimeOverlay(result, red, green, blue);
       } else if (this.modMain.getSettings().chunkGrid > -1 && c.isChunkGrid()) {
          this.getHelper().gridOverlay(result, ModSettings.COLORS[this.modMain.getSettings().chunkGrid], red, green, blue);

@@ -1,304 +1,134 @@
 package xaero.common.minimap.waypoints;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import net.minecraft.class_1937;
-import net.minecraft.class_2960;
-import net.minecraft.class_5321;
+import java.util.List;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
-import xaero.common.file.SimpleBackup;
-import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.container.MinimapWorldContainer;
+import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.path.XaeroPath;
+import xaero.hud.path.XaeroPathReader;
 
-public class WaypointWorldContainer {
-   private IXaeroMinimap modMain;
-   private XaeroMinimapSession minimapSession;
-   protected String key;
-   public HashMap<String, WaypointWorldContainer> subContainers;
-   public HashMap<String, WaypointWorld> worlds;
-   private HashMap<String, String> multiworldNames;
-   private final WaypointWorldRootContainer rootContainer;
+@Deprecated
+public class WaypointWorldContainer extends MinimapWorldContainer {
+   private static final XaeroPathReader pathReader = new XaeroPathReader();
 
+   @Deprecated
    public WaypointWorldContainer(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key, WaypointWorldRootContainer rootContainer) {
-      this.modMain = modMain;
-      this.minimapSession = minimapSession;
-      this.key = key;
-      this.worlds = new HashMap<>();
-      this.subContainers = new HashMap<>();
-      this.multiworldNames = new HashMap<>();
-      this.rootContainer = rootContainer;
+      this((HudMod)modMain, minimapSession.getWaypointsManager(), pathReader.read(key), rootContainer);
    }
 
+   @Deprecated
+   public WaypointWorldContainer(HudMod modMain, MinimapSession session, XaeroPath path, MinimapWorldRootContainer rootContainer) {
+      super(modMain, session, path, rootContainer);
+   }
+
+   @Deprecated
    public void setKey(String key) {
-      this.key = key;
-
-      for (WaypointWorldContainer s : this.subContainers.values()) {
-         String[] subKeySplit = s.getKey().split("/");
-         s.setKey(key + "/" + subKeySplit[subKeySplit.length - 1]);
-      }
+      super.setPath(pathReader.read(key));
    }
 
+   @Deprecated
    public WaypointWorldContainer addSubContainer(String subID) {
-      WaypointWorldContainer c = this.subContainers.get(subID);
-      if (c == null) {
-         this.subContainers.put(subID, c = new WaypointWorldContainer(this.modMain, this.minimapSession, this.key + "/" + subID, this.getRootContainer()));
-      }
-
-      return c;
+      return (WaypointWorldContainer)super.addSubContainer(this.path.resolve(subID));
    }
 
+   @Deprecated
    public boolean containsSub(String subId) {
-      return this.subContainers.containsKey(subId);
+      return super.containsSubContainer(this.path.resolve(subId));
    }
 
+   @Deprecated
    public void deleteSubContainer(String subId) {
-      this.subContainers.remove(subId);
+      super.deleteSubContainer(this.path.resolve(subId));
    }
 
-   public boolean isEmpty() {
-      return this.subContainers.isEmpty() && this.worlds.isEmpty();
-   }
-
-   public WaypointWorld addWorld(String multiworldId) {
-      WaypointWorld world = this.worlds.get(multiworldId);
-      if (world == null) {
-         WaypointWorld defaultWorld = this.worlds.get("waypoints");
-         if (defaultWorld == null) {
-            class_5321<class_1937> dimId = this.getRootContainer() == this
-               ? null
-               : this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(this.getSubId());
-            world = new WaypointWorld(this, multiworldId, dimId);
-            this.worlds.put(multiworldId, world);
-         } else {
-            this.worlds.put(multiworldId, defaultWorld);
-
-            try {
-               File defaultFile = this.modMain.getSettings().getWaypointsFile(defaultWorld);
-               defaultWorld.setId(multiworldId);
-               File fixedFile = this.modMain.getSettings().getWaypointsFile(defaultWorld);
-               if (Files.exists(defaultFile.toPath())) {
-                  Files.move(defaultFile.toPath(), fixedFile.toPath());
-               }
-            } catch (IOException var6) {
-               MinimapLogs.LOGGER.error("suppressed exception", var6);
-            }
-
-            this.worlds.remove("waypoints");
-            world = defaultWorld;
-         }
-      }
-
-      return world;
-   }
-
-   public void addName(String id, String name) {
-      String current = this.multiworldNames.get(id);
-      if (current != null && !current.equals(name)) {
-         this.worlds.get(id).requestRemovalOnSave(current);
-      }
-
-      this.multiworldNames.put(id, name);
-   }
-
-   public String getName(String id) {
-      if (id.equals("waypoints")) {
-         return null;
-      } else {
-         String name = this.multiworldNames.get(id);
-         if (name == null) {
-            int numericName = this.multiworldNames.size() + 1;
-
-            do {
-               name = numericName++ + "";
-            } while (this.multiworldNames.containsValue(name));
-
-            this.addName(id, name);
-         }
-
-         return name;
-      }
-   }
-
-   public void removeName(String id) {
-      this.multiworldNames.remove(id);
-   }
-
-   public String getSubId() {
-      return this.key.contains("/") ? this.key.substring(this.key.lastIndexOf("/") + 1) : "";
-   }
-
-   public String getSubName() {
-      String subName = this.getSubId();
-      if (subName.startsWith("dim%")) {
-         class_5321<class_1937> dimensionKey = this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(subName);
-         if (dimensionKey != null) {
-            subName = dimensionKey.method_29177().toString();
-            if (subName.startsWith("minecraft:")) {
-               subName = subName.substring(10);
-            }
-         } else {
-            subName = "Dim. " + subName.substring(4);
-         }
-      }
-
-      return subName;
-   }
-
-   public String getFullName(String id, String containerName) {
-      String name = this.getName(id);
-      String subID = this.getSubId();
-      if (subID.startsWith("dim%")) {
-         class_5321<class_1937> dimId = this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(subID);
-         if (dimId != null
-            && this.modMain.getSupportMods().worldmap()
-            && this.getRootContainer().getKey().equals(this.minimapSession.getWaypointsManager().getAutoRootContainerID())) {
-            String worldMapMWName = this.modMain.getSupportMods().worldmapSupport.tryToGetMultiworldName(dimId, id);
-            if (worldMapMWName != null && !worldMapMWName.equals(id)) {
-               name = worldMapMWName;
-            }
-         }
-      }
-
-      if (name != null && (this.worlds.size() >= 2 || containerName.isEmpty())) {
-         return containerName.length() > 0 ? name + " - " + containerName : name;
-      } else {
-         return containerName;
-      }
-   }
-
-   public String getKey() {
-      return this.key;
-   }
-
-   public WaypointWorld getFirstWorld() {
-      if (!this.worlds.isEmpty()) {
-         return ((WaypointWorld[])this.worlds.values().toArray(new WaypointWorld[0]))[0];
-      } else {
-         WaypointWorldContainer[] subs = this.subContainers.values().toArray(new WaypointWorldContainer[0]);
-
-         for (int i = 0; i < subs.length; i++) {
-            WaypointWorld subFirst = subs[i].getFirstWorld();
-            if (subFirst != null) {
-               return subFirst;
-            }
-         }
-
-         return null;
-      }
-   }
-
-   public WaypointWorld getFirstWorldConnectedTo(WaypointWorld refWorld) {
-      if (!this.worlds.isEmpty()) {
-         WaypointWorldRootContainer rootContainer = this.getRootContainer();
-
-         for (WaypointWorld world : this.worlds.values()) {
-            if (rootContainer.getSubWorldConnections().isConnected(refWorld, world)) {
-               return world;
-            }
-         }
-      }
-
-      WaypointWorldContainer[] subs = this.subContainers.values().toArray(new WaypointWorldContainer[0]);
-
-      for (int i = 0; i < subs.length; i++) {
-         WaypointWorld subFirst = subs[i].getFirstWorldConnectedTo(refWorld);
-         if (subFirst != null) {
-            return subFirst;
-         }
-      }
-
-      return null;
-   }
-
+   @Deprecated
    @Override
-   public String toString() {
-      return this.key + " sc:" + this.subContainers.size() + " w:" + this.worlds.size();
+   public boolean isEmpty() {
+      return super.isEmpty();
    }
 
+   @Deprecated
+   public WaypointWorld addWorld(String multiworldId) {
+      return (WaypointWorld)super.addWorld(multiworldId);
+   }
+
+   @Deprecated
+   public void addName(String id, String name) {
+      super.setName(id, name);
+   }
+
+   @Deprecated
+   @Override
+   public String getName(String id) {
+      return super.getName(id);
+   }
+
+   @Deprecated
+   @Override
+   public void removeName(String id) {
+      super.removeName(id);
+   }
+
+   @Deprecated
+   public String getSubId() {
+      return super.getLastNode();
+   }
+
+   @Deprecated
+   @Override
+   public String getSubName() {
+      return super.getSubName();
+   }
+
+   @Deprecated
+   public String getFullName(String id, String containerName) {
+      return super.getFullWorldName(id, containerName);
+   }
+
+   @Deprecated
+   public String getKey() {
+      return super.getPath().toString();
+   }
+
+   @Deprecated
+   public WaypointWorld getFirstWorld() {
+      return (WaypointWorld)super.getFirstWorld();
+   }
+
+   @Deprecated
+   public WaypointWorld getFirstWorldConnectedTo(WaypointWorld refWorld) {
+      return (WaypointWorld)super.getFirstWorldConnectedTo(refWorld);
+   }
+
+   @Deprecated
    public ArrayList<WaypointWorld> getAllWorlds() {
-      ArrayList<WaypointWorld> allWorlds = new ArrayList<>(this.worlds.values());
-      WaypointWorldContainer[] subs = this.subContainers.values().toArray(new WaypointWorldContainer[0]);
+      List<MinimapWorld> allWorlds = this.getWorldsCopy();
 
-      for (int i = 0; i < subs.length; i++) {
-         allWorlds.addAll(subs[i].getAllWorlds());
+      for (MinimapWorldContainer sub : this.subContainers.values()) {
+         allWorlds.addAll(((WaypointWorldContainer)sub).getAllWorlds());
       }
 
-      return allWorlds;
+      return (ArrayList<WaypointWorld>)allWorlds;
    }
 
+   @Deprecated
    public String getEqualIgnoreCaseSub(String cId) {
-      if (cId.equalsIgnoreCase(this.key)) {
-         return this.key;
-      } else if (this.subContainers.isEmpty()) {
-         return null;
-      } else if (!cId.toLowerCase().startsWith(this.key.toLowerCase() + "/")) {
-         return null;
-      } else {
-         for (Entry<String, WaypointWorldContainer> entry : this.subContainers.entrySet()) {
-            String subSearch = entry.getValue().getEqualIgnoreCaseSub(cId);
-            if (subSearch != null) {
-               return subSearch;
-            }
-         }
-
-         return this.key + cId.substring(this.key.length());
-      }
+      return this.fixPathCharacterCases(pathReader.read(cId)).toString();
    }
 
+   @Deprecated
    public WaypointWorldRootContainer getRootContainer() {
-      return this.rootContainer;
+      return (WaypointWorldRootContainer)super.getRoot();
    }
 
-   public void renameOldContainer(String containerID) {
-      if (!this.subContainers.isEmpty()) {
-         String dimensionPart = containerID.split("/")[1];
-         if (!this.subContainers.containsKey(dimensionPart)) {
-            class_5321<class_1937> dimId = this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(dimensionPart);
-            if (dimId != null) {
-               class_2960 dimKey = dimId.method_29177();
-               String dimKeyOldValidation = dimKey.method_12832().replaceAll("[^a-zA-Z0-9_]+", "");
-               String currentCustomID = this.minimapSession.getWaypointsManager().getCustomContainerID();
-               WaypointWorldContainer currentCustomContainer = currentCustomID == null
-                  ? null
-                  : this.minimapSession.getWaypointsManager().getWorldContainer(currentCustomID);
-
-               for (Entry<String, WaypointWorldContainer> subContainerEntry : this.subContainers.entrySet()) {
-                  String subKey = subContainerEntry.getKey();
-                  if (subKey.equals(dimKeyOldValidation)) {
-                     WaypointWorldContainer subContainer = subContainerEntry.getValue();
-                     boolean currentlySelected = currentCustomContainer == subContainer;
-                     this.subContainers.put(dimensionPart, subContainer);
-                     this.subContainers.remove(subKey);
-                     SimpleBackup.moveToBackup(subContainer.getDirectory().toPath());
-                     subContainer.setKey(this.key + "/" + dimensionPart);
-                     if (currentlySelected) {
-                        this.minimapSession.getWaypointsManager().setCustomContainerID(subContainer.getKey());
-                        this.minimapSession.getWaypointsManager().updateWaypoints();
-                     }
-
-                     try {
-                        this.modMain.getSettings().saveWorlds(this.getAllWorlds());
-                     } catch (IOException var15) {
-                        throw new RuntimeException("Failed to rename a dimension! Can't continue.", var15);
-                     }
-
-                     WaypointWorldRootContainer rootContainer = (WaypointWorldRootContainer)this;
-                     WaypointWorldConnectionManager connections = rootContainer.getSubWorldConnections();
-                     connections.renameDimension(subKey, dimensionPart);
-                     rootContainer.saveConfig();
-                     return;
-                  }
-               }
-            }
-         }
-      }
-   }
-
+   @Deprecated
    public File getDirectory() {
-      return new File(this.modMain.getWaypointsFolder(), this.key);
+      return super.getDirectoryPath().toFile();
    }
 }

@@ -36,6 +36,7 @@ import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.Minimap;
+import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.render.TextureLocations;
 
 public abstract class MinimapRenderer {
@@ -73,7 +74,7 @@ public abstract class MinimapRenderer {
    }
 
    protected abstract void renderChunks(
-      XaeroMinimapSession var1,
+      MinimapSession var1,
       class_332 var2,
       MinimapProcessor var3,
       double var4,
@@ -97,7 +98,7 @@ public abstract class MinimapRenderer {
    );
 
    public void renderMinimap(
-      XaeroMinimapSession minimapSession,
+      MinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
       int x,
@@ -117,8 +118,8 @@ public abstract class MinimapRenderer {
       }
 
       minimap.getEntityRadar().setLastRenderViewEntity(this.mc.method_1560());
-      int mapSize = minimapSession.getMinimapProcessor().getMinimapSize();
-      int bufferSize = minimapSession.getMinimapProcessor().getMinimapBufferSize(mapSize);
+      int mapSize = minimapSession.getProcessor().getMinimapSize();
+      int bufferSize = minimapSession.getProcessor().getMinimapBufferSize(mapSize);
       if (this.minimap.usingFBO()) {
          bufferSize = minimap.getFBOBufferSize();
       }
@@ -579,7 +580,7 @@ public abstract class MinimapRenderer {
          .getInfoDisplayRenderer()
          .render(
             guiGraphics,
-            minimapSession,
+            XaeroMinimapSession.getCurrentSession(),
             minimap,
             this.minimap,
             helper,

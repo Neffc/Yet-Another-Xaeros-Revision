@@ -2,6 +2,7 @@ package xaero.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import xaero.common.config.CommonConfig;
 import xaero.common.config.CommonConfigIO;
 import xaero.common.controls.ControlsRegister;
@@ -32,7 +33,7 @@ import xaero.hud.minimap.Minimap;
 import xaero.hud.render.HudRenderer;
 
 public interface IXaeroMinimap {
-   File old_waypointsFile = Services.PLATFORM.getGameDir().resolve("xaerowaypoints.txt").toFile();
+   Path old_waypointsFile = Services.PLATFORM.getGameDir().resolve("xaerowaypoints.txt");
    File wrongWaypointsFile = Services.PLATFORM.getGameDir().resolve("config").resolve("xaerowaypoints.txt").toFile();
    File wrongWaypointsFolder = Services.PLATFORM.getGameDir().resolve("mods").resolve("XaeroWaypoints").toFile();
 
@@ -40,7 +41,7 @@ public interface IXaeroMinimap {
 
    String getFileLayoutID();
 
-   File getConfigFile();
+   Path getConfigFile();
 
    File getModJAR();
 
@@ -78,9 +79,9 @@ public interface IXaeroMinimap {
 
    Object getSettingsKey();
 
-   File getWaypointsFile();
+   Path getWaypointsFile();
 
-   File getWaypointsFolder();
+   Path getWaypointsFolder();
 
    WidgetScreenHandler getWidgetScreenHandler();
 

@@ -2,40 +2,44 @@ package xaero.common.controls;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import net.minecraft.class_1074;
 import net.minecraft.class_304;
 import net.minecraft.class_310;
 import net.minecraft.class_3675;
 import net.minecraft.class_437;
 import net.minecraft.class_3675.class_307;
 import org.lwjgl.glfw.GLFW;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.gui.GuiAddWaypoint;
 import xaero.common.gui.GuiSlimeSeed;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.ScreenBase;
-import xaero.common.minimap.MinimapProcessor;
-import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.common.misc.KeySortableByOther;
 import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.platform.Services;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.HudSession;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
 
 public class ControlsHandler {
    protected IXaeroMinimap modMain;
-   protected XaeroMinimapSession minimapSession;
-   protected WaypointsManager waypointsManager;
-   protected MinimapProcessor minimap;
+   protected HudSession hudSession;
 
-   public ControlsHandler(IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public ControlsHandler(IXaeroMinimap modMain, HudSession hudSession) {
       this.modMain = modMain;
-      this.minimapSession = minimapSession;
-      this.waypointsManager = minimapSession.getWaypointsManager();
-      this.minimap = minimapSession.getMinimapProcessor();
+      this.hudSession = hudSession;
    }
 
    public void setKeyState(class_304 kb, boolean pressed) {
@@ -62,35 +66,35 @@ public class ControlsHandler {
    }
 
    public void keyDown(class_304 kb, boolean tickEnd, boolean isRepeat) {
+      MinimapSession session = BuiltInHudModules.MINIMAP.getCurrentSession();
+      MinimapWorldManager waypointsManager = session.getWorldManager();
       class_310 mc = class_310.method_1551();
       if (!tickEnd) {
          this.keyDownPre(kb);
-         if (kb == ModSettings.newWaypoint && this.modMain.getSettings().waypointsGUI(this.waypointsManager)) {
+         if (kb == ModSettings.newWaypoint && this.modMain.getSettings().waypointsGUI(session)) {
             mc.method_1507(
                new GuiAddWaypoint(
-                  this.modMain,
-                  this.waypointsManager,
+                  (HudMod)this.modMain,
+                  session,
                   null,
                   Lists.newArrayList(),
-                  this.waypointsManager.getCurrentContainerID().split("/")[0],
-                  this.waypointsManager.getCurrentWorld(),
+                  session.getWorldState().getCurrentWorldPath().getRoot(),
+                  waypointsManager.getCurrentWorld(),
                   true
                )
             );
          }
 
-         if (kb == ModSettings.keyWaypoints && this.modMain.getSettings().waypointsGUI(this.waypointsManager)) {
+         if (kb == ModSettings.keyWaypoints && this.modMain.getSettings().waypointsGUI(session)) {
             class_437 current = mc.field_1755;
             class_437 currentEscScreen = current instanceof ScreenBase ? ((ScreenBase)current).escape : null;
-            mc.method_1507(new GuiWaypoints(this.modMain, this.minimapSession, current, currentEscScreen));
+            mc.method_1507(new GuiWaypoints((HudMod)this.modMain, session, current, currentEscScreen));
          }
 
          if (kb == ModSettings.keyLargeMap) {
-            this.minimapSession
-               .getMinimapProcessor()
-               .setEnlargedMap(this.modMain.getSettings().enlargedMinimapAToggle ? !this.minimapSession.getMinimapProcessor().isEnlargedMap() : true);
-            this.minimap.setToResetImage(true);
-            this.minimap.instantZoom();
+            session.getProcessor().setEnlargedMap(this.modMain.getSettings().enlargedMinimapAToggle ? !session.getProcessor().isEnlargedMap() : true);
+            session.getProcessor().setToResetImage(true);
+            session.getProcessor().instantZoom();
          }
 
          if (kb == ModSettings.keyToggleMap && !Misc.hasEffect(mc.field_1724, Effects.NO_MINIMAP) && !Misc.hasEffect(mc.field_1724, Effects.NO_MINIMAP_HARMFUL)
@@ -109,17 +113,17 @@ public class ControlsHandler {
 
          if (kb == ModSettings.keyToggleSlimes) {
             try {
-               if (this.modMain.getSettings().customSlimeSeedNeeded(this.minimapSession)
+               if (this.modMain.getSettings().customSlimeSeedNeeded(this.hudSession)
                   && this.modMain.getSettings().getBooleanValue(ModOptions.OPEN_SLIME_SETTINGS)) {
                   class_437 current = mc.field_1755;
                   class_437 currentEscScreen = current instanceof ScreenBase ? ((ScreenBase)current).escape : null;
-                  class_310.method_1551().method_1507(new GuiSlimeSeed(this.modMain, this.waypointsManager, current, currentEscScreen));
+                  class_310.method_1551().method_1507(new GuiSlimeSeed(this.modMain, session, current, currentEscScreen));
                } else {
                   this.modMain.getSettings().slimeChunks = !this.modMain.getSettings().slimeChunks;
                   this.modMain.getSettings().saveSettings();
                }
-            } catch (IOException var12) {
-               MinimapLogs.LOGGER.error("suppressed exception", var12);
+            } catch (IOException var18) {
+               MinimapLogs.LOGGER.error("suppressed exception", var18);
             }
          }
 
@@ -127,17 +131,18 @@ public class ControlsHandler {
             try {
                this.modMain.getSettings().chunkGrid = -this.modMain.getSettings().chunkGrid - 1;
                this.modMain.getSettings().saveSettings();
-            } catch (IOException var11) {
-               MinimapLogs.LOGGER.error("suppressed exception", var11);
+            } catch (IOException var17) {
+               MinimapLogs.LOGGER.error("suppressed exception", var17);
             }
          }
 
          if (kb == ModSettings.keyInstantWaypoint
             && !Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS)
             && !Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS_HARMFUL)) {
-            this.waypointsManager
-               .createTemporaryWaypoints(
-                  this.waypointsManager.getCurrentWorld(),
+            session.getWaypointSession()
+               .getTemporaryHandler()
+               .createTemporaryWaypoint(
+                  waypointsManager.getCurrentWorld(),
                   OptimizedMath.myFloor(mc.field_1719.method_23317()),
                   OptimizedMath.myFloor(mc.field_1719.method_23318() + 0.0625),
                   OptimizedMath.myFloor(mc.field_1719.method_23321())
@@ -145,24 +150,45 @@ public class ControlsHandler {
          }
 
          if (kb == ModSettings.keySwitchSet) {
-            WaypointWorld currentWorld = this.waypointsManager.getCurrentWorld();
+            MinimapWorld currentWorld = waypointsManager.getCurrentWorld();
             if (currentWorld != null) {
-               String[] keys = currentWorld.getSets().keySet().toArray(new String[0]);
+               List<KeySortableByOther<String>> keysList = new ArrayList<>();
 
-               for (int i = 0; i < keys.length; i++) {
-                  if (keys[i] != null && keys[i].equals(currentWorld.getCurrent())) {
-                     currentWorld.setCurrent(keys[(i + 1) % keys.length]);
+               for (WaypointSet set : currentWorld.getIterableWaypointSets()) {
+                  String key = set.getName();
+                  keysList.add(new KeySortableByOther<>(key, class_1074.method_4662(key, new Object[0]).toLowerCase()));
+               }
+
+               Collections.sort(keysList);
+               boolean foundCurrent = false;
+               String firstSetKey = null;
+
+               for (KeySortableByOther<String> sortedSet : keysList) {
+                  String setKey = sortedSet.getKey();
+                  if (firstSetKey == null) {
+                     firstSetKey = setKey;
+                  }
+
+                  if (setKey != null && setKey.equals(currentWorld.getCurrentWaypointSetId())) {
+                     foundCurrent = true;
+                  } else if (foundCurrent) {
+                     foundCurrent = false;
+                     currentWorld.setCurrentWaypointSetId(setKey);
                      break;
                   }
                }
 
-               this.waypointsManager.updateWaypoints();
-               this.waypointsManager.setChanged = System.currentTimeMillis();
+               if (foundCurrent) {
+                  currentWorld.setCurrentWaypointSetId(firstSetKey);
+               }
+
+               session.getWorldStateUpdater().update(session);
+               session.getWaypointSession().setSetChangedTime(System.currentTimeMillis());
 
                try {
-                  this.modMain.getSettings().saveWaypoints(currentWorld);
-               } catch (IOException var10) {
-                  MinimapLogs.LOGGER.error("suppressed exception", var10);
+                  session.getWorldManagerIO().saveWorld(currentWorld);
+               } catch (IOException var16) {
+                  MinimapLogs.LOGGER.error("suppressed exception", var16);
                }
             }
          }
@@ -180,12 +206,12 @@ public class ControlsHandler {
 
             try {
                this.modMain.getSettings().saveSettings();
-            } catch (IOException var9) {
-               MinimapLogs.LOGGER.error("suppressed exception", var9);
+            } catch (IOException var15) {
+               MinimapLogs.LOGGER.error("suppressed exception", var15);
             }
          }
 
-         if (!this.minimapSession.getMinimapProcessor().isEnlargedMap() || this.modMain.getSettings().zoomOnEnlarged == 0) {
+         if (!session.getProcessor().isEnlargedMap() || this.modMain.getSettings().zoomOnEnlarged == 0) {
             int zoomChange = 0;
             if (kb == ModSettings.keyBindZoom) {
                zoomChange = 1;
@@ -200,8 +226,8 @@ public class ControlsHandler {
 
                try {
                   this.modMain.getSettings().saveSettings();
-               } catch (IOException var8) {
-                  MinimapLogs.LOGGER.error("suppressed exception", var8);
+               } catch (IOException var14) {
+                  MinimapLogs.LOGGER.error("suppressed exception", var14);
                }
             }
          }
@@ -209,7 +235,7 @@ public class ControlsHandler {
          if (kb == ModSettings.keyToggleRadar) {
             this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.RADAR_DISPLAYED);
          } else if (kb == ModSettings.keyManualCaveMode) {
-            this.minimapSession.getMinimapProcessor().toggleManualCaveMode();
+            session.getProcessor().toggleManualCaveMode();
          } else if (kb == ModSettings.keyToggleTrackedPlayers) {
             this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.TRACKED_PLAYERS);
          } else if (kb == ModSettings.keyTogglePacChunkClaims) {
@@ -231,12 +257,13 @@ public class ControlsHandler {
    }
 
    public void keyUp(class_304 kb, boolean tickEnd) {
+      MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
       if (!tickEnd) {
          this.keyUpPre(kb);
          if (!this.modMain.getSettings().enlargedMinimapAToggle && kb == ModSettings.keyLargeMap) {
-            this.minimapSession.getMinimapProcessor().setEnlargedMap(false);
-            this.minimap.setToResetImage(true);
-            this.minimap.instantZoom();
+            minimapSession.getProcessor().setEnlargedMap(false);
+            minimapSession.getProcessor().setToResetImage(true);
+            minimapSession.getProcessor().instantZoom();
          }
 
          this.keyUpPost(kb);

@@ -21,6 +21,7 @@ import xaero.common.minimap.write.MinimapWriterFabric;
 import xaero.common.mods.SupportMods;
 import xaero.common.mods.SupportModsFabric;
 import xaero.common.resource.ShaderResourceReloadListener;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class PlatformContextFabric extends PlatformContext {
    private final HudMod modMain;
@@ -120,10 +121,7 @@ public class PlatformContextFabric extends PlatformContext {
 
    @Override
    public MinimapWriter createMinimapWriter(
-      IXaeroMinimap modMain,
-      XaeroMinimapSession xaeroMinimapSession,
-      BlockStateShortShapeCache blockStateShortShapeCache,
-      HighlighterRegistry highlighterRegistry
+      IXaeroMinimap modMain, MinimapSession xaeroMinimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
    ) {
       return new MinimapWriterFabric(modMain, xaeroMinimapSession, blockStateShortShapeCache, highlighterRegistry);
    }

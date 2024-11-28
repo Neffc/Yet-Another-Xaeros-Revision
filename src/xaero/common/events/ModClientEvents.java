@@ -8,6 +8,8 @@ import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.anim.MultiplyAnimationHelper;
 import xaero.common.interfaces.InterfaceManager;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.module.MinimapSession;
 
 public abstract class ModClientEvents {
    protected IXaeroMinimap modMain;
@@ -36,14 +38,14 @@ public abstract class ModClientEvents {
       MultiplyAnimationHelper.tick();
       RenderSystem.clear(256, class_310.field_1703);
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+      MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
       if (minimapSession != null) {
          this.modMain.getHudRenderer().render(this.modMain.getHud(), guiGraphics, partialTicks);
          this.modMain
             .getInterfaces()
             .getMinimapInterface()
             .getWaypointsGuiRenderer()
-            .drawSetChange(minimapSession.getWaypointsManager(), guiGraphics, class_310.method_1551().method_22683());
+            .drawSetChange(minimapSession, guiGraphics, class_310.method_1551().method_22683());
       }
    }
 

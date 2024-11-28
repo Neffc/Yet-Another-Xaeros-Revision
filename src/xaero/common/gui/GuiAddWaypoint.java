@@ -16,12 +16,12 @@ import net.minecraft.class_364;
 import net.minecraft.class_4185;
 import net.minecraft.class_437;
 import net.minecraft.class_5481;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
 import xaero.common.graphics.CursorBox;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.gui.dropdown.IDropDownWidgetCallback;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointVisibilityType;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
@@ -30,11 +30,17 @@ import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 import xaero.common.validator.NumericFieldValidator;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
+import xaero.hud.path.XaeroPath;
 
 public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallback {
    private static final CursorBox VISIBILITY_TYPE_TOOLTIP = new CursorBox("gui.xaero_box_visibility_type");
    private static final CursorBox TYPE_TOOLTIP = new CursorBox("gui.xaero_box_waypoint_type");
-   private WaypointsManager waypointsManager;
+   private final MinimapSession session;
+   private MinimapWorldManager manager;
    protected String screenTitle;
    private class_4185 leftButton;
    private class_4185 rightButton;
@@ -50,7 +56,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    private ArrayList<WaypointEditForm> editForms;
    private int selectedWaypointIndex;
    private int defaultContainer;
-   private WaypointWorld defaultWorld;
+   private MinimapWorld defaultWorld;
    private GuiWaypointContainers containers;
    private GuiWaypointWorlds worlds;
    private GuiWaypointSets sets;
@@ -79,8 +85,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    private class_4185 defaultVisibilityTypeButton;
    protected class_4185 confirmButton;
    private boolean censorCoordsIfNeeded;
-   private final String frozenAutoContainerID;
-   private final String frozenAutoWorldID;
+   private final XaeroPath frozenAutoWorldPath;
    private BiFunction<String, Integer, String> censoredTextFormatterString;
    private BiFunction<String, Integer, class_5481> censoredTextFormatter;
    private boolean hasForcedPlayerPos;
@@ -88,13 +93,14 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    private int forcedPlayerY;
    private int forcedPlayerZ;
    private double forcedPlayerScale;
-   private WaypointWorld forcedCoordSrcWorld;
+   private MinimapWorld forcedCoordSrcWorld;
    private boolean ignoreEditBoxChanges = true;
    private boolean canBeLabyMod = true;
 
+   @Deprecated
    public GuiAddWaypoint(
       IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      WaypointsManager manager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
       Waypoint point,
@@ -102,12 +108,13 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       WaypointWorld defaultWorld,
       String waypointSet
    ) {
-      this(modMain, waypointsManager, par1GuiScreen, escapeScreen, point, defaultParentContainer, defaultWorld, waypointSet, false, 0, 0, 0);
+      this(modMain, manager, par1GuiScreen, escapeScreen, point, defaultParentContainer, defaultWorld, waypointSet, false, 0, 0, 0);
    }
 
+   @Deprecated
    public GuiAddWaypoint(
       IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      WaypointsManager manager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
       Waypoint point,
@@ -123,7 +130,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    ) {
       this(
          modMain,
-         waypointsManager,
+         manager,
          par1GuiScreen,
          escapeScreen,
          point == null ? Lists.newArrayList() : Lists.newArrayList(new Waypoint[]{point}),
@@ -140,21 +147,23 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       );
    }
 
+   @Deprecated
    public GuiAddWaypoint(
       IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      WaypointsManager manager,
       class_437 par1GuiScreen,
       ArrayList<Waypoint> waypointsEdited,
       String defaultParentContainer,
       WaypointWorld defaultWorld,
       boolean adding
    ) {
-      this(modMain, waypointsManager, par1GuiScreen, null, waypointsEdited, defaultParentContainer, defaultWorld, defaultWorld.getCurrent(), adding);
+      this(modMain, manager, par1GuiScreen, null, waypointsEdited, defaultParentContainer, defaultWorld, defaultWorld.getCurrentWaypointSetId(), adding);
    }
 
+   @Deprecated
    public GuiAddWaypoint(
       IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      WaypointsManager manager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
       ArrayList<Waypoint> waypointsEdited,
@@ -163,12 +172,13 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       String waypointSet,
       boolean adding
    ) {
-      this(modMain, waypointsManager, par1GuiScreen, escapeScreen, waypointsEdited, defaultParentContainer, defaultWorld, waypointSet, adding, false, 0, 0, 0);
+      this(modMain, manager, par1GuiScreen, escapeScreen, waypointsEdited, defaultParentContainer, defaultWorld, waypointSet, adding, false, 0, 0, 0);
    }
 
+   @Deprecated
    public GuiAddWaypoint(
       IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      WaypointsManager manager,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
       ArrayList<Waypoint> waypointsEdited,
@@ -183,7 +193,112 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       double forcedPlayerScale,
       WaypointWorld forcedCoordSrcWorld
    ) {
+      this(
+         (HudMod)modMain,
+         manager,
+         par1GuiScreen,
+         escapeScreen,
+         waypointsEdited,
+         XaeroPath.root(defaultParentContainer),
+         defaultWorld,
+         waypointSet,
+         adding,
+         hasForcedPlayerPos,
+         forcedPlayerX,
+         forcedPlayerY,
+         forcedPlayerZ,
+         forcedPlayerScale,
+         forcedCoordSrcWorld
+      );
+   }
+
+   @Deprecated
+   public GuiAddWaypoint(
+      IXaeroMinimap modMain,
+      WaypointsManager manager,
+      class_437 par1GuiScreen,
+      class_437 escapeScreen,
+      ArrayList<Waypoint> waypointsEdited,
+      String defaultParentContainer,
+      WaypointWorld defaultWorld,
+      String waypointSet,
+      boolean adding,
+      boolean hasForcedPlayerPos,
+      int forcedPlayerX,
+      int forcedPlayerY,
+      int forcedPlayerZ
+   ) {
+      this(
+         modMain,
+         manager,
+         par1GuiScreen,
+         escapeScreen,
+         waypointsEdited,
+         defaultParentContainer,
+         defaultWorld,
+         waypointSet,
+         adding,
+         hasForcedPlayerPos,
+         forcedPlayerX,
+         forcedPlayerY,
+         forcedPlayerZ,
+         class_310.method_1551().field_1687.method_8597().comp_646(),
+         null
+      );
+   }
+
+   @Deprecated
+   public GuiAddWaypoint(
+      IXaeroMinimap modMain,
+      WaypointsManager manager,
+      class_437 par1GuiScreen,
+      class_437 escapeScreen,
+      Waypoint point,
+      String defaultParentContainer,
+      WaypointWorld defaultWorld,
+      String waypointSet,
+      boolean hasForcedPlayerPos,
+      int forcedPlayerX,
+      int forcedPlayerY,
+      int forcedPlayerZ
+   ) {
+      this(
+         modMain,
+         manager,
+         par1GuiScreen,
+         escapeScreen,
+         point,
+         defaultParentContainer,
+         defaultWorld,
+         waypointSet,
+         hasForcedPlayerPos,
+         forcedPlayerX,
+         forcedPlayerY,
+         forcedPlayerZ,
+         class_310.method_1551().field_1687.method_8597().comp_646(),
+         null
+      );
+   }
+
+   public GuiAddWaypoint(
+      HudMod modMain,
+      MinimapSession session,
+      class_437 par1GuiScreen,
+      class_437 escapeScreen,
+      ArrayList<Waypoint> waypointsEdited,
+      XaeroPath defaultParentContainer,
+      MinimapWorld defaultWorld,
+      String waypointSet,
+      boolean adding,
+      boolean hasForcedPlayerPos,
+      int forcedPlayerX,
+      int forcedPlayerY,
+      int forcedPlayerZ,
+      double forcedPlayerScale,
+      MinimapWorld forcedCoordSrcWorld
+   ) {
       super(modMain, par1GuiScreen, escapeScreen, class_2561.method_43470(""));
+      this.session = session;
       this.hasForcedPlayerPos = hasForcedPlayerPos;
       this.forcedPlayerX = forcedPlayerX;
       this.forcedPlayerY = forcedPlayerY;
@@ -191,19 +306,14 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       this.forcedPlayerScale = forcedPlayerScale;
       this.forcedCoordSrcWorld = forcedCoordSrcWorld;
       this.waypointsEdited = waypointsEdited;
-      this.waypointsManager = waypointsManager;
+      this.manager = session.getWorldManager();
       this.fromSet = waypointSet;
       this.defaultWorld = defaultWorld;
-      this.frozenAutoContainerID = waypointsManager.getAutoContainerID();
-      this.frozenAutoWorldID = waypointsManager.getAutoWorldID();
-      this.containers = new GuiWaypointContainers(modMain, waypointsManager, defaultParentContainer, this.frozenAutoContainerID);
+      this.frozenAutoWorldPath = session.getWorldState().getAutoWorldPath();
+      this.containers = new GuiWaypointContainers(modMain, this.manager, defaultParentContainer, this.frozenAutoWorldPath);
       this.defaultContainer = this.containers.current;
       this.worlds = new GuiWaypointWorlds(
-         waypointsManager.getWorldContainer(defaultParentContainer),
-         waypointsManager,
-         defaultWorld.getFullId(),
-         this.frozenAutoContainerID,
-         this.frozenAutoWorldID
+         this.manager.getRootWorldContainer(defaultParentContainer), session, defaultWorld.getFullPath(), this.frozenAutoWorldPath
       );
       this.sets = new GuiWaypointSets(false, defaultWorld, this.fromSet);
       this.startPrefilled = this.prefilled = !waypointsEdited.isEmpty();
@@ -244,23 +354,19 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public GuiAddWaypoint(
-      IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      HudMod modMain,
+      MinimapSession session,
       class_437 par1GuiScreen,
       class_437 escapeScreen,
       ArrayList<Waypoint> waypointsEdited,
-      String defaultParentContainer,
-      WaypointWorld defaultWorld,
+      XaeroPath defaultParentContainer,
+      MinimapWorld defaultWorld,
       String waypointSet,
-      boolean adding,
-      boolean hasForcedPlayerPos,
-      int forcedPlayerX,
-      int forcedPlayerY,
-      int forcedPlayerZ
+      boolean adding
    ) {
       this(
          modMain,
-         waypointsManager,
+         session,
          par1GuiScreen,
          escapeScreen,
          waypointsEdited,
@@ -268,45 +374,25 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
          defaultWorld,
          waypointSet,
          adding,
-         hasForcedPlayerPos,
-         forcedPlayerX,
-         forcedPlayerY,
-         forcedPlayerZ,
+         false,
+         0,
+         0,
+         0,
          class_310.method_1551().field_1687.method_8597().comp_646(),
          null
       );
    }
 
    public GuiAddWaypoint(
-      IXaeroMinimap modMain,
-      WaypointsManager waypointsManager,
+      HudMod modMain,
+      MinimapSession session,
       class_437 par1GuiScreen,
-      class_437 escapeScreen,
-      Waypoint point,
-      String defaultParentContainer,
-      WaypointWorld defaultWorld,
-      String waypointSet,
-      boolean hasForcedPlayerPos,
-      int forcedPlayerX,
-      int forcedPlayerY,
-      int forcedPlayerZ
+      ArrayList<Waypoint> waypointsEdited,
+      XaeroPath defaultParentContainer,
+      MinimapWorld defaultWorld,
+      boolean adding
    ) {
-      this(
-         modMain,
-         waypointsManager,
-         par1GuiScreen,
-         escapeScreen,
-         point,
-         defaultParentContainer,
-         defaultWorld,
-         waypointSet,
-         hasForcedPlayerPos,
-         forcedPlayerX,
-         forcedPlayerY,
-         forcedPlayerZ,
-         class_310.method_1551().field_1687.method_8597().comp_646(),
-         null
-      );
+      this(modMain, session, par1GuiScreen, null, waypointsEdited, defaultParentContainer, defaultWorld, defaultWorld.getCurrentWaypointSetId(), adding);
    }
 
    private void fillFormWaypoint(WaypointEditForm form, Waypoint w) {
@@ -334,7 +420,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       return OptimizedMath.myFloor((double)playerX * this.getDimDiv(waypointDimScale));
    }
 
-   private String getAutomaticYInput(WaypointWorld destinationWorld) {
+   private String getAutomaticYInput(MinimapWorld destinationWorld) {
       if (!this.hasForcedPlayerPos || this.forcedPlayerY != 32767 && (this.forcedCoordSrcWorld == null || this.forcedCoordSrcWorld == destinationWorld)) {
          int playerY = this.hasForcedPlayerPos ? this.forcedPlayerY : OptimizedMath.myFloor(this.field_22787.field_1719.method_23318() + 0.0625);
          return OptimizedMath.myFloor((double)playerY) + "";
@@ -590,9 +676,9 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             }
 
             boolean creatingAWaypoint = this.adding && this.waypointsEdited.size() < this.editForms.size();
-            String[] destinationWorldKeys = this.worlds.getCurrentKeys();
-            WaypointWorld destinationWorld = this.waypointsManager.getWorld(destinationWorldKeys[0], destinationWorldKeys[1]);
-            double waypointDimScale = this.waypointsManager.getDimCoordinateScale(destinationWorld);
+            XaeroPath destinationWorldKeys = this.worlds.getCurrentKey();
+            MinimapWorld destinationWorld = this.manager.getWorld(destinationWorldKeys);
+            double waypointDimScale = this.session.getDimensionHelper().getDimCoordinateScale(destinationWorld);
             int initialEditedWaypointsSize = this.waypointsEdited.size();
 
             for (int i = 0; i < this.editForms.size(); i++) {
@@ -655,26 +741,26 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
                w.setVisibilityType(waypointForm.visibilityType);
             }
 
-            WaypointWorld sourceWorld = this.defaultWorld;
-            WaypointSet sourceSet = sourceWorld.getSets().get(this.fromSet);
+            MinimapWorld sourceWorld = this.defaultWorld;
+            WaypointSet sourceSet = sourceWorld.getWaypointSet(this.fromSet);
             String destinationSetKey = this.sets.getCurrentSetKey();
-            WaypointSet destinationSet = destinationWorld.getSets().get(destinationSetKey);
+            WaypointSet destinationSet = destinationWorld.getWaypointSet(destinationSetKey);
             if (this.adding || sourceSet != destinationSet) {
                if (!this.modMain.getSettings().waypointsBottom) {
-                  destinationSet.getList().addAll(0, this.waypointsEdited);
+                  destinationSet.addAll(this.waypointsEdited, true);
                } else {
-                  destinationSet.getList().addAll(this.waypointsEdited);
+                  destinationSet.addAll(this.waypointsEdited);
                }
             }
 
             if (sourceSet != destinationSet) {
-               sourceSet.getList().removeAll(this.waypointsEdited);
+               sourceSet.removeAll(this.waypointsEdited);
             }
 
             try {
-               this.modMain.getSettings().saveWaypoints(sourceWorld);
+               this.session.getWorldManagerIO().saveWorld(sourceWorld);
                if (destinationWorld != sourceWorld) {
-                  this.modMain.getSettings().saveWaypoints(destinationWorld);
+                  this.session.getWorldManagerIO().saveWorld(destinationWorld);
                }
             } catch (IOException var25) {
                MinimapLogs.LOGGER.error("suppressed exception", var25);
@@ -1125,9 +1211,9 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             this.nameTextField.method_1883(0);
          }
 
-         String[] destinationWorldKeys = this.worlds.getCurrentKeys();
-         WaypointWorld destinationWorld = this.waypointsManager.getWorld(destinationWorldKeys[0], destinationWorldKeys[1]);
-         double waypointDimScale = this.waypointsManager.getDimCoordinateScale(destinationWorld);
+         XaeroPath destinationWorldKeys = this.worlds.getCurrentKey();
+         MinimapWorld destinationWorld = this.manager.getWorld(destinationWorldKeys);
+         double waypointDimScale = this.session.getDimensionHelper().getDimCoordinateScale(destinationWorld);
          if (current.keepXText) {
             if (!this.xTextField.method_25370()) {
                Misc.setFieldText(this.xTextField, this.xPlaceholder, -11184811);
@@ -1202,12 +1288,11 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    public boolean onSelected(DropDownWidget menu, int selected) {
       if (menu == this.setsDD) {
          this.sets.setCurrentSet(selected);
-         if (this.waypointsManager.getCurrentContainerAndWorldID().equals(this.worlds.getCurrentKey())) {
-            this.waypointsManager.getCurrentWorld().setCurrent(this.sets.getCurrentSetKey());
-            this.waypointsManager.updateWaypoints();
+         if (this.session.getWorldState().getCurrentWorldPath().equals(this.worlds.getCurrentKey())) {
+            this.manager.getCurrentWorld().setCurrentWaypointSetId(this.sets.getCurrentSetKey());
 
             try {
-               this.modMain.getSettings().saveWaypoints(this.waypointsManager.getCurrentWorld());
+               this.session.getWorldManagerIO().saveWorld(this.manager.getCurrentWorld());
             } catch (IOException var5) {
                MinimapLogs.LOGGER.error("suppressed exception", var5);
             }
@@ -1216,28 +1301,26 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
          this.getCurrent().color = this.colorDD.size() > ModSettings.ENCHANT_COLORS.length ? selected : selected + 1;
       } else if (menu == this.containersDD) {
          this.containers.current = selected;
-         WaypointWorld currentWorld;
+         MinimapWorld currentWorld;
          if (this.containers.current != this.defaultContainer) {
-            currentWorld = this.waypointsManager.getWorldContainer(this.containers.getCurrentKey()).getFirstWorld();
+            currentWorld = this.manager.getRootWorldContainer(this.containers.getCurrentKey()).getFirstWorld();
          } else {
             currentWorld = this.defaultWorld;
          }
 
-         this.sets = new GuiWaypointSets(false, currentWorld, this.containers.current == this.defaultContainer ? this.fromSet : currentWorld.getCurrent());
+         this.sets = new GuiWaypointSets(
+            false, currentWorld, this.containers.current == this.defaultContainer ? this.fromSet : currentWorld.getCurrentWaypointSetId()
+         );
          this.worlds = new GuiWaypointWorlds(
-            this.waypointsManager.getWorldContainer(this.containers.getCurrentKey()),
-            this.waypointsManager,
-            currentWorld.getFullId(),
-            this.frozenAutoContainerID,
-            this.frozenAutoWorldID
+            this.manager.getRootWorldContainer(this.containers.getCurrentKey()), this.session, currentWorld.getFullPath(), this.frozenAutoWorldPath
          );
          this.replaceWidget(this.setsDD, this.setsDD = this.createSetsDropdown());
          this.replaceWidget(this.worldsDD, this.worldsDD = this.createWorldsDropdown());
       } else if (menu == this.worldsDD) {
          this.worlds.current = selected;
-         String[] worldKeys = this.worlds.getCurrentKeys();
-         WaypointWorld currentWorld = this.waypointsManager.getWorld(worldKeys[0], worldKeys[1]);
-         this.sets = new GuiWaypointSets(false, currentWorld, currentWorld == this.defaultWorld ? this.fromSet : currentWorld.getCurrent());
+         XaeroPath worldKeys = this.worlds.getCurrentKey();
+         MinimapWorld currentWorld = this.manager.getWorld(worldKeys);
+         this.sets = new GuiWaypointSets(false, currentWorld, currentWorld == this.defaultWorld ? this.fromSet : currentWorld.getCurrentWaypointSetId());
          this.replaceWidget(this.setsDD, this.setsDD = this.createSetsDropdown());
       }
 

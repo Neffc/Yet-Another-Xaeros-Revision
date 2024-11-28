@@ -9,9 +9,10 @@ import net.minecraft.class_2561;
 import net.minecraft.class_437;
 import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class GuiMinimapMain extends GuiMinimapSettings {
    private ISettingEntry[] mainEntries;
@@ -52,17 +53,17 @@ public class GuiMinimapMain extends GuiMinimapSettings {
       ScreenSwitchSettingEntry miscSettingsEntry = new ScreenSwitchSettingEntry(
          "gui.xaero_minimap_misc_settings", (current, escape) -> new GuiMinimapMiscSettings(modMain, current, escape), null, true
       );
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+      MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
       ScreenSwitchSettingEntry waypointsEntry = new ScreenSwitchSettingEntry(
          "gui.xaero_waypoints",
          (current, escape) -> {
-            XaeroMinimapSession minimapSession2 = XaeroMinimapSession.getCurrentSession();
-            return minimapSession2 != null && modMain.getSettings().waypointsGUI(minimapSession2.getWaypointsManager())
-               ? new GuiWaypoints(modMain, minimapSession2, this, escape)
+            MinimapSession minimapSession2 = BuiltInHudModules.MINIMAP.getCurrentSession();
+            return minimapSession2 != null && modMain.getSettings().waypointsGUI(minimapSession2)
+               ? new GuiWaypoints((HudMod)modMain, minimapSession2, this, escape)
                : null;
          },
          null,
-         minimapSession != null && modMain.getSettings().waypointsGUI(minimapSession.getWaypointsManager())
+         minimapSession != null && modMain.getSettings().waypointsGUI(minimapSession)
       );
       List<ISettingEntry> mainEntriesBuilder = Lists.newArrayList(
          new ISettingEntry[]{

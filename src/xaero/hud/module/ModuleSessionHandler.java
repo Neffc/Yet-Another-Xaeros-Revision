@@ -1,5 +1,7 @@
 package xaero.hud.module;
 
+import java.util.function.BiConsumer;
+import net.minecraft.class_634;
 import xaero.common.HudMod;
 
 public class ModuleSessionHandler {
@@ -9,9 +11,9 @@ public class ModuleSessionHandler {
       this.manager = manager;
    }
 
-   public void resetSessions(HudMod modMain) {
+   public void resetSessions(HudMod modMain, class_634 packetListener, BiConsumer<HudModule<?>, ModuleSession<?>> sessionDest) {
       for (HudModule<?> module : this.manager.getModules()) {
-         this.resetSession(module, modMain);
+         this.resetSession(module, modMain, packetListener, sessionDest);
       }
    }
 
@@ -21,9 +23,11 @@ public class ModuleSessionHandler {
       }
    }
 
-   private <MS extends ModuleSession<MS>> void resetSession(HudModule<MS> module, HudMod modMain) {
+   private <MS extends ModuleSession<MS>> void resetSession(
+      HudModule<MS> module, HudMod modMain, class_634 packetListener, BiConsumer<HudModule<?>, ModuleSession<?>> sessionDest
+   ) {
       this.closeSession(module, modMain);
-      module.setCurrentSession(module.getSessionFactory().apply(modMain, module));
+      sessionDest.accept(module, (ModuleSession<?>)module.getSessionFactory().apply(modMain, module, packetListener));
       HudMod.LOGGER.debug("Initialized new session for module {}!", module.getId());
    }
 
@@ -38,6 +42,5 @@ public class ModuleSessionHandler {
       }
 
       module.setRenderer(null);
-      module.setCurrentSession(null);
    }
 }

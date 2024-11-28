@@ -1,19 +1,20 @@
 package xaero.common.gui;
 
-import java.util.ArrayList;
 import net.minecraft.class_1074;
 import net.minecraft.class_2561;
 import net.minecraft.class_332;
 import net.minecraft.class_437;
+import xaero.common.HudMod;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.gui.dropdown.DropDownWidget;
 import xaero.common.gui.dropdown.IDropDownWidgetCallback;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
-import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
+import xaero.hud.path.XaeroPath;
 
 public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
    private MySmallButton transferButton;
@@ -25,35 +26,25 @@ public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
    private DropDownWidget worlds1DD;
    private DropDownWidget containers2DD;
    private DropDownWidget worlds2DD;
-   private XaeroMinimapSession minimapSession;
-   private WaypointsManager waypointsManager;
-   private final String frozenAutoContainerID;
-   private final String frozenAutoWorldID;
+   private MinimapSession session;
+   private MinimapWorldManager manager;
+   private final XaeroPath frozenAutoWorldPath;
    private boolean dropped = false;
 
-   public GuiTransfer(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, class_437 par1, class_437 escapeScreen) {
+   public GuiTransfer(IXaeroMinimap modMain, MinimapSession session, class_437 par1, class_437 escapeScreen) {
       super(modMain, par1, escapeScreen, class_2561.method_43471("gui.xaero_transfer_all"));
-      this.minimapSession = minimapSession;
-      this.waypointsManager = minimapSession.getWaypointsManager();
-      this.frozenAutoContainerID = this.waypointsManager.getAutoContainerID();
-      this.frozenAutoWorldID = this.waypointsManager.getAutoWorldID();
-      String currentContainer = this.waypointsManager.getCurrentContainerID(this.frozenAutoContainerID).split("/")[0];
-      this.containers1 = new GuiWaypointContainers(modMain, this.waypointsManager, currentContainer, this.frozenAutoContainerID);
-      this.containers2 = new GuiWaypointContainers(modMain, this.waypointsManager, currentContainer, this.frozenAutoContainerID);
-      String currentWorld = this.waypointsManager.getCurrentContainerAndWorldID(this.frozenAutoContainerID, this.frozenAutoWorldID);
+      this.session = session;
+      this.manager = session.getWorldManager();
+      this.frozenAutoWorldPath = session.getWorldState().getAutoWorldPath();
+      XaeroPath currentWorldPath = session.getWorldState().getCurrentWorldPath(this.frozenAutoWorldPath);
+      XaeroPath currentContainerPath = currentWorldPath.getRoot();
+      this.containers1 = new GuiWaypointContainers((HudMod)modMain, this.manager, currentContainerPath, this.frozenAutoWorldPath);
+      this.containers2 = new GuiWaypointContainers((HudMod)modMain, this.manager, currentContainerPath, this.frozenAutoWorldPath);
       this.worlds1 = new GuiWaypointWorlds(
-         this.waypointsManager.getWorldContainer(this.containers1.getCurrentKey()),
-         this.waypointsManager,
-         currentWorld,
-         this.frozenAutoContainerID,
-         this.frozenAutoWorldID
+         this.manager.getRootWorldContainer(this.containers1.getCurrentKey()), session, currentWorldPath, this.frozenAutoWorldPath
       );
       this.worlds2 = new GuiWaypointWorlds(
-         this.waypointsManager.getWorldContainer(this.containers2.getCurrentKey()),
-         this.waypointsManager,
-         currentWorld,
-         this.frozenAutoContainerID,
-         this.frozenAutoWorldID
+         this.manager.getRootWorldContainer(this.containers2.getCurrentKey()), session, currentWorldPath, this.frozenAutoWorldPath
       );
    }
 
@@ -131,7 +122,7 @@ public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
 
    private void openParent() {
       if (this.parent instanceof GuiWaypoints) {
-         this.field_22787.method_1507(new GuiWaypoints(this.modMain, this.minimapSession, ((GuiWaypoints)this.parent).parent, this.escape));
+         this.field_22787.method_1507(new GuiWaypoints((HudMod)this.modMain, this.session, ((GuiWaypoints)this.parent).parent, this.escape));
       } else {
          this.goBack();
       }
@@ -139,48 +130,40 @@ public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
 
    public void transfer() {
       try {
-         String[] keys1 = this.worlds1.getCurrentKeys();
-         String[] keys2 = this.worlds2.getCurrentKeys();
-         WaypointWorld from = this.waypointsManager.getWorld(keys1[0], keys1[1]);
-         WaypointWorld to = this.waypointsManager.getWorld(keys2[0], keys2[1]);
-         Object[] keys = from.getSets().keySet().toArray();
-         Object[] values = from.getSets().values().toArray();
+         XaeroPath keys1 = this.worlds1.getCurrentKey();
+         XaeroPath keys2 = this.worlds2.getCurrentKey();
+         MinimapWorld from = this.manager.getWorld(keys1);
+         MinimapWorld to = this.manager.getWorld(keys2);
 
-         for (int i = 0; i < keys.length; i++) {
-            String setName = (String)keys[i];
-            WaypointSet fromSet = (WaypointSet)values[i];
-            WaypointSet toSet = to.getSets().get(setName);
+         for (WaypointSet fromSet : from.getIterableWaypointSets()) {
+            WaypointSet toSet = to.getWaypointSet(fromSet.getName());
             if (toSet == null) {
-               toSet = new WaypointSet(setName);
+               toSet = WaypointSet.Builder.begin().setName(fromSet.getName()).build();
             }
 
-            ArrayList<Waypoint> list = fromSet.getList();
-
-            for (int j = 0; j < list.size(); j++) {
-               Waypoint w = list.get(j);
-               Waypoint copy = new Waypoint(w.getX(), w.getY(), w.getZ(), w.getName(), w.getSymbol(), w.getColor(), w.getWaypointType());
+            for (Waypoint w : fromSet.getWaypoints()) {
+               Waypoint copy = new Waypoint(
+                  w.getX(), w.getY(), w.getZ(), w.getName(), w.getSymbol(), w.getColor(), w.getWaypointType(), w.isTemporary(), w.isYIncluded()
+               );
                copy.setRotation(w.isRotation());
                copy.setDisabled(w.isDisabled());
                copy.setYaw(w.getYaw());
-               toSet.getList().add(copy);
+               copy.setVisibilityType(w.getVisibilityType());
+               copy.setOneoffDestination(w.isOneoffDestination());
+               toSet.add(copy);
             }
 
-            to.getSets().put(setName, toSet);
+            to.addWaypointSet(toSet);
          }
 
-         if (keys2[0] != null && !keys2[0].equals(this.waypointsManager.getCustomContainerID())) {
-            this.waypointsManager.setCustomContainerID(keys2[0]);
+         if (keys2 != null) {
+            this.session.getWorldState().setCustomWorldPath(keys2);
          }
 
-         if (keys2[1] != null && !keys2[1].equals(this.waypointsManager.getCustomWorldID())) {
-            this.waypointsManager.setCustomWorldID(keys2[1]);
-         }
-
-         this.waypointsManager.updateWaypoints();
          this.openParent();
-         this.modMain.getSettings().saveWaypoints(to);
-      } catch (Exception var15) {
-         MinimapLogs.LOGGER.error("suppressed exception", var15);
+         this.session.getWorldManagerIO().saveWorld(to);
+      } catch (Exception var11) {
+         MinimapLogs.LOGGER.error("suppressed exception", var11);
       }
    }
 
@@ -215,21 +198,19 @@ public class GuiTransfer extends ScreenBase implements IDropDownWidgetCallback {
       if (menu == this.containers1DD) {
          this.containers1.current = selected;
          this.worlds1 = new GuiWaypointWorlds(
-            this.waypointsManager.getWorldContainer(this.containers1.getCurrentKey()),
-            this.waypointsManager,
-            this.waypointsManager.getCurrentContainerAndWorldID(this.frozenAutoContainerID, this.frozenAutoWorldID),
-            this.frozenAutoContainerID,
-            this.frozenAutoWorldID
+            this.manager.getRootWorldContainer(this.containers1.getCurrentKey()),
+            this.session,
+            this.session.getWorldState().getCurrentWorldPath(this.frozenAutoWorldPath),
+            this.frozenAutoWorldPath
          );
          this.replaceWidget(this.worlds1DD, this.worlds1DD = this.createWorlds1DD());
       } else if (menu == this.containers2DD) {
          this.containers2.current = selected;
          this.worlds2 = new GuiWaypointWorlds(
-            this.waypointsManager.getWorldContainer(this.containers2.getCurrentKey()),
-            this.waypointsManager,
-            this.waypointsManager.getCurrentContainerAndWorldID(this.frozenAutoContainerID, this.frozenAutoWorldID),
-            this.frozenAutoContainerID,
-            this.frozenAutoWorldID
+            this.manager.getRootWorldContainer(this.containers2.getCurrentKey()),
+            this.session,
+            this.session.getWorldState().getCurrentWorldPath(this.frozenAutoWorldPath),
+            this.frozenAutoWorldPath
          );
          this.replaceWidget(this.worlds2DD, this.worlds2DD = this.createWorlds2DD());
       } else if (menu == this.worlds1DD) {

@@ -11,6 +11,7 @@ import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
 
 public class GuiWorldTpCommand extends ScreenBase {
    private MySmallButton confirmButton;
@@ -19,13 +20,19 @@ public class GuiWorldTpCommand extends ScreenBase {
    private boolean usingDefault;
    private String commandFormat;
    private String rotationCommandFormat;
-   private WaypointWorldRootContainer rootContainer;
+   private MinimapWorldRootContainer rootContainer;
 
+   @Deprecated
    public GuiWorldTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape, WaypointWorld world) {
-      this(modMain, parent, escape, world.getContainer().getRootContainer());
+      this(modMain, parent, escape, world.getContainer().getRoot());
    }
 
+   @Deprecated
    public GuiWorldTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape, WaypointWorldRootContainer rootContainer) {
+      this(modMain, parent, escape, (MinimapWorldRootContainer)rootContainer);
+   }
+
+   public GuiWorldTpCommand(IXaeroMinimap modMain, class_437 parent, class_437 escape, MinimapWorldRootContainer rootContainer) {
       super(modMain, parent, escape, class_2561.method_43471("gui.xaero_world_teleport_command"));
       this.rootContainer = rootContainer;
       this.commandFormat = rootContainer.getServerTeleportCommandFormat() == null
@@ -121,7 +128,7 @@ public class GuiWorldTpCommand extends ScreenBase {
                this.rootContainer.setUsingDefaultTeleportCommand(this.usingDefault);
                this.rootContainer.setServerTeleportCommandFormat(this.commandFormat);
                this.rootContainer.setServerTeleportCommandRotationFormat(this.rotationCommandFormat);
-               this.rootContainer.saveConfig();
+               this.rootContainer.getSession().getWorldManagerIO().getRootConfigIO().save(this.rootContainer);
                this.goBack();
             }
          )

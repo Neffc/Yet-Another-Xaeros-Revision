@@ -15,7 +15,6 @@ import net.minecraft.class_4587.class_4665;
 import net.minecraft.class_4597.class_4598;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.CustomVertexConsumers;
@@ -40,6 +39,7 @@ import xaero.common.settings.ModSettings;
 import xaero.hud.compat.mods.ImmediatelyFastHelper;
 import xaero.hud.minimap.Minimap;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class MinimapFBORenderer extends MinimapRenderer {
    private ImprovedFramebuffer scalingFramebuffer;
@@ -81,7 +81,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
 
    @Override
    protected void renderChunks(
-      XaeroMinimapSession minimapSession,
+      MinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
       double playerX,
@@ -137,7 +137,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
    }
 
    public void renderChunksToFBO(
-      XaeroMinimapSession minimapSession,
+      MinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
       class_1657 player,
@@ -237,7 +237,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
             int loadedMapChunkX = minimap.getMinimapWriter().getLoadedMapChunkX();
             int loadedMapChunkZ = minimap.getMinimapWriter().getLoadedMapChunkZ();
             int loadedWidth = minimap.getMinimapWriter().getLoadedBlocks().length;
-            boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
+            boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession);
             minX = Math.max(minX, loadedMapChunkX);
             minZ = Math.max(minZ, loadedMapChunkZ);
             maxX = Math.min(maxX, loadedMapChunkX + loadedWidth - 1);

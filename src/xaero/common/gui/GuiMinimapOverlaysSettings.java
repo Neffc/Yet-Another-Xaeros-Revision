@@ -3,8 +3,10 @@ package xaero.common.gui;
 import net.minecraft.class_2561;
 import net.minecraft.class_437;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.settings.ModOptions;
+import xaero.hud.HudSession;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class GuiMinimapOverlaysSettings extends GuiMinimapSettings {
    public GuiMinimapOverlaysSettings(IXaeroMinimap modMain, class_437 backScreen, class_437 escScreen) {
@@ -13,10 +15,10 @@ public class GuiMinimapOverlaysSettings extends GuiMinimapSettings {
          "gui.xaero_light_overlay", (current, escape) -> new GuiLightOverlay(modMain, current, escape), null, true
       );
       ScreenSwitchSettingEntry slimeChunksMultiplayerEntry = null;
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-      if (modMain.getSettings().customSlimeSeedNeeded(minimapSession)) {
+      MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+      if (modMain.getSettings().customSlimeSeedNeeded(HudSession.getCurrentSession())) {
          slimeChunksMultiplayerEntry = new ScreenSwitchSettingEntry(
-            "gui.xaero_slime_chunks", (current, escape) -> new GuiSlimeSeed(modMain, minimapSession.getWaypointsManager(), current, escape), null, true
+            "gui.xaero_slime_chunks", (current, escape) -> new GuiSlimeSeed(modMain, minimapSession, current, escape), null, true
          );
       }
 

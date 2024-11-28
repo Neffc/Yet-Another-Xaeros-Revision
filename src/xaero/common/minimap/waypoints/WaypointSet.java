@@ -2,20 +2,21 @@ package xaero.common.minimap.waypoints;
 
 import java.util.ArrayList;
 
-public class WaypointSet {
-   private String name;
-   private ArrayList<Waypoint> list;
-
+@Deprecated
+public class WaypointSet extends xaero.hud.minimap.waypoint.set.WaypointSet {
+   @Deprecated
    public WaypointSet(String name) {
-      this.name = name;
-      this.list = new ArrayList<>();
+      super(name);
    }
 
+   @Deprecated
+   @Override
    public String getName() {
-      return this.name;
+      return super.getName();
    }
 
+   @Deprecated
    public ArrayList<Waypoint> getList() {
-      return this.list;
+      return (ArrayList<Waypoint>)this.list;
    }
 }

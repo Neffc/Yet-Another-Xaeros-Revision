@@ -19,7 +19,6 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendererProvider;
@@ -28,8 +27,9 @@ import xaero.common.minimap.highlight.HighlighterRegistry;
 import xaero.common.minimap.region.MinimapTile;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.element.RadarRenderer;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
@@ -72,7 +72,7 @@ public class SupportXaeroWorldmap {
    }
 
    public void drawMinimap(
-      XaeroMinimapSession minimapSession,
+      MinimapSession minimapSession,
       class_4587 matrixStack,
       MinimapRendererHelper helper,
       int xFloored,
@@ -121,7 +121,7 @@ public class SupportXaeroWorldmap {
                int globalRegionCacheHashCode = WorldMap.settings.getRegionCacheHashCode();
                boolean reloadEverything = WorldMap.settings.reloadEverything;
                int globalReloadVersion = WorldMap.settings.reloadVersion;
-               boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
+               boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession);
                boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
                if (wmHasDimensionSwitch) {
                   mapProcessor.initMinimapRender(xFloored, zFloored);
@@ -196,8 +196,8 @@ public class SupportXaeroWorldmap {
 
                mapWithLightRenderer = multiTextureRenderTypeRenderers.getRenderer(shaderBinder, binder, finalizer, CustomRenderTypes.MAP);
                mapNoLightRenderer = multiTextureRenderTypeRenderers.getRenderer(shaderBinder, binder, finalizer, CustomRenderTypes.MAP);
-               WaypointWorld world = minimapSession.getWaypointsManager().getAutoWorld();
-               Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullId()) : null;
+               MinimapWorld world = minimapSession.getWorldManager().getAutoWorld();
+               Long seed = slimeChunks && world != null ? this.modMain.getSettings().getSlimeChunksSeed(world.getFullPath()) : null;
                this.renderChunks(
                   matrixStack,
                   minX,

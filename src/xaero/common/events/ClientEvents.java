@@ -33,11 +33,14 @@ import xaero.common.gui.GuiAddWaypoint;
 import xaero.common.gui.GuiWaypoints;
 import xaero.common.gui.GuiWidgetUpdateAll;
 import xaero.common.minimap.MinimapProcessor;
-import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.patreon.Patreon;
 import xaero.common.settings.ModSettings;
+import xaero.hud.HudSession;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointSession;
 
 public class ClientEvents {
    protected IXaeroMinimap modMain;
@@ -107,7 +110,7 @@ public class ClientEvents {
 
    public void handleRenderGameOverlayEventPre(class_332 guiGraphics, float partialTicks) {
       if (!class_310.method_1551().field_1690.field_1842) {
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
          if (minimapSession != null) {
             class_1041 mainwindow = class_310.method_1551().method_22683();
             Matrix4f projectionMatrixBU = RenderSystem.getProjectionMatrix();
@@ -121,9 +124,7 @@ public class ClientEvents {
                .getInterfaces()
                .getMinimapInterface()
                .getWaypointsIngameRenderer()
-               .render(
-                  minimapSession, partialTicks, minimapSession.getMinimapProcessor(), XaeroMinimapCore.waypointsProjection, XaeroMinimapCore.waypointModelView
-               );
+               .render(minimapSession, partialTicks, minimapSession.getProcessor(), XaeroMinimapCore.waypointsProjection, XaeroMinimapCore.waypointModelView);
             RenderSystem.getModelViewStack().method_22909();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.setProjectionMatrix(projectionMatrixBU, vertexSortingBU);
@@ -140,12 +141,12 @@ public class ClientEvents {
    public boolean handleClientSendChatEvent(String message) {
       if (message.startsWith("xaero_waypoint_add:")) {
          String[] args = message.split(":");
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-         minimapSession.getWaypointSharing().onWaypointAdd(args);
+         WaypointSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession().getWaypointSession();
+         minimapSession.getSharing().onWaypointAdd(args);
          return true;
       } else if (message.equals("xaero_tp_anyway")) {
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-         minimapSession.getWaypointsManager().teleportAnyway();
+         WaypointSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession().getWaypointSession();
+         minimapSession.getTeleport().teleportAnyway();
          return true;
       } else {
          return false;
@@ -193,8 +194,8 @@ public class ClientEvents {
       if (!textString.contains("xaero_waypoint:") && !textString.contains("xaero-waypoint:")) {
          return false;
       } else {
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-         minimapSession.getWaypointSharing().onWaypointReceived(playerName, textString);
+         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+         minimapSession.getWaypointSession().getSharing().onWaypointReceived(playerName, textString);
          return true;
       }
    }
@@ -209,9 +210,9 @@ public class ClientEvents {
 
    public void handlePlayerSetSpawnEvent(class_2338 newSpawnPoint, class_1937 world) {
       if (world instanceof class_638) {
-         XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+         MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
          if (minimapSession != null) {
-            minimapSession.getWaypointsManager().setCurrentSpawn(newSpawnPoint, (class_638)world);
+            minimapSession.getWorldStateUpdater().setCurrentWorldSpawn(newSpawnPoint);
          }
       }
    }
@@ -244,17 +245,16 @@ public class ClientEvents {
    public void handlePlayerTickStart(class_1657 player) {
       if (player == class_310.method_1551().field_1724) {
          if (this.modMain.isLoadedClient()) {
-            XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
+            MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
             if (minimapSession != null) {
                try {
-                  MinimapProcessor minimap = minimapSession.getMinimapProcessor();
-                  WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-                  waypointsManager.updateWorldIds();
+                  MinimapProcessor minimap = minimapSession.getProcessor();
+                  minimapSession.getWorldStateUpdater().update(minimapSession);
                   minimap.onPlayerTick();
-                  waypointsManager.updateWaypoints();
                   class_310 mc = class_310.method_1551();
-                  minimapSession.getKeyEventHandler().handleEvents(mc, minimapSession);
-                  this.modMain.getForgeEventHandlerListener().playerTickPost(minimapSession);
+                  HudSession hudSession = HudSession.getCurrentSession();
+                  hudSession.getKeyEventHandler().handleEvents(mc, hudSession);
+                  this.modMain.getForgeEventHandlerListener().playerTickPost(hudSession);
                } catch (Throwable var6) {
                   this.modMain.getInterfaces().getMinimapInterface().setCrashedWith(var6);
                }

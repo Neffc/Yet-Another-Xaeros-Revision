@@ -1,24 +1,25 @@
 package xaero.hud.module;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.class_2561;
 import net.minecraft.class_2960;
 import net.minecraft.class_310;
 import net.minecraft.class_437;
+import net.minecraft.class_634;
+import org.apache.commons.lang3.function.TriFunction;
 import xaero.common.HudMod;
+import xaero.hud.HudSession;
 import xaero.hud.pushbox.PushboxHandler;
 import xaero.hud.render.module.IModuleRenderer;
 
 public final class HudModule<MS extends ModuleSession<MS>> {
    private final class_2960 id;
    private final class_2561 displayName;
-   private final BiFunction<HudMod, HudModule<MS>, MS> sessionFactory;
+   private final TriFunction<HudMod, HudModule<MS>, class_634, MS> sessionFactory;
    private final Supplier<IModuleRenderer<MS>> rendererFactory;
    private final Function<class_437, class_437> configScreenFactory;
    private IModuleRenderer<MS> renderer;
-   private MS currentSession;
    private ModuleTransform transform;
    private ModuleTransform unconfirmedTransform;
    private PushboxHandler.State pushState;
@@ -27,7 +28,7 @@ public final class HudModule<MS extends ModuleSession<MS>> {
    public HudModule(
       class_2960 id,
       class_2561 displayName,
-      BiFunction<HudMod, HudModule<MS>, MS> sessionFactory,
+      TriFunction<HudMod, HudModule<MS>, class_634, MS> sessionFactory,
       Supplier<IModuleRenderer<MS>> rendererFactory,
       Function<class_437, class_437> configScreenFactory
    ) {
@@ -54,7 +55,8 @@ public final class HudModule<MS extends ModuleSession<MS>> {
    }
 
    public MS getCurrentSession() {
-      return this.currentSession;
+      HudSession hudSession = HudSession.getCurrentSession();
+      return hudSession == null ? null : hudSession.getSession(this);
    }
 
    public IModuleRenderer<MS> getRenderer() {
@@ -117,12 +119,8 @@ public final class HudModule<MS extends ModuleSession<MS>> {
       return this.configScreenFactory;
    }
 
-   BiFunction<HudMod, HudModule<MS>, MS> getSessionFactory() {
+   TriFunction<HudMod, HudModule<MS>, class_634, MS> getSessionFactory() {
       return this.sessionFactory;
-   }
-
-   void setCurrentSession(MS currentSession) {
-      this.currentSession = currentSession;
    }
 
    void setRenderer(IModuleRenderer<MS> renderer) {

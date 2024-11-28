@@ -31,7 +31,9 @@ import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.minimap.render.radar.EntityIconPrerenderer;
 import xaero.common.misc.Misc;
+import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.pushbox.BuiltInPushBoxes;
 import xaero.hud.pushbox.boss.IBossHealthPushBox;
 import xaero.hud.pushbox.effect.IPotionEffectsPushBox;
@@ -115,7 +117,7 @@ public class XaeroMinimapCore {
                }
 
                if (currentSession != null) {
-                  MinimapLogs.LOGGER.info("Previous minimap session still active. Probably using MenuMobs. Forcing it to end...");
+                  MinimapLogs.LOGGER.info("Previous hud session still active. Probably using MenuMobs. Forcing it to end...");
                   cleanupCurrentSession();
                }
 
@@ -172,8 +174,10 @@ public class XaeroMinimapCore {
    public static void beforeRespawn(class_1657 player) {
       if (isModLoaded()) {
          if (player == class_310.method_1551().field_1724) {
-            XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-            minimapSession.getWaypointsManager().createDeathpoint(player);
+            MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+            if (minimapSession != null) {
+               minimapSession.getWaypointSession().getDeathpointHandler().createDeathpoint(player);
+            }
          }
       }
    }
@@ -238,7 +242,7 @@ public class XaeroMinimapCore {
       if (isModLoaded()) {
          Path worldName = levelStorageAccess.method_27010(class_5218.field_24188).getParent().getFileName();
          if (!worldName.toString().isEmpty()) {
-            Path worldMinimapDataFolder = HudMod.INSTANCE.getWaypointsFolder().toPath().resolve(worldName);
+            Path worldMinimapDataFolder = HudMod.INSTANCE.getMinimapFolder().resolve(worldName);
             if (worldMinimapDataFolder.toFile().exists()) {
                try {
                   Misc.deleteFile(worldMinimapDataFolder, 20);

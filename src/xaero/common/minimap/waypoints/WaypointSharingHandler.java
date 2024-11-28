@@ -1,8 +1,8 @@
 package xaero.common.minimap.waypoints;
 
 import com.google.common.collect.Lists;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import net.minecraft.class_1074;
 import net.minecraft.class_124;
 import net.minecraft.class_1937;
@@ -16,27 +16,37 @@ import net.minecraft.class_5250;
 import net.minecraft.class_5321;
 import net.minecraft.class_2558.class_2559;
 import net.minecraft.class_2568.class_5247;
-import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
+import xaero.common.HudMod;
 import xaero.common.gui.GuiAddWaypoint;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.container.MinimapWorldContainer;
+import xaero.hud.minimap.world.container.MinimapWorldContainerUtil;
+import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.path.XaeroPath;
 
 public class WaypointSharingHandler {
    public static final String WAYPOINT_OLD_SHARE_PREFIX = "xaero_waypoint:";
    public static final String WAYPOINT_ADD_PREFIX = "xaero_waypoint_add:";
    public static final String WAYPOINT_SHARE_PREFIX = "xaero-waypoint:";
-   private IXaeroMinimap modMain;
-   private XaeroMinimapSession minimapSession;
+   private HudMod modMain;
+   private MinimapSession session;
    private class_437 parent;
    private Waypoint w;
-   private WaypointWorld wWorld;
+   private MinimapWorld wWorld;
 
-   public WaypointSharingHandler(IXaeroMinimap modMain, XaeroMinimapSession minimapSession) {
+   public WaypointSharingHandler(HudMod modMain, MinimapSession session) {
       this.modMain = modMain;
-      this.minimapSession = minimapSession;
+      this.session = session;
    }
 
+   @Deprecated
    public void shareWaypoint(class_437 parent, Waypoint w, WaypointWorld wWorld) {
+      this.shareWaypoint(parent, w, (MinimapWorld)wWorld);
+   }
+
+   public void shareWaypoint(class_437 parent, Waypoint w, MinimapWorld wWorld) {
       this.parent = parent;
       this.w = w;
       this.wWorld = wWorld;
@@ -70,7 +80,7 @@ public class WaypointSharingHandler {
                   if (details.length() == 4) {
                      dimensionName = class_1074.method_4662("gui.xaero_waypoint_unknown_dimension", new Object[0]);
                   } else {
-                     class_5321<class_1937> dimId = this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(details);
+                     class_5321<class_1937> dimId = this.session.getDimensionHelper().getDimensionKeyForDirectoryName(details);
                      if (dimId == null) {
                         dimensionName = class_1074.method_4662("gui.xaero_waypoint_unknown_dimension", new Object[0]);
                      } else {
@@ -118,160 +128,165 @@ public class WaypointSharingHandler {
          String waypointSymbol = Waypoint.getStringFromStringSafe(args[2], "^col^");
          if (waypointSymbol.length() >= 1 && waypointSymbol.length() <= 3) {
             try {
-               if (this.minimapSession.getWaypointsManager().getAutoContainerID() == null) {
+               if (this.session.getWorldState().getAutoWorldPath() == null) {
                   MinimapLogs.LOGGER.info("Can't add a waypoint at this time!");
-               } else {
-                  boolean yIsIncluded = !args[4].equals("~");
-                  int x = Integer.parseInt(args[3]);
-                  int y = yIsIncluded ? Integer.parseInt(args[4]) : 0;
-                  int z = Integer.parseInt(args[5]);
-                  int color = Integer.parseInt(args[6]);
-                  String yawString = args[8];
-                  if (yawString.length() > 4) {
-                     MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 4");
-                  } else {
-                     int yaw = Integer.parseInt(yawString);
-                     boolean rotation = args[7].equals("true");
-                     Waypoint w = new Waypoint(x, y, z, waypointName, waypointSymbol, color, 0, false, yIsIncluded);
-                     w.setRotation(rotation);
-                     w.setYaw(yaw);
-                     String externalContainerId = this.minimapSession.getWaypointsManager().getCurrentContainerID().split("/")[0];
-                     WaypointWorld externalWorld = this.minimapSession.getWaypointsManager().getCurrentWorld();
-                     String parentContainerId = externalContainerId;
-                     WaypointWorld currentWorld = externalWorld;
-                     if (args.length > 9) {
-                        String worldDetails = args[9];
-                        if (worldDetails.length() > 9 && worldDetails.startsWith("Internal_")) {
-                           int divider = worldDetails.lastIndexOf(95);
-                           if (divider < 1 || divider == worldDetails.length() - 1) {
-                              MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 5");
-                              return;
-                           }
+                  return;
+               }
 
-                           String worldId = worldDetails.substring(divider + 1);
-                           if (!worldId.replaceAll("[^a-zA-Z0-9,\\$-]+", "").equals(worldId)) {
-                              MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 7");
-                              return;
-                           }
+               boolean yIsIncluded = !args[4].equals("~");
+               int x = Integer.parseInt(args[3]);
+               int y = yIsIncluded ? Integer.parseInt(args[4]) : 0;
+               int z = Integer.parseInt(args[5]);
+               int color = Integer.parseInt(args[6]);
+               String yawString = args[8];
+               if (yawString.length() > 4) {
+                  MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 4");
+                  return;
+               }
 
-                           boolean destinationDimensionExists = true;
-
-                           String subContainers;
-                           try {
-                              subContainers = worldDetails.substring(9, divider);
-                           } catch (IndexOutOfBoundsException var30) {
-                              subContainers = null;
-                           }
-
-                           parentContainerId = this.minimapSession.getWaypointsManager().getAutoRootContainerID();
-                           String containerId = null;
-                           class_5321<class_1937> dimId = null;
-                           if (subContainers == null) {
-                              containerId = parentContainerId;
-                           } else {
-                              subContainers = subContainers.replace("^col^", ":");
-                              String[] subContainersArgs = subContainers.split("/");
-                              if (subContainersArgs.length > 1) {
-                                 MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 8");
-                                 return;
-                              }
-
-                              for (int i = 0; i < subContainersArgs.length; i++) {
-                                 String s = subContainersArgs[i];
-                                 if (s.isEmpty()) {
-                                    MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 11");
-                                    return;
-                                 }
-                              }
-
-                              String dimContainer = subContainersArgs[0];
-                              if (!dimContainer.startsWith("dim%")) {
-                                 if (!dimContainer.replaceAll("[^a-zA-Z0-9_]+", "").equals(dimContainer)) {
-                                    MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 18");
-                                    return;
-                                 }
-
-                                 dimId = this.minimapSession.getWaypointsManager().findDimensionKey(dimContainer);
-                              } else {
-                                 dimId = this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(dimContainer);
-                              }
-
-                              if (dimId == null) {
-                                 MinimapLogs.LOGGER.info("Destination dimension doesn't exists! Handling waypoint as external.");
-                                 parentContainerId = externalContainerId;
-                                 currentWorld = externalWorld;
-                                 destinationDimensionExists = false;
-                              } else {
-                                 subContainersArgs[0] = this.minimapSession.getWaypointsManager().getDimensionDirectoryName(dimId);
-                                 subContainers = String.join("/", subContainersArgs);
-                                 containerId = parentContainerId + "/" + subContainers;
-                                 WaypointWorldContainer rootContainer = this.minimapSession.getWaypointsManager().getWorldContainer(parentContainerId);
-                                 rootContainer.renameOldContainer(containerId);
-                              }
-                           }
-
-                           if (destinationDimensionExists) {
-                              WaypointWorldContainer worldContainer = this.minimapSession.getWaypointsManager().getWorldContainer(containerId);
-                              WaypointWorld autoWorld = this.minimapSession.getWaypointsManager().getAutoWorld();
-                              if (worldContainer == autoWorld.getContainer()) {
-                                 worldId = autoWorld.getId();
-                              } else {
-                                 WaypointWorld firstWorld = worldContainer.getFirstWorldConnectedTo(autoWorld);
-                                 if (firstWorld == null) {
-                                    firstWorld = worldContainer.getFirstWorld();
-                                 }
-
-                                 if (firstWorld != null) {
-                                    worldId = firstWorld.getId();
-                                 } else {
-                                    worldId = this.minimapSession.getWaypointsManager().getNewAutoWorldID(dimId, false);
-                                 }
-                              }
-
-                              try {
-                                 File securityTest = new File(this.modMain.getWaypointsFolder().getCanonicalFile(), containerId + "/" + worldId + "_1.txt");
-                                 if (!securityTest.getPath().equals(securityTest.getCanonicalPath())) {
-                                    MinimapLogs.LOGGER.info("Dangerously incorrect format of the shared waypoint! Error: 10");
-                                    return;
-                                 }
-                              } catch (IOException var29) {
-                                 MinimapLogs.LOGGER.error("IO error adding a shared waypoint!", var29);
-                                 return;
-                              }
-
-                              if (this.modMain.getSupportMods().worldmap()
-                                 && this.minimapSession.getWaypointsManager().isMultiplayer(containerId)
-                                 && dimId != null) {
-                                 for (String mw : this.modMain.getSupportMods().worldmapSupport.getMultiworldIds(dimId)) {
-                                    this.minimapSession.getWaypointsManager().addWorld(containerId, mw);
-                                 }
-                              }
-
-                              currentWorld = this.minimapSession.getWaypointsManager().getWorld(containerId, worldId);
-                           }
-                        } else if (!worldDetails.equals("External")) {
-                           MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 12");
-                           return;
-                        }
+               int yaw = Integer.parseInt(yawString);
+               boolean rotation = args[7].equals("true");
+               Waypoint w = new Waypoint(x, y, z, waypointName, waypointSymbol, color, 0, false, yIsIncluded);
+               w.setRotation(rotation);
+               w.setYaw(yaw);
+               XaeroPath externalContainerId = this.session.getWorldManager().getCurrentRootContainer().getPath();
+               MinimapWorld externalWorld = this.session.getWorldManager().getCurrentWorld();
+               XaeroPath parentContainerId = externalContainerId;
+               MinimapWorld currentWorld = externalWorld;
+               if (args.length > 9) {
+                  String worldDetails = args[9];
+                  if (worldDetails.length() > 9 && worldDetails.startsWith("Internal_")) {
+                     int divider = worldDetails.lastIndexOf(95);
+                     if (divider < 1 || divider == worldDetails.length() - 1) {
+                        MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 5");
+                        return;
                      }
 
-                     class_310.method_1551()
-                        .method_1507(
-                           new GuiAddWaypoint(
-                              this.modMain,
-                              this.minimapSession.getWaypointsManager(),
-                              null,
-                              null,
-                              Lists.newArrayList(new Waypoint[]{w}),
-                              parentContainerId,
-                              currentWorld,
-                              currentWorld.getCurrent(),
-                              true
-                           )
-                        );
+                     String worldId = worldDetails.substring(divider + 1);
+                     if (!worldId.replaceAll("[^a-zA-Z0-9,\\$-]+", "").equals(worldId)) {
+                        MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 7");
+                        return;
+                     }
+
+                     boolean destinationDimensionExists = true;
+
+                     String subContainers;
+                     try {
+                        subContainers = worldDetails.substring(9, divider);
+                     } catch (IndexOutOfBoundsException var31) {
+                        subContainers = null;
+                     }
+
+                     parentContainerId = this.session.getWorldState().getAutoRootContainerPath();
+                     XaeroPath containerId = null;
+                     class_5321<class_1937> dimId = null;
+                     if (subContainers != null) {
+                        subContainers = subContainers.replace("^col^", ":");
+                        String[] subContainersArgs = subContainers.split("/");
+                        if (subContainersArgs.length > 1) {
+                           MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 8");
+                           return;
+                        }
+
+                        for (int i = 0; i < subContainersArgs.length; i++) {
+                           String s = subContainersArgs[i];
+                           if (s.isEmpty()) {
+                              MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 11");
+                              return;
+                           }
+                        }
+
+                        String dimContainer = subContainersArgs[0];
+                        if (!dimContainer.startsWith("dim%")) {
+                           if (!dimContainer.replaceAll("[^a-zA-Z0-9_]+", "").equals(dimContainer)) {
+                              MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 18");
+                              return;
+                           }
+
+                           dimId = this.session.getDimensionHelper().findDimensionKeyForOldName(class_310.method_1551().field_1724, dimContainer);
+                        } else {
+                           dimId = this.session.getDimensionHelper().getDimensionKeyForDirectoryName(dimContainer);
+                        }
+
+                        if (dimId == null) {
+                           MinimapLogs.LOGGER.info("Destination dimension doesn't exists! Handling waypoint as external.");
+                           parentContainerId = externalContainerId;
+                           currentWorld = externalWorld;
+                           destinationDimensionExists = false;
+                        } else {
+                           subContainersArgs[0] = this.session.getDimensionHelper().getDimensionDirectoryName(dimId);
+                           containerId = parentContainerId;
+
+                           for (String subContainersArg : subContainersArgs) {
+                              containerId = containerId.resolve(subContainersArg);
+                           }
+
+                           MinimapWorldRootContainer rootContainer = this.session.getWorldManager().getRootWorldContainer(parentContainerId);
+                           rootContainer.renameOldContainer(containerId);
+                        }
+                     } else {
+                        containerId = parentContainerId;
+                     }
+
+                     if (destinationDimensionExists) {
+                        MinimapWorldContainer worldContainer = this.session.getWorldManager().getWorldContainer(containerId);
+                        MinimapWorld autoWorld = this.session.getWorldManager().getAutoWorld();
+                        if (worldContainer == autoWorld.getContainer()) {
+                           worldId = autoWorld.getNode();
+                        } else {
+                           MinimapWorld firstWorld = worldContainer.getFirstWorldConnectedTo(autoWorld);
+                           if (firstWorld == null) {
+                              firstWorld = worldContainer.getFirstWorld();
+                           }
+
+                           if (firstWorld != null) {
+                              worldId = firstWorld.getNode();
+                           } else {
+                              worldId = this.session.getWorldStateUpdater().getPotentialWorldNode(dimId, false, this.session);
+                           }
+                        }
+
+                        try {
+                           Path securityTest = containerId.applyToFilePath(this.modMain.getMinimapFolder().toFile().getCanonicalFile().toPath())
+                              .resolve(worldId + "_1.txt");
+                           if (!securityTest.equals(securityTest.toFile().getCanonicalFile().toPath())) {
+                              MinimapLogs.LOGGER.info("Dangerously incorrect format of the shared waypoint! Error: 10");
+                              return;
+                           }
+                        } catch (IOException var30) {
+                           MinimapLogs.LOGGER.error("IO error adding a shared waypoint!", var30);
+                           return;
+                        }
+
+                        if (this.modMain.getSupportMods().worldmap() && MinimapWorldContainerUtil.isMultiplayer(containerId) && dimId != null) {
+                           for (String mw : this.modMain.getSupportMods().worldmapSupport.getMultiworldIds(dimId)) {
+                              this.session.getWorldManager().addWorld(containerId.resolve(mw));
+                           }
+                        }
+
+                        currentWorld = this.session.getWorldManager().getWorld(containerId.resolve(worldId));
+                     }
+                  } else if (!worldDetails.equals("External")) {
+                     MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 12");
+                     return;
                   }
                }
-            } catch (NumberFormatException var31) {
+
+               class_310.method_1551()
+                  .method_1507(
+                     new GuiAddWaypoint(
+                        this.modMain,
+                        this.session,
+                        null,
+                        null,
+                        Lists.newArrayList(new Waypoint[]{w}),
+                        parentContainerId,
+                        currentWorld,
+                        currentWorld.getCurrentWaypointSetId(),
+                        true
+                     )
+                  );
+            } catch (NumberFormatException var32) {
                MinimapLogs.LOGGER.info("Incorrect format of the shared waypoint! Error: 3");
             }
          } else {
@@ -284,26 +299,25 @@ public class WaypointSharingHandler {
 
    public void confirmResult(boolean p_confirmResult_1_) {
       if (p_confirmResult_1_) {
-         WaypointWorldContainer rootContainer = this.wWorld.getContainer().getRootContainer();
-         WaypointWorldContainer autoRootContainer = this.minimapSession.getWaypointsManager().getAutoWorld().getContainer().getRootContainer();
+         MinimapWorldContainer rootContainer = this.wWorld.getContainer().getRoot();
+         MinimapWorldContainer autoRootContainer = this.session.getWorldManager().getAutoWorld().getContainer().getRoot();
          String worldDetails;
          if (rootContainer == autoRootContainer) {
-            String containerId = this.wWorld.getContainer().getKey();
-            int firstSlashIndex = containerId.indexOf("/");
+            XaeroPath containerId = this.wWorld.getContainer().getPath();
             String details;
-            if (firstSlashIndex != -1) {
-               String subContainers = containerId.substring(firstSlashIndex + 1);
-               String[] subContainersSplit = subContainers.split("/");
-               if (subContainersSplit[0].equals("dim%0")) {
-                  subContainersSplit[0] = "overworld";
-               } else if (subContainersSplit[0].equals("dim%-1")) {
-                  subContainersSplit[0] = "the_nether";
-               } else if (subContainersSplit[0].equals("dim%1")) {
-                  subContainersSplit[0] = "the_end";
+            if (containerId.getNodeCount() > 1) {
+               XaeroPath subContainers = containerId.getSubPath(1);
+               String dimKey = subContainers.getRoot().getLastNode();
+               if (dimKey.equals("dim%0")) {
+                  dimKey = "overworld";
+               } else if (dimKey.equals("dim%-1")) {
+                  dimKey = "the_nether";
+               } else if (dimKey.equals("dim%1")) {
+                  dimKey = "the_end";
                }
 
-               subContainers = String.join("/", subContainersSplit);
-               details = subContainers.replace(":", "^col^") + "_waypoints";
+               subContainers = XaeroPath.root(dimKey).resolve(subContainers.getSubPath(1));
+               details = subContainers.toString().replace(":", "^col^") + "_waypoints";
             } else {
                details = "waypoints";
             }

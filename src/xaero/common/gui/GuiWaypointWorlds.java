@@ -3,40 +3,44 @@ package xaero.common.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointWorldContainer;
-import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
-import xaero.common.minimap.waypoints.WaypointsManager;
+import java.util.List;
+import java.util.Map;
 import xaero.common.misc.KeySortableByOther;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.container.MinimapWorldContainer;
+import xaero.hud.minimap.world.container.MinimapWorldContainerUtil;
+import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.path.XaeroPath;
 
-public class GuiWaypointWorlds extends GuiDropdownHelper {
-   public GuiWaypointWorlds(WaypointWorldContainer wc, WaypointsManager waypointsManager, String currentWorld, String autoContainer, String autoWorld) {
-      String a = autoContainer + "_" + autoWorld;
+public class GuiWaypointWorlds extends GuiDropdownHelper<XaeroPath> {
+   public GuiWaypointWorlds(MinimapWorldRootContainer root, MinimapSession session, XaeroPath currentWorldPath, XaeroPath autoWorldPath) {
+      Map<XaeroPath, String> nameMap = new HashMap<>();
+      XaeroPath autoContainer = autoWorldPath == null ? null : autoWorldPath.getParent();
+      boolean connections = autoContainer != null
+         && MinimapWorldContainerUtil.isMultiplayer(autoContainer)
+         && root.getPath().equals(session.getWorldState().getAutoRootContainerPath());
+      MinimapWorld autoWorldObj = autoWorldPath == null ? null : session.getWorldManager().getWorld(autoWorldPath);
+      List<KeySortableByOther<XaeroPath>> sortableKeyList = new ArrayList<>();
+      this.addWorlds(root, root, autoWorldObj, autoWorldPath, sortableKeyList, nameMap, connections);
+      Collections.sort(sortableKeyList);
       this.current = -1;
       this.auto = -1;
-      ArrayList<KeySortableByOther<String>> keysList = new ArrayList<>();
-      HashMap<String, String> nameMap = new HashMap<>();
-      boolean connections = autoContainer != null
-         && waypointsManager.isMultiplayer(autoContainer)
-         && wc.getKey().equals(waypointsManager.getAutoRootContainerID());
-      WaypointWorld autoWorldObj = autoWorld == null ? null : waypointsManager.getWorld(autoContainer, autoWorld);
-      this.addWorlds((WaypointWorldRootContainer)wc, autoWorldObj, connections, wc, a, keysList, nameMap);
-      Collections.sort(keysList);
-      ArrayList<String> keysStringList = new ArrayList<>();
-      ArrayList<String> optionsList = new ArrayList<>();
+      List<XaeroPath> keyList = new ArrayList<>();
+      List<String> optionList = new ArrayList<>();
 
-      for (int j = 0; j < keysList.size(); j++) {
-         KeySortableByOther<String> keySortable = keysList.get(j);
-         String key = keySortable.getKey();
-         if (this.current == -1 && key.equals(currentWorld)) {
+      for (int j = 0; j < sortableKeyList.size(); j++) {
+         KeySortableByOther<XaeroPath> keySortable = sortableKeyList.get(j);
+         XaeroPath key = keySortable.getKey();
+         if (this.current == -1 && key.equals(currentWorldPath)) {
             this.current = j;
          }
 
          String option = "Error";
 
          try {
-            if (this.auto == -1 && key.equals(a)) {
+            if (this.auto == -1 && key.equals(autoWorldPath)) {
                this.auto = j;
             }
 
@@ -44,71 +48,62 @@ public class GuiWaypointWorlds extends GuiDropdownHelper {
             if (this.auto == j) {
                option = option + " (auto)";
             }
-         } catch (Exception var18) {
-            MinimapLogs.LOGGER.error("suppressed exception", var18);
+         } catch (Exception var17) {
+            MinimapLogs.LOGGER.error("suppressed exception", var17);
          }
 
-         keysStringList.add(key);
-         optionsList.add(option);
+         keyList.add(key);
+         optionList.add(option);
       }
 
       if (this.current == -1) {
          this.current = 0;
       }
 
-      this.keys = keysStringList.toArray(new String[0]);
-      this.options = optionsList.toArray(new String[0]);
+      this.keys = keyList.toArray(new XaeroPath[0]);
+      this.options = optionList.toArray(new String[0]);
    }
 
    private void addWorlds(
-      WaypointWorldRootContainer rootWC,
-      WaypointWorld autoWorld,
-      boolean connections,
-      WaypointWorldContainer wc,
-      String a,
-      ArrayList<KeySortableByOther<String>> keysList,
-      HashMap<String, String> nameMap
+      MinimapWorldRootContainer root,
+      MinimapWorldContainer container,
+      MinimapWorld autoWorld,
+      XaeroPath autoWorldPath,
+      List<KeySortableByOther<XaeroPath>> sortableKeyList,
+      Map<XaeroPath, String> nameMap,
+      boolean connections
    ) {
-      String[] worldKeys = wc.worlds.keySet().toArray(new String[0]);
+      String containerName = container.getSubName();
 
-      for (int j = 0; j < worldKeys.length; j++) {
-         String worldKey = worldKeys[j];
-         String containerName = wc.getSubName();
-         String worldName = wc.getFullName(worldKey, containerName);
-         String fullKey = wc.getKey() + "_" + worldKey;
-         int firstNameSpace = worldName.indexOf(32);
-         String firstNameWord = firstNameSpace != -1 ? worldName.substring(0, firstNameSpace) : "";
+      for (MinimapWorld world : container.getWorlds()) {
+         String worldNode = world.getNode();
+         String worldName = container.getFullWorldName(worldNode, containerName);
+         XaeroPath fullKey = world.getFullPath();
          int firstNameWordAsInt = 0;
+         int firstNameSpace = worldName.indexOf(32);
+         if (firstNameSpace != -1) {
+            String firstNameWord = worldName.substring(0, firstNameSpace);
 
-         try {
-            firstNameWordAsInt = Integer.parseInt(firstNameWord);
-         } catch (NumberFormatException var19) {
-         }
-
-         boolean connected = false;
-         if (connections) {
-            WaypointWorld waypointWorld = wc.worlds.get(worldKey);
-            if (rootWC.getSubWorldConnections().isConnected(autoWorld, waypointWorld)) {
-               connected = true;
-               if (!fullKey.equals(a)) {
-                  worldName = worldName + " *";
-               }
+            try {
+               firstNameWordAsInt = Integer.parseInt(firstNameWord);
+            } catch (NumberFormatException var18) {
             }
          }
 
-         keysList.add(new KeySortableByOther<>(fullKey, !connected, containerName.toLowerCase(), firstNameWordAsInt, worldName.toLowerCase()));
+         boolean connected = false;
+         if (connections && root.getSubWorldConnections().isConnected(autoWorld, world)) {
+            connected = true;
+            if (!fullKey.equals(autoWorldPath)) {
+               worldName = worldName + " *";
+            }
+         }
+
+         sortableKeyList.add(new KeySortableByOther<>(fullKey, !connected, containerName.toLowerCase(), firstNameWordAsInt, worldName.toLowerCase()));
          nameMap.put(fullKey, worldName);
       }
 
-      WaypointWorldContainer[] subContainers = wc.subContainers.values().toArray(new WaypointWorldContainer[0]);
-
-      for (int i = 0; i < subContainers.length; i++) {
-         this.addWorlds(rootWC, autoWorld, connections, subContainers[i], a, keysList, nameMap);
+      for (MinimapWorldContainer subContainer : container.getSubContainers()) {
+         this.addWorlds(root, subContainer, autoWorld, autoWorldPath, sortableKeyList, nameMap, connections);
       }
-   }
-
-   public String[] getCurrentKeys() {
-      String fullKey = this.getCurrentKey();
-      return new String[]{fullKey.substring(0, fullKey.lastIndexOf("_")), fullKey.substring(fullKey.lastIndexOf("_") + 1)};
    }
 }

@@ -1,13 +1,11 @@
 package xaero.common.minimap;
 
-import java.io.IOException;
 import net.minecraft.class_1657;
 import net.minecraft.class_1937;
 import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_638;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.anim.MultiplyAnimationHelper;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.minimap.mcworld.MinimapClientWorldData;
@@ -19,12 +17,13 @@ import xaero.common.minimap.write.MinimapWriter;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class MinimapProcessor {
    public static final boolean DEBUG = false;
    public static final int FRAME = 9;
    private IXaeroMinimap modMain;
-   private XaeroMinimapSession minimapSession;
+   private MinimapSession minimapSession;
    private MinimapWriter minimapWriter;
    private MinimapRadar entityRadar;
    private MinimapInterface minimapInterface;
@@ -39,11 +38,11 @@ public class MinimapProcessor {
 
    public MinimapProcessor(
       IXaeroMinimap modMain,
-      XaeroMinimapSession minimapSession,
+      MinimapSession minimapSession,
       MinimapWriter minimapWriter,
       MinimapRadar entityRadar,
       ClientSyncedTrackedPlayerManager clientSyncedTrackedPlayerManager
-   ) throws IOException {
+   ) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.minimapWriter = minimapWriter;

@@ -12,6 +12,7 @@ public class InterfaceManager {
       this.modMain = modMain;
    }
 
+   @Deprecated
    public MinimapInterface getMinimapInterface() {
       return (MinimapInterface)this.modMain.getMinimap();
    }

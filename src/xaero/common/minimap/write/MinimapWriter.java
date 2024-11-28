@@ -64,7 +64,6 @@ import net.minecraft.class_2338.class_2339;
 import net.minecraft.class_2902.class_2903;
 import org.lwjgl.opengl.GL11;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.cache.BlockStateShortShapeCache;
 import xaero.common.core.XaeroMinimapCore;
 import xaero.common.effect.Effects;
@@ -77,7 +76,6 @@ import xaero.common.minimap.mcworld.MinimapClientWorldData;
 import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
 import xaero.common.minimap.region.MinimapChunk;
 import xaero.common.minimap.region.MinimapTile;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.write.biome.BiomeBlendCalculator;
 import xaero.common.misc.CachedFunction;
 import xaero.common.misc.Misc;
@@ -85,6 +83,8 @@ import xaero.common.misc.OptimizedMath;
 import xaero.common.mods.SupportMods;
 import xaero.common.settings.ModSettings;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.MinimapWorld;
 
 public abstract class MinimapWriter {
    private static final int VOID_COLOR = -16121833;
@@ -100,7 +100,7 @@ public abstract class MinimapWriter {
    public static final int NO_Y_VALUE = Integer.MAX_VALUE;
    private static final int MAX_TRANSPARENCY_BLEND_DEPTH = 5;
    private IXaeroMinimap modMain;
-   private XaeroMinimapSession minimapSession;
+   private MinimapSession minimapSession;
    private MinimapWriterHelper helper;
    private MinimapInterface minimapInterface;
    protected final class_5819 usedRandom = class_5819.method_43049(0L);
@@ -243,7 +243,7 @@ public abstract class MinimapWriter {
    private DimensionHighlighterHandler dimensionHighlightHandler;
 
    public MinimapWriter(
-      IXaeroMinimap modMain, XaeroMinimapSession minimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
+      IXaeroMinimap modMain, MinimapSession minimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
    ) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
@@ -335,7 +335,7 @@ public abstract class MinimapWriter {
    public void onRender() {
       if (ModSettings.canEditIngameSettings()) {
          long before = System.nanoTime();
-         MinimapProcessor minimapProcessor = this.minimapSession.getMinimapProcessor();
+         MinimapProcessor minimapProcessor = this.minimapSession.getProcessor();
 
          try {
             class_1297 player = class_310.method_1551().method_1560();
@@ -585,9 +585,9 @@ public abstract class MinimapWriter {
             this.loadingLightOverlayType = this.modMain.getSettings().lightOverlayType;
             this.loadingFlowers = this.modMain.getSettings().getShowFlowers();
             this.loadingAdjustHeightForCarpetLikeBlocks = this.modMain.getSettings().getAdjustHeightForCarpetLikeBlocks();
-            WaypointWorld waypointWorld = this.minimapSession.getWaypointsManager().getAutoWorld();
-            if (waypointWorld != null) {
-               this.loadingSlimeSeed = this.modMain.getSettings().getSlimeChunksSeed(waypointWorld.getFullId());
+            MinimapWorld minimapWorld = this.minimapSession.getWorldManager().getAutoWorld();
+            if (minimapWorld != null) {
+               this.loadingSlimeSeed = this.modMain.getSettings().getSlimeChunksSeed(minimapWorld.getFullPath());
             }
 
             this.loadingHighlightVersion = this.dimensionHighlightHandler.getVersion();
@@ -2416,7 +2416,7 @@ public abstract class MinimapWriter {
    }
 
    public int getUpdateRadiusInChunks() {
-      return (int)Math.ceil((double)this.loadingSideInChunks / 2.0 / this.minimapSession.getMinimapProcessor().getMinimapZoom());
+      return (int)Math.ceil((double)this.loadingSideInChunks / 2.0 / this.minimapSession.getProcessor().getMinimapZoom());
    }
 
    public int getMapCoord(int side, int coord) {

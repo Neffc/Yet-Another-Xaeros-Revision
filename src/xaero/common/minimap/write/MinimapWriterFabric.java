@@ -12,13 +12,13 @@ import net.minecraft.class_4696;
 import net.minecraft.class_773;
 import net.minecraft.class_777;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.cache.BlockStateShortShapeCache;
 import xaero.common.minimap.highlight.HighlighterRegistry;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class MinimapWriterFabric extends MinimapWriter {
    public MinimapWriterFabric(
-      IXaeroMinimap modMain, XaeroMinimapSession minimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
+      IXaeroMinimap modMain, MinimapSession minimapSession, BlockStateShortShapeCache blockStateShortShapeCache, HighlighterRegistry highlighterRegistry
    ) {
       super(modMain, minimapSession, blockStateShortShapeCache, highlighterRegistry);
    }

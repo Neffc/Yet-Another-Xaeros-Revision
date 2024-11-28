@@ -1,10 +1,8 @@
 package xaero.common.minimap.waypoints.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map.Entry;
 import net.minecraft.class_1041;
 import net.minecraft.class_1074;
 import net.minecraft.class_1297;
@@ -18,7 +16,6 @@ import net.minecraft.class_4587;
 import net.minecraft.class_4588;
 import net.minecraft.class_4597.class_4598;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.graphics.GuiHelper;
@@ -26,11 +23,16 @@ import xaero.common.graphics.renderer.multitexture.MultiTextureRenderTypeRendere
 import xaero.common.minimap.element.render.MinimapElementRenderer;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointUtil;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.BuiltInHudModules;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointSession;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.minimap.world.MinimapWorldManager;
 import xaero.hud.render.TextureLocations;
 
 public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint, WaypointGuiRenderContext> {
@@ -132,25 +134,23 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
       renderTypeBuffers.method_22993();
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-      WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
-      this.waypointReachDeleter.deleteCollected(waypointsManager.getCurrentWorld(), modMain.getSettings().renderAllSets);
+      MinimapSession session = BuiltInHudModules.MINIMAP.getCurrentSession();
+      MinimapWorldManager manager = session.getWorldManager();
+      this.waypointReachDeleter.deleteCollected(session, manager.getCurrentWorld(), modMain.getSettings().renderAllSets);
    }
 
    public void updateWaypointCollection(double renderX, double renderY, double renderZ, IXaeroMinimap modMain) {
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-      WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
+      MinimapSession session = BuiltInHudModules.MINIMAP.getCurrentSession();
+      MinimapWorldManager manager = session.getWorldManager();
       List<Waypoint> sortingList = this.context.sortingList;
       sortingList.clear();
-      if (waypointsManager.getWaypoints() != null) {
+      if (manager.getCurrentWorld() != null) {
          if (modMain.getSettings().renderAllSets) {
-            HashMap<String, WaypointSet> sets = waypointsManager.getCurrentWorld().getSets();
-
-            for (Entry<String, WaypointSet> setEntry : sets.entrySet()) {
-               sortingList.addAll(setEntry.getValue().getList());
+            for (WaypointSet set : manager.getCurrentWorld().getIterableWaypointSets()) {
+               set.addTo(sortingList);
             }
          } else {
-            sortingList.addAll(waypointsManager.getWaypoints().getList());
+            manager.getCurrentWorld().getCurrentWaypointSet().addTo(sortingList);
          }
       }
 
@@ -161,8 +161,14 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
          }
       }
 
+      if (manager.hasCustomWaypoints()) {
+         for (Waypoint waypoint : manager.getCustomWaypoints()) {
+            sortingList.add(waypoint);
+         }
+      }
+
       this.waypointReachDeleter.begin();
-      this.context.dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
+      this.context.dimDiv = session.getDimensionHelper().getDimensionDivision(manager.getCurrentWorld());
       class_243 cameraPos = class_310.method_1551().field_1773.method_19418().method_19326();
       Waypoint.RENDER_SORTING_POS = new class_243(cameraPos.field_1352 * this.context.dimDiv, cameraPos.field_1351, cameraPos.field_1350 * this.context.dimDiv);
       ModSettings settings = modMain.getSettings();
@@ -230,9 +236,16 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       }
    }
 
+   @Deprecated
    public void drawSetChange(WaypointsManager waypointsManager, class_332 guiGraphics, class_1041 res) {
-      if (waypointsManager.getWaypoints() != null && waypointsManager.setChanged != 0L) {
-         int passed = (int)(System.currentTimeMillis() - waypointsManager.setChanged);
+      this.drawSetChange((MinimapSession)waypointsManager, guiGraphics, res);
+   }
+
+   public void drawSetChange(MinimapSession session, class_332 guiGraphics, class_1041 res) {
+      MinimapWorld minimapWorld = session.getWorldManager().getCurrentWorld();
+      WaypointSession waypointSession = session.getWaypointSession();
+      if (minimapWorld != null && waypointSession.getSetChangedTime() != 0L) {
+         int passed = (int)(System.currentTimeMillis() - waypointSession.getSetChangedTime());
          if (passed < 1500) {
             int fadeTime = 300;
             boolean fading = passed > 1500 - fadeTime;
@@ -241,7 +254,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
             class_4598 textRenderTypeBuffers = this.modMain.getHudRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
             Misc.drawCenteredPiercingText(
                guiGraphics.method_51448(),
-               class_1074.method_4662(waypointsManager.getWaypoints().getName(), new Object[0]),
+               class_1074.method_4662(minimapWorld.getCurrentWaypointSet().getName(), new Object[0]),
                (float)(res.method_4486() / 2),
                (float)(res.method_4502() / 2 + 50),
                c,
@@ -252,7 +265,7 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(770, 771);
          } else {
-            waypointsManager.setChanged = 0L;
+            waypointSession.setSetChangedTime(0L);
          }
       }
    }

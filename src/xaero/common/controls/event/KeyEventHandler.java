@@ -6,6 +6,7 @@ import net.minecraft.class_304;
 import net.minecraft.class_310;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
+import xaero.hud.HudSession;
 
 public class KeyEventHandler {
    public ArrayList<KeyEvent> keyEvents = new ArrayList<>();
@@ -31,11 +32,11 @@ public class KeyEventHandler {
       return false;
    }
 
-   public void handleEvents(class_310 mc, XaeroMinimapSession minimapSession) {
+   public void handleEvents(class_310 mc, HudSession hudSession) {
       for (int i = 0; i < this.oldKeyEvents.size(); i++) {
          KeyEvent ke = this.oldKeyEvents.get(i);
-         if (!minimapSession.getControls().isDown(ke.getKb())) {
-            minimapSession.getControls().keyUp(ke.getKb(), ke.isTickEnd());
+         if (!hudSession.getControls().isDown(ke.getKb())) {
+            hudSession.getControls().keyUp(ke.getKb(), ke.isTickEnd());
 
             while (ke.getKb().method_1436()) {
             }
@@ -47,11 +48,11 @@ public class KeyEventHandler {
 
       for (int ix = 0; ix < this.keyEvents.size(); ix++) {
          KeyEvent ke = this.keyEvents.get(ix);
-         if (mc.field_1755 == null && (!ke.wasFiredOnce() || minimapSession.getControls().isDown(ke.getKb()))) {
-            minimapSession.getControls().keyDown(ke.getKb(), ke.isTickEnd(), ke.isRepeat());
+         if (mc.field_1755 == null && (!ke.wasFiredOnce() || hudSession.getControls().isDown(ke.getKb()))) {
+            hudSession.getControls().keyDown(ke.getKb(), ke.isTickEnd(), ke.isRepeat());
          }
 
-         if (!ke.isRepeat() || !minimapSession.getControls().isDown(ke.getKb())) {
+         if (!ke.isRepeat() || !hudSession.getControls().isDown(ke.getKb())) {
             if (!this.oldEventExists(ke.getKb())) {
                this.oldKeyEvents.add(ke);
             }

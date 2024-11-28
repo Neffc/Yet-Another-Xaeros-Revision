@@ -1,115 +1,93 @@
 package xaero.common.minimap.waypoints;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import net.minecraft.class_1937;
 import net.minecraft.class_5321;
+import xaero.hud.minimap.world.MinimapWorld;
+import xaero.hud.path.XaeroPath;
 
-public class WaypointWorld {
-   private String id;
-   private HashMap<String, WaypointSet> sets;
-   private HashMap<Integer, Waypoint> serverWaypoints;
-   private HashMap<String, Boolean> serverWaypointsDisabled;
-   private String current = "gui.xaero_default";
-   private WaypointWorldContainer container;
-   private List<String> toRemoveOnSave;
-   private final class_5321<class_1937> dimId;
+@Deprecated
+public class WaypointWorld extends MinimapWorld {
+   private final HashMap<String, Boolean> serverWaypointsDisabled = new HashMap<>();
+   private final HashMap<Integer, Waypoint> serverWaypoints = new HashMap<>();
 
+   @Deprecated
    public WaypointWorld(WaypointWorldContainer container, String id, class_5321<class_1937> dimId) {
-      this.container = container;
-      this.id = id;
-      this.sets = new HashMap<>();
-      this.serverWaypoints = new HashMap<>();
-      this.serverWaypointsDisabled = new HashMap<>();
-      this.addSet("gui.xaero_default");
-      this.toRemoveOnSave = new ArrayList<>();
-      this.dimId = dimId;
+      super(container, id, dimId);
    }
 
+   private String worldPathToOldString(XaeroPath path) {
+      return path == null ? null : path.getParent().toString() + "_" + path.getLastNode();
+   }
+
+   @Deprecated
    public WaypointSet getCurrentSet() {
-      return this.sets.get(this.current);
+      return (WaypointSet)super.getCurrentWaypointSet();
    }
 
+   @Deprecated
    public void addSet(String s) {
-      this.sets.put(s, new WaypointSet(s));
+      super.addWaypointSet(s);
    }
 
-   public void onSaveCleanup(File worldFile) throws IOException {
-      Path folder = worldFile.toPath().getParent();
-
-      for (int i = 0; i < this.toRemoveOnSave.size(); i++) {
-         String s = this.toRemoveOnSave.get(i);
-         Path path = folder.resolve(this.id + "_" + s + ".txt");
-         Files.deleteIfExists(path);
-      }
-   }
-
+   @Deprecated
    public String getInternalWorldKey() {
-      String containerKey = this.container.getKey();
-      StringBuilder keyBuilder = new StringBuilder();
-      if (containerKey.contains("/")) {
-         keyBuilder.append(containerKey.substring(containerKey.indexOf(47) + 1));
-         keyBuilder.append("/");
-      }
-
-      keyBuilder.append(this.id);
-      return keyBuilder.toString();
+      return super.getLocalWorldKey().toString();
    }
 
+   @Deprecated
    public HashMap<String, Boolean> getServerWaypointsDisabled() {
       return this.serverWaypointsDisabled;
    }
 
+   @Deprecated
    public HashMap<Integer, Waypoint> getServerWaypoints() {
       return this.serverWaypoints;
    }
 
+   @Deprecated
    public HashMap<String, WaypointSet> getSets() {
-      return this.sets;
+      return (HashMap<String, WaypointSet>)this.waypointSets;
    }
 
+   @Deprecated
    public String getCurrent() {
-      return this.current;
+      return super.getCurrentWaypointSetId();
    }
 
+   @Deprecated
    public void setCurrent(String current) {
-      this.current = current;
+      super.setCurrentWaypointSetId(current);
    }
 
+   @Deprecated
    public String getId() {
-      return this.id;
+      return this.getNode();
    }
 
+   @Deprecated
    public String getFullId() {
-      return this.container.getKey() + "_" + this.id;
+      return this.worldPathToOldString(this.getFullPath());
    }
 
+   @Deprecated
    public void setId(String id) {
-      this.id = id;
+      super.setNode(id);
    }
 
+   @Deprecated
    public WaypointWorldContainer getContainer() {
-      return this.container;
+      return (WaypointWorldContainer)super.getContainer();
    }
 
+   @Deprecated
    public void setContainer(WaypointWorldContainer container) {
-      this.container = container;
+      super.setContainer(container);
    }
 
-   public void requestRemovalOnSave(String name) {
-      this.toRemoveOnSave.add(name);
-   }
-
-   public boolean hasSomethingToRemoveOnSave() {
-      return !this.toRemoveOnSave.isEmpty();
-   }
-
+   @Deprecated
+   @Override
    public class_5321<class_1937> getDimId() {
-      return this.dimId;
+      return super.getDimId();
    }
 }

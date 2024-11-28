@@ -92,9 +92,9 @@ public abstract class HudMod implements IXaeroMinimap {
    private HudClientOnlyBase clientOnlyBase;
    private MinimapInterface minimapInterface;
    private File modJAR = null;
-   private File configFile;
-   public File waypointsFile;
-   public File waypointsFolder;
+   private Path configFile;
+   public Path waypointsFile;
+   public Path minimapFolder;
    private XaeroMinimapServer minimapServer;
 
    @Override
@@ -161,7 +161,7 @@ public abstract class HudMod implements IXaeroMinimap {
 
       Path gameDir = Services.PLATFORM.getGameDir();
       Path config = Services.PLATFORM.getConfigDir();
-      this.waypointsFile = config.resolve("xaerowaypoints.txt").toFile();
+      this.waypointsFile = config.resolve("xaerowaypoints.txt");
       Path wrongWaypointsFolder3 = config.resolve("XaeroWaypoints");
       Path wrongWaypointsFolder2;
       if (this.modJAR != null) {
@@ -172,44 +172,44 @@ public abstract class HudMod implements IXaeroMinimap {
 
       Path wrongWaypointsFolder4 = new File(config.toFile().getCanonicalPath()).toPath().getParent().resolve("XaeroWaypoints");
       Path wrongWaypointsFolder5 = config.getParent().resolve("XaeroWaypoints");
-      File preMinimapWorldsFolder = gameDir.resolve("XaeroWaypoints").toFile();
+      Path preMinimapWorldsFolder = gameDir.resolve("XaeroWaypoints");
       Path xaeroFolder = gameDir.resolve("xaero");
       if (!Files.exists(xaeroFolder)) {
          Files.createDirectories(xaeroFolder);
       }
 
-      this.waypointsFolder = xaeroFolder.resolve("minimap").toFile();
-      if (preMinimapWorldsFolder.exists() && !this.waypointsFolder.exists()) {
-         Files.move(preMinimapWorldsFolder.toPath(), this.waypointsFolder.toPath());
+      this.minimapFolder = xaeroFolder.resolve("minimap");
+      if (Files.exists(preMinimapWorldsFolder) && !Files.exists(this.minimapFolder)) {
+         Files.move(preMinimapWorldsFolder, this.minimapFolder);
       }
 
-      if (wrongWaypointsFile.exists() && !this.waypointsFile.exists()) {
-         Files.move(wrongWaypointsFile.toPath(), this.waypointsFile.toPath());
+      if (wrongWaypointsFile.exists() && !Files.exists(this.waypointsFile)) {
+         Files.move(wrongWaypointsFile.toPath(), this.waypointsFile);
       }
 
-      if (wrongWaypointsFolder.exists() && !this.waypointsFolder.exists()) {
-         Files.move(wrongWaypointsFolder.toPath(), this.waypointsFolder.toPath());
-      } else if (wrongWaypointsFolder2.toFile().exists() && !this.waypointsFolder.exists()) {
-         Files.move(wrongWaypointsFolder2, this.waypointsFolder.toPath());
-      } else if (wrongWaypointsFolder3.toFile().exists() && !this.waypointsFolder.exists()) {
-         Files.move(wrongWaypointsFolder3, this.waypointsFolder.toPath());
-      } else if (wrongWaypointsFolder4.toFile().exists() && !this.waypointsFolder.exists()) {
-         Files.move(wrongWaypointsFolder4, this.waypointsFolder.toPath());
-      } else if (wrongWaypointsFolder5.toFile().exists() && !this.waypointsFolder.exists()) {
-         Files.move(wrongWaypointsFolder5, this.waypointsFolder.toPath());
+      if (wrongWaypointsFolder.exists() && !Files.exists(this.minimapFolder)) {
+         Files.move(wrongWaypointsFolder.toPath(), this.minimapFolder);
+      } else if (wrongWaypointsFolder2.toFile().exists() && !Files.exists(this.minimapFolder)) {
+         Files.move(wrongWaypointsFolder2, this.minimapFolder);
+      } else if (wrongWaypointsFolder3.toFile().exists() && !Files.exists(this.minimapFolder)) {
+         Files.move(wrongWaypointsFolder3, this.minimapFolder);
+      } else if (wrongWaypointsFolder4.toFile().exists() && !Files.exists(this.minimapFolder)) {
+         Files.move(wrongWaypointsFolder4, this.minimapFolder);
+      } else if (wrongWaypointsFolder5.toFile().exists() && !Files.exists(this.minimapFolder)) {
+         Files.move(wrongWaypointsFolder5, this.minimapFolder);
       }
 
       Path waypointsFolderBackup = gameDir.resolve("XaeroWaypoints_BACKUP240807");
-      if (!Files.exists(waypointsFolderBackup) && this.waypointsFolder.exists()) {
+      if (!Files.exists(waypointsFolderBackup) && Files.exists(this.minimapFolder)) {
          LOGGER.info("Backing up Xaero's minimap data...");
-         SimpleBackup.copyDirectoryWithContents(this.waypointsFolder.toPath(), waypointsFolderBackup, 32);
+         SimpleBackup.copyDirectoryWithContents(this.minimapFolder, waypointsFolderBackup, 32);
          LOGGER.info("Done backing up Xaero's minimap data!");
       }
 
-      this.configFile = config.resolve(this.getConfigFileName()).toFile();
-      File oldConfigFile = gameDir.resolve("config").resolve(this.getOldConfigFileName()).toFile();
-      if (oldConfigFile.exists() && !this.configFile.exists()) {
-         Files.move(oldConfigFile.toPath(), this.configFile.toPath());
+      this.configFile = config.resolve(this.getConfigFileName());
+      Path oldConfigFile = gameDir.resolve("config").resolve(this.getOldConfigFileName());
+      if (Files.exists(oldConfigFile) && !Files.exists(this.configFile)) {
+         Files.move(oldConfigFile, this.configFile);
       }
 
       this.widgetScreenHandler = new WidgetScreenHandler();
@@ -221,15 +221,23 @@ public abstract class HudMod implements IXaeroMinimap {
       this.interfaceRenderer = new InterfaceRenderer(this);
       this.interfaces = new InterfaceManager(this);
       this.minimapInterface = new MinimapInterface(this);
-      File old_optionsFile = gameDir.resolve(this.getOldConfigFileName()).toFile();
-      if (old_optionsFile.exists() && !this.configFile.exists()) {
-         this.configFile.getParentFile().mkdirs();
-         Files.move(old_optionsFile.toPath(), this.configFile.toPath());
+      Path old_optionsFile = gameDir.resolve(this.getOldConfigFileName());
+      if (Files.exists(old_optionsFile) && !Files.exists(this.configFile)) {
+         Path configFileParent = this.configFile.getParent();
+         if (!Files.exists(configFileParent)) {
+            Files.createDirectories(configFileParent);
+         }
+
+         Files.move(old_optionsFile, this.configFile);
       }
 
-      if (old_waypointsFile.exists() && !this.waypointsFile.exists()) {
-         this.waypointsFile.getParentFile().mkdirs();
-         Files.move(old_waypointsFile.toPath(), this.waypointsFile.toPath());
+      if (Files.exists(old_waypointsFile) && !Files.exists(this.waypointsFile)) {
+         Path waypointFileParent = this.waypointsFile.getParent();
+         if (!Files.exists(waypointFileParent)) {
+            Files.createDirectories(waypointFileParent);
+         }
+
+         Files.move(old_waypointsFile, this.waypointsFile);
       }
 
       this.trackedPlayerRenderer = PlayerTrackerMinimapElementRenderer.Builder.begin(this).build();
@@ -304,7 +312,7 @@ public abstract class HudMod implements IXaeroMinimap {
    }
 
    @Override
-   public File getConfigFile() {
+   public Path getConfigFile() {
       return this.configFile;
    }
 
@@ -381,13 +389,18 @@ public abstract class HudMod implements IXaeroMinimap {
    }
 
    @Override
-   public File getWaypointsFile() {
+   public Path getWaypointsFile() {
       return this.waypointsFile;
    }
 
+   public Path getMinimapFolder() {
+      return this.minimapFolder;
+   }
+
+   @Deprecated
    @Override
-   public File getWaypointsFolder() {
-      return this.waypointsFolder;
+   public Path getWaypointsFolder() {
+      return this.getMinimapFolder();
    }
 
    @Override

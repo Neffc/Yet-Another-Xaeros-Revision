@@ -1,26 +1,14 @@
 package xaero.common.settings;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
 import net.minecraft.class_1074;
 import net.minecraft.class_1792;
 import net.minecraft.class_1937;
@@ -29,14 +17,11 @@ import net.minecraft.class_304;
 import net.minecraft.class_310;
 import net.minecraft.class_3532;
 import net.minecraft.class_437;
-import net.minecraft.class_5321;
-import net.minecraft.class_634;
 import net.minecraft.class_7923;
 import net.minecraft.server.MinecraftServer;
 import xaero.common.IXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.category.setting.ObjectCategorySetting;
-import xaero.common.file.SimpleBackup;
 import xaero.common.gui.GuiSettings;
 import xaero.common.gui.GuiSlimeSeed;
 import xaero.common.minimap.MinimapProcessor;
@@ -47,15 +32,15 @@ import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
 import xaero.common.minimap.radar.category.EntityRadarBackwardsCompatibilityConfig;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
-import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointWorld;
-import xaero.common.minimap.waypoints.WaypointWorldContainer;
-import xaero.common.minimap.waypoints.WaypointWorldRootContainer;
 import xaero.common.minimap.waypoints.WaypointsManager;
-import xaero.common.misc.Misc;
+import xaero.hud.HudSession;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.world.container.MinimapWorldRootContainer;
+import xaero.hud.path.XaeroPath;
+import xaero.hud.path.XaeroPathReader;
 
 public class ModSettings {
    public static int defaultSettings;
@@ -120,7 +105,7 @@ public class ModSettings {
    private boolean oldDeathpoints = true;
    public int chunkGrid = -1;
    public boolean slimeChunks = false;
-   private static HashMap<String, Long> serverSlimeSeeds = new HashMap<>();
+   private static HashMap<XaeroPath, Long> serverSlimeSeeds = new HashMap<>();
    private boolean showIngameWaypoints = true;
    private boolean lockNorth = false;
    private boolean antiAliasing = true;
@@ -322,11 +307,11 @@ public class ModSettings {
       return this.oldDeathpoints;
    }
 
-   public void setSlimeChunksSeed(long seed, String fullWorldID) {
+   public void setSlimeChunksSeed(long seed, XaeroPath fullWorldID) {
       serverSlimeSeeds.put(fullWorldID, seed);
    }
 
-   public Long getSlimeChunksSeed(String fullWorldID) {
+   public Long getSlimeChunksSeed(XaeroPath fullWorldID) {
       MinecraftServer sp = class_310.method_1551().method_1576();
       if (sp == null) {
          return serverSlimeSeeds.get(fullWorldID);
@@ -344,13 +329,18 @@ public class ModSettings {
       }
    }
 
-   public boolean customSlimeSeedNeeded(XaeroMinimapSession minimapSession) {
+   public boolean customSlimeSeedNeeded(HudSession minimapSession) {
       return !(class_310.method_1551().field_1755 instanceof GuiSlimeSeed) && class_310.method_1551().method_1576() == null && minimapSession != null;
    }
 
+   @Deprecated
    public boolean getSlimeChunks(WaypointsManager waypointsManager) {
+      return this.getSlimeChunks((MinimapSession)waypointsManager);
+   }
+
+   public boolean getSlimeChunks(MinimapSession session) {
       return this.slimeChunks
-         && (class_310.method_1551().method_1576() != null || this.getSlimeChunksSeed(waypointsManager.getCurrentContainerAndWorldID()) != null);
+         && (class_310.method_1551().method_1576() != null || this.getSlimeChunksSeed(session.getWorldState().getCurrentWorldPath()) != null);
    }
 
    public boolean getShowIngameWaypoints() {
@@ -359,9 +349,14 @@ public class ModSettings {
          && (minimapItem == null || class_310.method_1551().field_1724 == null || MinimapProcessor.hasMinimapItem(class_310.method_1551().field_1724));
    }
 
+   @Deprecated
    public boolean waypointsGUI(WaypointsManager waypointsManager) {
+      return this.waypointsGUI((MinimapSession)waypointsManager);
+   }
+
+   public boolean waypointsGUI(MinimapSession waypointSession) {
       return class_310.method_1551().field_1724 != null
-         && waypointsManager.getWaypoints() != null
+         && waypointSession.getWorldState().getAutoWorldPath() != null
          && (minimapItem == null || class_310.method_1551().field_1724 == null || MinimapProcessor.hasMinimapItem(class_310.method_1551().field_1724));
    }
 
@@ -553,608 +548,24 @@ public class ModSettings {
       if (this.modMain.getSupportMods().shouldUseWorldMapChunks()) {
          return this.modMain.getSupportMods().worldmapSupport.getWorldMapIgnoreHeightmaps();
       } else {
-         WaypointWorldRootContainer currentRootContainer = XaeroMinimapSession.getCurrentSession()
-            .getWaypointsManager()
-            .getAutoWorld()
-            .getContainer()
-            .getRootContainer();
+         MinimapWorldRootContainer currentRootContainer = BuiltInHudModules.MINIMAP.getCurrentSession().getWorldManager().getAutoRootContainer();
          return currentRootContainer.isIgnoreHeightmaps();
       }
    }
 
-   public void convertWaypointFilesToFolders() throws IOException {
-      Stream<Path> files = Files.list(this.modMain.getWaypointsFolder().toPath());
-      Path backupFolder = this.modMain.getWaypointsFolder().toPath().resolve("backup");
-      Files.createDirectories(backupFolder);
-      if (files != null) {
-         Object[] fileArray = files.toArray();
-
-         for (int i = 0; i < fileArray.length; i++) {
-            Path filePath = (Path)fileArray[i];
-            if (!filePath.toFile().isDirectory()) {
-               String fileName = filePath.getFileName().toString();
-               if (fileName.endsWith(".txt") && fileName.contains("_")) {
-                  int lastUnderscore = fileName.lastIndexOf("_");
-                  if (!fileName.startsWith("Multiplayer_") && !fileName.startsWith("Realms_")) {
-                     fileName = fileName.substring(0, lastUnderscore).replace("_", "%us%") + fileName.substring(lastUnderscore);
-                  }
-
-                  String noExtension = fileName.substring(0, fileName.lastIndexOf("."));
-                  Path folderPath = filePath.getParent().resolve(noExtension);
-                  Path fixedFilePath = folderPath.resolve("waypoints.txt");
-                  Path backupFilePath = backupFolder.resolve(fileName);
-                  Files.createDirectories(folderPath);
-                  if (!backupFilePath.toFile().exists()) {
-                     Files.copy(filePath, backupFilePath);
-                  }
-
-                  try {
-                     Files.move(filePath, fixedFilePath);
-                  } catch (FileAlreadyExistsException var13) {
-                     if (backupFilePath.toFile().exists()) {
-                        Files.deleteIfExists(filePath);
-                     }
-                  }
-               }
-            }
-         }
-
-         files.close();
-      }
-   }
-
-   public void convertWaypointFoldersToSingleFolder(WaypointsManager waypointsManager) throws IOException {
-      Stream<Path> folders = Files.list(this.modMain.getWaypointsFolder().toPath());
-      if (folders != null) {
-         Object[] folderArray = folders.toArray();
-
-         for (int i = 0; i < folderArray.length; i++) {
-            Path folderPath = (Path)folderArray[i];
-            if (folderPath.toFile().isDirectory()) {
-               String folderName = folderPath.getFileName().toString();
-               String[] folderArgs = folderName.split("_");
-               if (folderArgs.length > 2 || folderArgs.length == 2 && !folderArgs[0].equals("Multiplayer")) {
-                  String lastArg = folderArgs[folderArgs.length - 1];
-                  if (lastArg.equals("null") || lastArg.startsWith("DIM") && lastArg.length() > 3) {
-                     int dimensionId = lastArg.equals("null") ? 0 : Integer.parseInt(lastArg.substring(3));
-                     String dimensionName = "dim%" + dimensionId;
-                     class_5321<class_1937> dimRegistryKey = waypointsManager.getDimensionKeyForDirectoryName(dimensionName);
-                     if (dimRegistryKey != null) {
-                        dimensionName = waypointsManager.getDimensionDirectoryName(dimRegistryKey);
-                     }
-
-                     Path correctFolder = folderPath.getParent().resolve(folderName.substring(0, folderName.lastIndexOf("_"))).resolve(dimensionName);
-                     if (!Files.exists(correctFolder)) {
-                        Files.createDirectories(correctFolder);
-                     }
-
-                     Stream<Path> files = Files.list(folderPath);
-                     if (files != null) {
-                        Object[] filesArray = files.toArray();
-
-                        for (int j = 0; j < filesArray.length; j++) {
-                           Path filePath = (Path)filesArray[j];
-                           if (!filePath.toFile().isDirectory()) {
-                              Path correctFilePath = correctFolder.resolve(filePath.getFileName());
-                              Files.move(filePath, correctFilePath);
-                           }
-                        }
-
-                        files.close();
-                     }
-
-                     Stream<Path> deleteCheck = Files.list(folderPath);
-                     boolean oldFolderEmpty = deleteCheck.count() == 0L;
-                     deleteCheck.close();
-                     if (oldFolderEmpty) {
-                        Files.deleteIfExists(folderPath);
-                     }
-                  }
-               }
-            }
-         }
-
-         folders.close();
-      }
-   }
-
-   public static void copyTempFilesBack(Path folder) throws IOException {
-      Stream<Path> tempFiles = Files.list(folder);
-      if (tempFiles != null) {
-         Iterator<Path> tempFilesIter = tempFiles.iterator();
-
-         while (tempFilesIter.hasNext()) {
-            Path tempFile = tempFilesIter.next();
-            Path newLocation = folder.getParent().resolve(tempFile.getFileName());
-            if (Files.exists(newLocation) && (Files.isDirectory(newLocation) || Files.size(newLocation) != 0L)) {
-               SimpleBackup.moveToBackup(folder.getParent(), tempFile);
-            } else {
-               Misc.safeMoveAndReplace(tempFile, newLocation, false);
-            }
-         }
-
-         tempFiles.close();
-      }
-
-      Files.delete(folder);
-   }
-
-   public void loadAllWaypoints(WaypointsManager waypointsManager) throws IOException {
-      Path waypointsFolderPath = this.modMain.getWaypointsFolder().toPath();
-      if (!Files.exists(waypointsFolderPath)) {
-         Files.createDirectories(waypointsFolderPath);
-      }
-
-      Path waypointTempToAddFolder = waypointsFolderPath.resolve("temp_to_add");
-      if (Files.exists(waypointTempToAddFolder)) {
-         copyTempFilesBack(waypointTempToAddFolder);
-      }
-
-      this.convertWaypointFilesToFolders();
-      this.convertWaypointFoldersToSingleFolder(waypointsManager);
-      Stream<Path> folders = Files.list(this.modMain.getWaypointsFolder().toPath());
-      if (folders != null) {
-         Object[] paths = folders.toArray();
-
-         for (int i = 0; i < paths.length; i++) {
-            Path folderPath = (Path)paths[i];
-            Path tempToAdd = folderPath.resolve("temp_to_add");
-            if (Files.exists(tempToAdd)) {
-               copyTempFilesBack(tempToAdd);
-            }
-
-            if (folderPath.toFile().isDirectory()) {
-               String folderName = folderPath.getFileName().toString();
-               if (!folderName.equals("backup")) {
-                  Stream<Path> filesOrFolders = Files.list(folderPath);
-                  if (filesOrFolders != null) {
-                     Object[] fileArray = filesOrFolders.toArray();
-
-                     for (int j = 0; j < fileArray.length; j++) {
-                        Path fileOrFolderPath = (Path)fileArray[j];
-                        Path tempToAdd2 = fileOrFolderPath.resolve("temp_to_add");
-                        if (Files.exists(tempToAdd2)) {
-                           copyTempFilesBack(tempToAdd2);
-                        }
-
-                        String fileOrFolderName = fileOrFolderPath.getFileName().toString();
-                        if (!fileOrFolderName.startsWith("backup")) {
-                           if (fileOrFolderPath.toFile().isDirectory()) {
-                              String fixedDimensionName = this.fixDimensionName(fileOrFolderName);
-                              boolean toDeleteOld = !fixedDimensionName.equals(fileOrFolderName);
-                              String containerKey = folderName + "/" + fixedDimensionName;
-                              WaypointWorldContainer wc = waypointsManager.addWorldContainer(containerKey);
-                              Stream<Path> files = Files.list(fileOrFolderPath);
-                              if (files != null) {
-                                 Object[] filesArray = files.toArray();
-                                 if (filesArray.length == 0) {
-                                    waypointsManager.removeContainer(containerKey);
-                                 } else {
-                                    for (int k = 0; k < filesArray.length; k++) {
-                                       Path filePath = (Path)filesArray[k];
-                                       String fileName = filePath.getFileName().toString();
-                                       this.loadWaypointsFile(wc, fileName, filePath.toFile());
-                                    }
-                                 }
-
-                                 files.close();
-                              }
-
-                              if (waypointsManager.getWorldContainer(folderName).isEmpty()) {
-                                 waypointsManager.removeContainer(folderName);
-                              }
-
-                              if (toDeleteOld) {
-                                 SimpleBackup.moveToBackup(fileOrFolderPath);
-                                 this.saveWorlds(wc.getAllWorlds());
-                              }
-                           } else if (fileOrFolderName.contains("_")) {
-                              WaypointWorldContainer wcx = waypointsManager.addWorldContainer(folderName);
-                              this.loadWaypointsFile(wcx, fileOrFolderName, null);
-                           }
-                        }
-                     }
-
-                     filesOrFolders.close();
-                  }
-               }
-            }
-         }
-
-         folders.close();
-      }
-   }
-
-   private String fixDimensionName(String savedDimName) {
-      if (savedDimName.equals("Overworld")) {
-         return "dim%0";
-      } else if (savedDimName.equals("Nether")) {
-         return "dim%-1";
-      } else {
-         return savedDimName.equals("The End") ? "dim%1" : savedDimName;
-      }
-   }
-
-   private boolean loadWaypointsFile(WaypointWorldContainer wc, String fileName, File file) throws IOException {
-      if (!fileName.endsWith(".txt")) {
-         return false;
-      } else {
-         String noExtension = fileName.substring(0, fileName.lastIndexOf("."));
-         String multiworldId = noExtension;
-         if (!noExtension.equals("waypoints")) {
-            String[] multiworld = noExtension.split("_");
-            if (multiworld.length < 2) {
-               return false;
-            }
-
-            multiworldId = multiworld[0];
-            String multiworldName = multiworld[1].replace("%us%", "_");
-            wc.addName(multiworldId, multiworldName);
-         }
-
-         WaypointWorld w = wc.addWorld(multiworldId);
-         if (w != null) {
-            this.loadWaypoints(w, file);
-         }
-
-         return true;
-      }
-   }
-
+   @Deprecated
    public void saveAllWaypoints(WaypointsManager waypointsManager) throws IOException {
-      String[] keys = waypointsManager.getWaypointMap().keySet().toArray(new String[0]);
-
-      for (int i = 0; i < keys.length; i++) {
-         String key = keys[i];
-         WaypointWorldContainer wc = waypointsManager.getWaypointMap().get(key);
-         this.saveWorlds(wc.getAllWorlds());
-      }
+      waypointsManager.getWorldManagerIO().saveAllWorlds(waypointsManager);
    }
 
-   public void saveWorlds(ArrayList<WaypointWorld> worlds) throws IOException {
-      for (int j = 0; j < worlds.size(); j++) {
-         WaypointWorld w = worlds.get(j);
-         if (w != null) {
-            this.saveWaypoints(w);
-         }
-      }
-   }
-
+   @Deprecated
    public void saveWaypoints(WaypointWorld wpw) throws IOException {
       this.saveWaypoints(wpw, true);
    }
 
-   public File getWaypointsFile(WaypointWorld w) throws IOException {
-      File containerFolder = w.getContainer().getDirectory();
-      Path containerFolderPath = containerFolder.toPath();
-      if (!Files.exists(containerFolderPath)) {
-         Files.createDirectories(containerFolderPath);
-      }
-
-      String filePath = containerFolder.getPath() + "/" + w.getId();
-      String name = w.getContainer().getName(w.getId());
-      if (name != null) {
-         filePath = filePath + "_" + name.replace("_", "%us%").replace(":", "§§");
-      }
-
-      return new File(filePath + ".txt");
-   }
-
+   @Deprecated
    public void saveWaypoints(WaypointWorld wpw, boolean overwrite) throws IOException {
-      if (wpw != null) {
-         File worldFile = this.getWaypointsFile(wpw);
-         if (!worldFile.exists() || overwrite) {
-            File worldFileTemp = new File(worldFile.getParentFile(), worldFile.getName() + ".temp");
-            BufferedOutputStream bufferedOutput = new BufferedOutputStream(new FileOutputStream(worldFileTemp));
-
-            try (OutputStreamWriter output = new OutputStreamWriter(bufferedOutput, StandardCharsets.UTF_8)) {
-               Object[] keys = wpw.getSets().keySet().toArray();
-               if (keys.length > 1) {
-                  output.write("sets:" + wpw.getCurrent());
-
-                  for (int i = 0; i < keys.length; i++) {
-                     String name = (String)keys[i];
-                     if (!name.equals(wpw.getCurrent())) {
-                        output.write(":" + (String)keys[i]);
-                     }
-                  }
-
-                  output.write("\n");
-               }
-
-               output.write("#\n");
-               output.write("#waypoint:name:initials:x:y:z:color:disabled:type:set:rotate_on_tp:tp_yaw:visibility_type:destination\n");
-               output.write("#\n");
-
-               for (int ix = 0; ix < keys.length; ix++) {
-                  String name = (String)keys[ix];
-                  WaypointSet set = wpw.getSets().get(name);
-                  if (set != null) {
-                     ArrayList<Waypoint> list = set.getList();
-
-                     for (int j = 0; j < list.size(); j++) {
-                        Waypoint w = list.get(j);
-                        if (!w.isTemporary()) {
-                           output.write(
-                              "waypoint:"
-                                 + w.getNameSafe("§§")
-                                 + ":"
-                                 + w.getSymbolSafe("§§")
-                                 + ":"
-                                 + w.getX()
-                                 + ":"
-                                 + (w.isYIncluded() ? w.getY() : "~")
-                                 + ":"
-                                 + w.getZ()
-                                 + ":"
-                                 + w.getColor()
-                                 + ":"
-                                 + w.isDisabled()
-                                 + ":"
-                                 + w.getWaypointType()
-                                 + ":"
-                                 + name
-                                 + ":"
-                                 + w.isRotation()
-                                 + ":"
-                                 + w.getYaw()
-                                 + ":"
-                                 + w.getVisibilityType()
-                                 + ":"
-                                 + w.isOneoffDestination()
-                                 + "\n"
-                           );
-                        }
-                     }
-                  }
-               }
-
-               ArrayList<Entry<String, Boolean>> serverWaypointsDisabled = new ArrayList<>(wpw.getServerWaypointsDisabled().entrySet());
-
-               for (int ixx = 0; ixx < serverWaypointsDisabled.size(); ixx++) {
-                  Entry<String, Boolean> e = serverWaypointsDisabled.get(ixx);
-                  output.write("server_waypoint:" + e.getKey() + ":" + e.getValue() + "\n");
-               }
-            } catch (Throwable var17) {
-               try {
-                  bufferedOutput.close();
-               } catch (Throwable var14) {
-                  var17.addSuppressed(var14);
-               }
-
-               throw var17;
-            }
-
-            bufferedOutput.close();
-            Misc.safeMoveAndReplace(worldFileTemp.toPath(), worldFile.toPath(), true);
-            if (wpw.hasSomethingToRemoveOnSave()) {
-               wpw.onSaveCleanup(worldFile);
-            }
-         }
-      }
-   }
-
-   public boolean checkWaypointsLine(String[] args, WaypointWorld wpw) {
-      if (args[0].equalsIgnoreCase("sets")) {
-         wpw.setCurrent(args[1]);
-
-         for (int i = 1; i < args.length; i++) {
-            if (wpw.getSets().get(args[i]) == null) {
-               wpw.getSets().put(args[i], new WaypointSet(args[i]));
-            }
-         }
-
-         return true;
-      } else if (args[0].equalsIgnoreCase("waypoint")) {
-         String setName = args[9];
-         WaypointSet waypoints = wpw.getSets().get(setName);
-         if (waypoints == null) {
-            wpw.getSets().put(setName, waypoints = new WaypointSet(setName));
-         }
-
-         boolean yIncluded = !args[4].equals("~");
-         int yCoord = 0;
-         if (yIncluded) {
-            yCoord = Integer.parseInt(args[4]);
-         }
-
-         Waypoint loadWaypoint = new Waypoint(
-            Integer.parseInt(args[3]),
-            yCoord,
-            Integer.parseInt(args[5]),
-            Waypoint.getStringFromStringSafe(args[1], "§§"),
-            Waypoint.getStringFromStringSafe(args[2], "§§"),
-            Integer.parseInt(args[6]),
-            0,
-            false,
-            yIncluded
-         );
-         if (args.length > 7) {
-            loadWaypoint.setDisabled(args[7].equals("true"));
-         }
-
-         if (args.length > 8) {
-            loadWaypoint.setType(Integer.parseInt(args[8]));
-         }
-
-         if (args.length > 10) {
-            loadWaypoint.setRotation(args[10].equals("true"));
-         }
-
-         if (args.length > 11) {
-            loadWaypoint.setYaw(Integer.parseInt(args[11]));
-         }
-
-         if (args.length > 12) {
-            String visibilityTypeString = args[12];
-            int visibilityType = 0;
-
-            try {
-               visibilityType = visibilityTypeString.equals("true") ? 1 : (visibilityTypeString.equals("false") ? 0 : Integer.parseInt(visibilityTypeString));
-            } catch (NumberFormatException var11) {
-               MinimapLogs.LOGGER.error("suppressed exception", var11);
-            }
-
-            loadWaypoint.setVisibilityType(visibilityType);
-         }
-
-         if (args.length > 13) {
-            String destinationString = args[13];
-            loadWaypoint.setOneoffDestination(destinationString.equals("true"));
-         }
-
-         waypoints.getList().add(loadWaypoint);
-         return true;
-      } else {
-         if (args[0].equalsIgnoreCase("server_waypoint")) {
-            wpw.getServerWaypointsDisabled().put(args[1], args[2].equals("true"));
-         }
-
-         return false;
-      }
-   }
-
-   public void loadWaypoints(WaypointWorld wpw, File file) throws IOException {
-      if (file == null) {
-         file = this.getWaypointsFile(wpw);
-      }
-
-      if (file.exists()) {
-         BufferedReader reader = null;
-
-         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
-
-            String s;
-            while ((s = reader.readLine()) != null) {
-               String[] args = s.split(":");
-
-               try {
-                  this.checkWaypointsLine(args, wpw);
-               } catch (Exception var10) {
-                  MinimapLogs.LOGGER.error("Skipping:" + Arrays.toString((Object[])args), var10);
-               }
-            }
-         } finally {
-            if (reader != null) {
-               reader.close();
-            }
-         }
-      }
-   }
-
-   public String convertToNewConteinerID(String oldID, WaypointsManager waypointsManager) {
-      String parentContainer = oldID.substring(0, oldID.lastIndexOf("_"));
-      String dimension = oldID.substring(oldID.lastIndexOf("_") + 1);
-      if (dimension.equals("null")) {
-         dimension = "Overworld";
-      } else if (dimension.startsWith("DIM")) {
-         int dimensionId = Integer.parseInt(dimension.substring(3));
-         dimension = "dim%" + dimensionId;
-         class_5321<class_1937> dimRegistryKey = waypointsManager.getDimensionKeyForDirectoryName(dimension);
-         if (dimRegistryKey != null) {
-            dimension = waypointsManager.getDimensionDirectoryName(dimRegistryKey);
-         }
-      }
-
-      return parentContainer + "/" + this.fixDimensionName(dimension);
-   }
-
-   public boolean checkWaypointsLineOLD(String[] args, WaypointsManager waypointsManager) {
-      if (args[0].equalsIgnoreCase("world")) {
-         if (!args[1].contains("_")) {
-            args[1] = args[1] + "_null";
-         }
-
-         WaypointWorldContainer wc = waypointsManager.addWorldContainer(this.convertToNewConteinerID(args[1], waypointsManager));
-         WaypointWorld map = wc.addWorld("waypoints");
-         map.setCurrent(args[2]);
-
-         for (int i = 2; i < args.length; i++) {
-            if (map.getSets().get(args[i]) == null) {
-               map.getSets().put(args[i], new WaypointSet(args[i]));
-            }
-         }
-
-         return true;
-      } else if (args[0].equalsIgnoreCase("waypoint")) {
-         if (!args[1].contains("_")) {
-            args[1] = args[1] + "_null";
-         }
-
-         WaypointWorldContainer wc = waypointsManager.addWorldContainer(this.convertToNewConteinerID(args[1], waypointsManager));
-         WaypointWorld map = wc.addWorld("waypoints");
-         String setName = "gui.xaero_default";
-         if (args.length > 10) {
-            setName = args[10];
-         }
-
-         WaypointSet waypoints = map.getSets().get(setName);
-         if (waypoints == null) {
-            map.getSets().put(setName, waypoints = new WaypointSet(setName));
-         }
-
-         Waypoint loadWaypoint = new Waypoint(
-            Integer.parseInt(args[4]),
-            Integer.parseInt(args[5]),
-            Integer.parseInt(args[6]),
-            args[2].replace("§§", ":"),
-            args[3].replace("§§", ":"),
-            Integer.parseInt(args[7])
-         );
-         if (args.length > 8) {
-            loadWaypoint.setDisabled(args[8].equals("true"));
-         }
-
-         if (args.length > 9) {
-            loadWaypoint.setType(Integer.parseInt(args[9]));
-         }
-
-         if (args.length > 11) {
-            loadWaypoint.setRotation(args[11].equals("true"));
-         }
-
-         if (args.length > 12) {
-            loadWaypoint.setYaw(Integer.parseInt(args[12]));
-         }
-
-         waypoints.getList().add(loadWaypoint);
-         return true;
-      } else {
-         return false;
-      }
-   }
-
-   public void loadOldWaypoints(File file, WaypointsManager waypointsManager) throws IOException {
-      if (file.exists()) {
-         BufferedReader reader = null;
-
-         try {
-            reader = new BufferedReader(new FileReader(file));
-
-            String s;
-            while ((s = reader.readLine()) != null) {
-               String[] args = s.split(":");
-
-               try {
-                  this.checkWaypointsLineOLD(args, waypointsManager);
-               } catch (Exception var10) {
-                  MinimapLogs.LOGGER.info("Skipping setting:" + args[0]);
-               }
-            }
-         } finally {
-            if (reader != null) {
-               reader.close();
-            }
-         }
-
-         File backupFile = new File(file.getAbsolutePath() + ".backup");
-         if (backupFile.exists()) {
-            MinimapLogs.LOGGER.info("Waypoints old file backup already exists!");
-         } else {
-            Files.move(file.toPath(), backupFile.toPath());
-         }
-      }
+      wpw.getContainer().getSession().getWorldManagerIO().saveWorld(wpw, overwrite);
    }
 
    public void writeSettings(PrintWriter writer) {
@@ -1281,7 +692,7 @@ public class ModSettings {
       PrintWriter writer = null;
 
       try {
-         writer = new PrintWriter(new FileWriter(this.modMain.getConfigFile()));
+         writer = new PrintWriter(new FileWriter(this.modMain.getConfigFile().toFile()));
          this.writeSettings(writer);
          this.modMain.getInterfaces().getMinimapInterface().getInfoDisplayIO().save(writer);
          Object[] keys = serverSlimeSeeds.keySet().toArray();
@@ -1415,7 +826,7 @@ public class ModSettings {
       } else if (args[0].equalsIgnoreCase("arrowColour")) {
          this.arrowColour = Integer.parseInt(valueString);
       } else if (args[0].equalsIgnoreCase("seed")) {
-         serverSlimeSeeds.put(valueString, Long.parseLong(args[2]));
+         serverSlimeSeeds.put(new XaeroPathReader().read(valueString), Long.parseLong(args[2]));
       } else if (args[0].equalsIgnoreCase("smoothDots")) {
          this.smoothDots = valueString.equals("true");
       } else if (args[0].equalsIgnoreCase("worldMap")) {
@@ -1581,48 +992,9 @@ public class ModSettings {
       }
    }
 
-   public void loadWaypointsFromAllSources(WaypointsManager waypointsManager, class_634 connection) throws IOException {
-      waypointsManager.onLoad(connection);
-      waypointsManager.getWaypointMap().clear();
-      BufferedReader reader = null;
-      boolean saveWaypoints = false;
-
-      try {
-         reader = new BufferedReader(new FileReader(this.modMain.getConfigFile()));
-
-         String s;
-         while ((s = reader.readLine()) != null) {
-            String[] args = s.split(":");
-
-            try {
-               if (this.checkWaypointsLineOLD(args, waypointsManager)) {
-                  saveWaypoints = true;
-               }
-            } catch (Exception var11) {
-               MinimapLogs.LOGGER.info("Skipping setting:" + args[0]);
-            }
-         }
-      } finally {
-         if (reader != null) {
-            reader.close();
-         }
-      }
-
-      if (this.modMain.getWaypointsFile().exists()) {
-         this.loadOldWaypoints(this.modMain.getWaypointsFile(), waypointsManager);
-         saveWaypoints = true;
-      }
-
-      this.loadAllWaypoints(waypointsManager);
-      if (saveWaypoints) {
-         this.saveAllWaypoints(waypointsManager);
-         this.saveSettings();
-      }
-   }
-
    public void loadDefaultSettings() throws IOException {
-      File mainConfigFile = this.modMain.getConfigFile();
-      File defaultConfigFile = mainConfigFile.toPath().getParent().resolveSibling("defaultconfigs").resolve(mainConfigFile.getName()).toFile();
+      Path mainConfigFile = this.modMain.getConfigFile();
+      File defaultConfigFile = mainConfigFile.getParent().resolveSibling("defaultconfigs").resolve(mainConfigFile.getFileName()).toFile();
       if (defaultConfigFile.exists()) {
          this.loadSettingsFile(defaultConfigFile);
       }
@@ -1630,14 +1002,14 @@ public class ModSettings {
 
    public void loadSettings() throws IOException {
       this.loadDefaultSettings();
-      File mainConfigFile = this.modMain.getConfigFile();
-      Path configFolderPath = mainConfigFile.toPath().getParent();
+      Path mainConfigFile = this.modMain.getConfigFile();
+      Path configFolderPath = mainConfigFile.getParent();
       if (!Files.exists(configFolderPath)) {
          Files.createDirectories(configFolderPath);
       }
 
-      if (mainConfigFile.exists()) {
-         this.loadSettingsFile(mainConfigFile);
+      if (Files.exists(mainConfigFile)) {
+         this.loadSettingsFile(mainConfigFile.toFile());
       }
 
       this.saveSettings();
@@ -2329,13 +1701,9 @@ public class ModSettings {
             } else if (par1EnumOptions == ModOptions.WAYPOINTS_ALL_SETS) {
                this.renderAllSets = (Boolean)value;
             } else if (par1EnumOptions == ModOptions.IGNORE_HEIGHTMAPS) {
-               WaypointWorldRootContainer currentRootContainer = XaeroMinimapSession.getCurrentSession()
-                  .getWaypointsManager()
-                  .getAutoWorld()
-                  .getContainer()
-                  .getRootContainer();
+               MinimapWorldRootContainer currentRootContainer = BuiltInHudModules.MINIMAP.getCurrentSession().getWorldManager().getAutoRootContainer();
                currentRootContainer.setIgnoreHeightmaps((Boolean)value);
-               currentRootContainer.saveConfig();
+               currentRootContainer.getSession().getWorldManagerIO().getRootConfigIO().save(currentRootContainer);
             } else if (par1EnumOptions == ModOptions.WAYPOINTS_BOTTOM) {
                this.waypointsBottom = (Boolean)value;
             } else if (par1EnumOptions == ModOptions.MINIMAP_SHAPE) {
@@ -2777,8 +2145,8 @@ public class ModSettings {
    }
 
    public static boolean canEditIngameSettings() {
-      XaeroMinimapSession minimapSession = XaeroMinimapSession.getCurrentSession();
-      return minimapSession != null && minimapSession.getWaypointsManager().getAutoContainerID() != null;
+      MinimapSession minimapSession = BuiltInHudModules.MINIMAP.getCurrentSession();
+      return minimapSession != null && minimapSession.getWorldState().getAutoWorldPath() != null;
    }
 
    private <T> String getRadarSettingOptionName(ObjectCategorySetting<T> setting) {

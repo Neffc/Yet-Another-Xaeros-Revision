@@ -1,12 +1,12 @@
 package xaero.common.gui;
 
-public class GuiDropdownHelper {
+public class GuiDropdownHelper<T> {
    protected int current;
    protected int auto;
-   protected String[] keys;
+   protected T[] keys;
    protected String[] options;
 
-   public String getCurrentKey() {
+   public T getCurrentKey() {
       return this.keys[this.current];
    }
 

@@ -68,10 +68,6 @@ public class EntityIconDefinition {
          this.variants = new HashMap<>();
       }
 
-      if (this.variants.get("default") == null) {
-         this.variants.put("default", "model");
-      }
-
       for (Entry<String, String> entry : this.variants.entrySet()) {
          String value = entry.getValue();
          class_2960 type;
@@ -153,6 +149,12 @@ public class EntityIconDefinition {
          }
 
          this.variantTypes.put(entry.getKey(), type);
+      }
+
+      if (this.variantTypes != null) {
+         if (!this.variantTypes.containsKey("default")) {
+            this.variantTypes.put("default", MODEL_TYPE);
+         }
       }
    }
 

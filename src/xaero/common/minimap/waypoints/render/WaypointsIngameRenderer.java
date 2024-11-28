@@ -2,11 +2,9 @@ package xaero.common.minimap.waypoints.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import net.minecraft.class_1297;
@@ -25,18 +23,19 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomRenderTypes;
 import xaero.common.gui.GuiMisc;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
 import xaero.common.minimap.waypoints.WaypointUtil;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorldManager;
 
 public class WaypointsIngameRenderer {
    private IXaeroMinimap modMain;
@@ -98,7 +97,7 @@ public class WaypointsIngameRenderer {
       this.waypointReachDeleter = waypointReachDeleter;
    }
 
-   public void render(XaeroMinimapSession minimapSession, float partial, MinimapProcessor minimap, Matrix4f waypointsProjection, Matrix4f worldModelView) {
+   public void render(MinimapSession session, float partial, MinimapProcessor minimap, Matrix4f waypointsProjection, Matrix4f worldModelView) {
       if (this.modMain.getSettings().getShowIngameWaypoints()) {
          class_310 mc = class_310.method_1551();
          if (mc.field_1724 == null || Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS) || Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS_HARMFUL)) {
@@ -117,10 +116,10 @@ public class WaypointsIngameRenderer {
          class_4587 matrixStack = this.identityMatrixStack;
          class_4587 matrixStackOverlay = this.identityMatrixStackOverlay;
          MinimapRendererHelper helper = this.modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getHelper();
-         WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
+         MinimapWorldManager manager = session.getWorldManager();
          String subworldName = null;
-         if (waypointsManager.getCurrentWorld() != null && waypointsManager.getAutoWorld() != waypointsManager.getCurrentWorld()) {
-            subworldName = "(" + waypointsManager.getCurrentWorld().getContainer().getSubName() + ")";
+         if (manager.getCurrentWorld() != null && manager.getAutoWorld() != manager.getCurrentWorld()) {
+            subworldName = "(" + manager.getCurrentWorld().getContainer().getSubName() + ")";
          }
 
          class_1297 entity = mc.method_1560();
@@ -130,7 +129,7 @@ public class WaypointsIngameRenderer {
          double actualEntityZ = entity.method_23321();
          double smoothEntityY = minimap.getEntityRadar().getEntityY(entity, partial);
          class_243 cameraPos = activeRender.method_19326();
-         double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
+         double dimDiv = session.getDimensionHelper().getDimensionDivision(manager.getCurrentWorld());
          Waypoint.RENDER_SORTING_POS = new class_243(cameraPos.field_1352 * dimDiv, cameraPos.field_1351, cameraPos.field_1350 * dimDiv);
          double d3 = cameraPos.method_10216();
          double d4 = cameraPos.method_10214();
@@ -150,15 +149,13 @@ public class WaypointsIngameRenderer {
          double clampDepth = this.modMain.getSettings().getWaypointsClampDepth(fov, screenHeight);
          List<Waypoint> sortingList = this.sortingList;
          sortingList.clear();
-         if (waypointsManager.getWaypoints() != null) {
+         if (manager.getCurrentWorld() != null) {
             if (this.modMain.getSettings().renderAllSets) {
-               HashMap<String, WaypointSet> sets = waypointsManager.getCurrentWorld().getSets();
-
-               for (Entry<String, WaypointSet> setEntry : sets.entrySet()) {
-                  sortingList.addAll(setEntry.getValue().getList());
+               for (WaypointSet set : manager.getCurrentWorld().getIterableWaypointSets()) {
+                  set.addTo(sortingList);
                }
             } else {
-               sortingList.addAll(waypointsManager.getWaypoints().getList());
+               manager.getCurrentWorld().getCurrentWaypointSet().addTo(sortingList);
             }
          }
 
@@ -166,6 +163,12 @@ public class WaypointsIngameRenderer {
          if (!customWaypoints.isEmpty()) {
             for (Hashtable<Integer, Waypoint> modCustomWaypoints : customWaypoints.values()) {
                sortingList.addAll(modCustomWaypoints.values());
+            }
+         }
+
+         if (manager.hasCustomWaypoints()) {
+            for (Waypoint waypoint : manager.getCustomWaypoints()) {
+               sortingList.add(waypoint);
             }
          }
 
@@ -223,7 +226,7 @@ public class WaypointsIngameRenderer {
                minDistance,
                subworldName
             );
-            this.waypointReachDeleter.deleteCollected(waypointsManager.getCurrentWorld(), settings.renderAllSets);
+            this.waypointReachDeleter.deleteCollected(session, manager.getCurrentWorld(), settings.renderAllSets);
          }
 
          matrixStackOverlay.method_22909();

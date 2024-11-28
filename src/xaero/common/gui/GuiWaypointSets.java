@@ -5,22 +5,33 @@ import java.util.Collections;
 import net.minecraft.class_1074;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.misc.KeySortableByOther;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
 
 public class GuiWaypointSets {
    private int currentSet;
    private String[] options;
 
+   @Deprecated
    public GuiWaypointSets(boolean canCreate, WaypointWorld currentWorld) {
-      this(canCreate, currentWorld, currentWorld.getCurrent());
+      this(canCreate, (MinimapWorld)currentWorld);
    }
 
+   @Deprecated
    public GuiWaypointSets(boolean canCreate, WaypointWorld currentWorld, String currentSetName) {
-      int size = currentWorld.getSets().size() + (canCreate ? 1 : 0);
-      String[] keys = currentWorld.getSets().keySet().toArray(new String[0]);
+      this(canCreate, (MinimapWorld)currentWorld, currentSetName);
+   }
+
+   public GuiWaypointSets(boolean canCreate, MinimapWorld currentWorld) {
+      this(canCreate, currentWorld, currentWorld.getCurrentWaypointSetId());
+   }
+
+   public GuiWaypointSets(boolean canCreate, MinimapWorld currentWorld, String currentSetName) {
+      int size = currentWorld.getSetCount() + (canCreate ? 1 : 0);
       ArrayList<KeySortableByOther<String>> keysList = new ArrayList<>();
 
-      for (int i = 0; i < keys.length; i++) {
-         String key = keys[i];
+      for (WaypointSet set : currentWorld.getIterableWaypointSets()) {
+         String key = set.getName();
          keysList.add(new KeySortableByOther<>(key, class_1074.method_4662(key, new Object[0]).toLowerCase()));
       }
 

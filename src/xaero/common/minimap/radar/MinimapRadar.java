@@ -1,6 +1,5 @@
 package xaero.common.minimap.radar;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import net.minecraft.class_1657;
 import net.minecraft.class_270;
 import net.minecraft.class_638;
 import xaero.common.IXaeroMinimap;
-import xaero.common.XaeroMinimapSession;
 import xaero.common.category.rule.resolver.ObjectCategoryRuleResolver;
 import xaero.common.effect.Effects;
 import xaero.common.minimap.MinimapProcessor;
@@ -22,12 +20,13 @@ import xaero.common.minimap.radar.category.EntityRadarCategoryManager;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
+import xaero.hud.minimap.module.MinimapSession;
 
 public class MinimapRadar {
    public static final int radarPlayers = -1;
    public static final int radarShadow = -16777216;
    private IXaeroMinimap modMain;
-   private XaeroMinimapSession minimapSession;
+   private MinimapSession minimapSession;
    private EntityRadarCategoryManager entityCategoryManager;
    private class_1297 lastRenderViewEntity;
    private EntityRadarCategory listsGeneratedForConfig;
@@ -35,7 +34,7 @@ public class MinimapRadar {
    private List<MinimapRadarList> radarLists;
    private Map<EntityRadarCategory, MinimapRadarList> middleRadarListMap;
 
-   public MinimapRadar(IXaeroMinimap modMain, XaeroMinimapSession minimapSession, EntityRadarCategoryManager entityCategoryManager) throws IOException {
+   public MinimapRadar(IXaeroMinimap modMain, MinimapSession minimapSession, EntityRadarCategoryManager entityCategoryManager) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.entityCategoryManager = entityCategoryManager;

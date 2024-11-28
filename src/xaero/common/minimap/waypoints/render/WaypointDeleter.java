@@ -2,14 +2,13 @@ package xaero.common.minimap.waypoints.render;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import xaero.common.IXaeroMinimap;
 import xaero.common.minimap.waypoints.Waypoint;
-import xaero.common.minimap.waypoints.WaypointSet;
-import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.hud.minimap.MinimapLogs;
+import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.set.WaypointSet;
+import xaero.hud.minimap.world.MinimapWorld;
 
 public class WaypointDeleter {
    private final IXaeroMinimap modMain;
@@ -33,7 +32,7 @@ public class WaypointDeleter {
       }
    }
 
-   public void deleteCollected(WaypointWorld world, boolean allSets) {
+   public void deleteCollected(MinimapSession session, MinimapWorld world, boolean allSets) {
       if (!this.started) {
          throw new IllegalStateException();
       } else {
@@ -41,17 +40,15 @@ public class WaypointDeleter {
          if (!this.toDeleteList.isEmpty()) {
             if (world != null) {
                if (allSets) {
-                  HashMap<String, WaypointSet> sets = world.getSets();
-
-                  for (Entry<String, WaypointSet> setEntry : sets.entrySet()) {
-                     setEntry.getValue().getList().removeAll(this.toDeleteList);
+                  for (WaypointSet set : world.getIterableWaypointSets()) {
+                     set.removeAll(this.toDeleteList);
                   }
                } else {
-                  world.getCurrentSet().getList().removeAll(this.toDeleteList);
+                  world.getCurrentWaypointSet().removeAll(this.toDeleteList);
                }
 
                try {
-                  this.modMain.getSettings().saveWaypoints(world);
+                  session.getWorldManagerIO().saveWorld(world);
                } catch (IOException var6) {
                   MinimapLogs.LOGGER.error("suppressed exception", var6);
                }
