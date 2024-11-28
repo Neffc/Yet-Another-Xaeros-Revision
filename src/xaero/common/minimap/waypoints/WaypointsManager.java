@@ -513,7 +513,7 @@ public class WaypointsManager {
 
    public void createTemporaryWaypoints(WaypointWorld waypointWorld, int x, int y, int z, boolean yIncluded) {
       if (this.modMain.getSettings().waypointsGUI(this) && waypointWorld != null) {
-         double dimDiv = this.getDimensionDivision(this.getCurrentContainerID());
+         double dimDiv = this.getDimensionDivision(waypointWorld.getContainer().key);
          x = OptimizedMath.myFloor((double)x * dimDiv);
          z = OptimizedMath.myFloor((double)z * dimDiv);
          Waypoint instant = new Waypoint(x, y, z, "Waypoint", "X", (int)(Math.random() * (double)ModSettings.ENCHANT_COLORS.length), 0, true, yIncluded);

@@ -53,7 +53,7 @@ public final class EntityRadarCategoryConstants {
    public static final Predicate<String> PLAYER_NAME_VALIDATOR = s -> s.matches("[A-Za-z_0-9\\_]+");
    public static final Function<String, String> PLAYER_NAME_VALIDATOR_FIXER = s -> s.replaceAll("[^A-Za-z_0-9\\_]+", "");
    public static final Supplier<Iterable<Boolean>> PREDICATE_VALUE_ALL_SUPPLIER = () -> Lists.newArrayList(new Boolean[]{false, true});
-   public static final Function<String, List<Boolean>> PREDICATE_VALUE_RESOLVER = s -> Lists.newArrayList(new Boolean[]{s.equals("yes")});
+   public static final Function<String, List<Boolean>> PREDICATE_VALUE_RESOLVER = s -> Lists.newArrayList(new Boolean[]{s.equalsIgnoreCase("yes")});
    public static final Function<Boolean, String> PREDICATE_VALUE_SERIALIZER = b -> b ? "yes" : "no";
    public static final Predicate<String> PREDICATE_VALUE_VALIDATOR = s -> s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("no");
    public static final Function<String, String> PREDICATE_VALUE_VALIDATOR_FIXER = s -> s;
@@ -85,6 +85,8 @@ public final class EntityRadarCategoryConstants {
    public static final String HARD_MODDED = "modded";
    public static final String HARD_ABOVE_GROUND = "above-ground";
    public static final String HARD_BELOW_GROUND = "below-ground";
+   public static final String HARD_MY_GROUND = "my-ground";
+   public static final String HARD_NOT_MY_GROUND = "not-my-ground";
    public static final String HARD_LIT = "block-lit";
    public static final String HARD_UNLIT = "block-unlit";
    public static final String HARD_CUSTOM_NAME = "has-custom-name";

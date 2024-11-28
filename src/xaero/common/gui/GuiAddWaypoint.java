@@ -248,17 +248,17 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    private int getAutomaticX(double dimDiv) {
-      int playerX = this.hasForcedPlayerPos ? this.forcedPlayerX : OptimizedMath.myFloor(this.field_22787.field_1724.method_23317());
+      int playerX = this.hasForcedPlayerPos ? this.forcedPlayerX : OptimizedMath.myFloor(this.field_22787.field_1719.method_23317());
       return OptimizedMath.myFloor((double)playerX * dimDiv);
    }
 
    private int getAutomaticY() {
-      int playerY = this.hasForcedPlayerPos ? this.forcedPlayerY : OptimizedMath.myFloor(this.field_22787.field_1724.method_23318() + 0.0625);
+      int playerY = this.hasForcedPlayerPos ? this.forcedPlayerY : OptimizedMath.myFloor(this.field_22787.field_1719.method_23318() + 0.0625);
       return OptimizedMath.myFloor((double)playerY);
    }
 
    private int getAutomaticZ(double dimDiv) {
-      int playerZ = this.hasForcedPlayerPos ? this.forcedPlayerZ : OptimizedMath.myFloor(this.field_22787.field_1724.method_23321());
+      int playerZ = this.hasForcedPlayerPos ? this.forcedPlayerZ : OptimizedMath.myFloor(this.field_22787.field_1719.method_23321());
       return OptimizedMath.myFloor((double)playerZ * dimDiv);
    }
 
@@ -1002,7 +1002,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    }
 
    public void method_25393() {
-      if (this.field_22787.field_1724 == null) {
+      if (this.field_22787.field_1719 == null) {
          this.field_22787.method_1507(null);
       } else {
          this.nameTextField.method_1865();

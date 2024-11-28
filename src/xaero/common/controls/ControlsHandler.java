@@ -134,9 +134,9 @@ public class ControlsHandler {
             this.waypointsManager
                .createTemporaryWaypoints(
                   this.waypointsManager.getCurrentWorld(),
-                  OptimizedMath.myFloor(mc.field_1724.method_23317()),
-                  OptimizedMath.myFloor(mc.field_1724.method_23318() + 0.0625),
-                  OptimizedMath.myFloor(mc.field_1724.method_23321())
+                  OptimizedMath.myFloor(mc.field_1719.method_23317()),
+                  OptimizedMath.myFloor(mc.field_1719.method_23318() + 0.0625),
+                  OptimizedMath.myFloor(mc.field_1719.method_23321())
                );
          }
 

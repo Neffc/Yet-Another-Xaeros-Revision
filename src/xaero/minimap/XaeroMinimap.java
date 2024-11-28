@@ -64,9 +64,9 @@ import xaero.minimap.interfaces.MinimapInterfaceLoader;
 public class XaeroMinimap extends AXaeroMinimap implements ClientModInitializer, DedicatedServerModInitializer {
    public static XaeroMinimap instance;
    private static final String versionID_minecraft = "1.20";
-   private static final String versionID_mod = "23.8.2";
+   private static final String versionID_mod = "23.8.3";
    private static final boolean versionID_fair = false;
-   public static final String versionID = "1.20_23.8.2_fabric";
+   public static final String versionID = "1.20_23.8.3_fabric";
    private int newestUpdateID;
    private boolean isOutdated;
    private String fileLayoutID = "minimap_fabric";
@@ -144,7 +144,7 @@ public class XaeroMinimap extends AXaeroMinimap implements ClientModInitializer,
       MinimapLogs.LOGGER.info("Loading Xaero's Minimap - Stage 1/2");
       ModOptions.init(this);
       ModContainer modContainer = (ModContainer)FabricLoader.getInstance()
-         .getModContainer("1.20_23.8.2_fabric".endsWith("fair") ? "xaerominimapfair" : "xaerominimap")
+         .getModContainer("1.20_23.8.3_fabric".endsWith("fair") ? "xaerominimapfair" : "xaerominimap")
          .orElse(null);
       if (modContainer == null) {
          modContainer = (ModContainer)FabricLoader.getInstance().getModContainer("xaerodev").orElse(null);
@@ -270,7 +270,7 @@ public class XaeroMinimap extends AXaeroMinimap implements ClientModInitializer,
                   PatreonMod patreonEntry = this.getPatreon();
                   if (patreonEntry != null) {
                      patreonEntry.modJar = this.modJAR;
-                     patreonEntry.currentVersion = "1.20_23.8.2_fabric";
+                     patreonEntry.currentVersion = "1.20_23.8.3_fabric";
                      patreonEntry.latestVersion = this.latestVersion;
                      patreonEntry.md5 = this.latestVersionMD5;
                      patreonEntry.onVersionIgnore = () -> {
@@ -422,7 +422,7 @@ public class XaeroMinimap extends AXaeroMinimap implements ClientModInitializer,
 
    @Override
    public String getVersionID() {
-      return "1.20_23.8.2_fabric";
+      return "1.20_23.8.3_fabric";
    }
 
    @Override

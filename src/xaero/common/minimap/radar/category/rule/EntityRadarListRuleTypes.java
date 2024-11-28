@@ -79,6 +79,9 @@ public class EntityRadarListRuleTypes {
    public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> ABOVE_GROUND = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(
       EntityRadarCategoryHardRules.IS_ABOVE_GROUND, TYPE_LIST, TYPE_MAP
    );
+   public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> MY_GROUND = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(
+      EntityRadarCategoryHardRules.IS_MY_GROUND, TYPE_LIST, TYPE_MAP
+   );
    public static final ObjectCategoryListRuleType<class_1297, class_1657, Boolean> LIT = EntityRadarCategoryConstants.createHardRuleBasedPredicateListRuleType(
       EntityRadarCategoryHardRules.IS_LIT, TYPE_LIST, TYPE_MAP
    );

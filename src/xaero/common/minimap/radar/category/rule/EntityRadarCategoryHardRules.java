@@ -9,6 +9,8 @@ import net.minecraft.class_1542;
 import net.minecraft.class_1657;
 import net.minecraft.class_1944;
 import net.minecraft.class_2960;
+import net.minecraft.class_310;
+import xaero.common.XaeroMinimapSession;
 import xaero.common.category.rule.ObjectCategoryHardRule;
 import xaero.common.core.XaeroMinimapCore;
 import xaero.common.minimap.radar.RadarUtils;
@@ -80,6 +82,17 @@ public final class EntityRadarCategoryHardRules {
    public static final ObjectCategoryHardRule<class_1297, class_1657> IS_BELOW_GROUND = new ObjectCategoryHardRule.Builder<class_1297, class_1657>()
       .setName("below-ground")
       .setPredicate((e, p) -> !IS_ABOVE_GROUND.isFollowedBy(e, p))
+      .build(HARD_RULES, HARD_RULES_LIST);
+   public static final ObjectCategoryHardRule<class_1297, class_1657> IS_MY_GROUND = new ObjectCategoryHardRule.Builder<class_1297, class_1657>()
+      .setName("my-ground")
+      .setPredicate(
+         (e, p) -> class_310.method_1551().field_1719 == null
+               || IS_ABOVE_GROUND.isFollowedBy(e, p) == !XaeroMinimapSession.getCurrentSession().getMinimapProcessor().isCaveModeDisplayed()
+      )
+      .build(HARD_RULES, HARD_RULES_LIST);
+   public static final ObjectCategoryHardRule<class_1297, class_1657> IS_NOT_MY_GROUND = new ObjectCategoryHardRule.Builder<class_1297, class_1657>()
+      .setName("not-my-ground")
+      .setPredicate((e, p) -> !IS_MY_GROUND.isFollowedBy(e, p))
       .build(HARD_RULES, HARD_RULES_LIST);
    public static final ObjectCategoryHardRule<class_1297, class_1657> IS_LIT = new ObjectCategoryHardRule.Builder<class_1297, class_1657>()
       .setName("block-lit")

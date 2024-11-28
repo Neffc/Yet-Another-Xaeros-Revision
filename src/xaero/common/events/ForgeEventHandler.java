@@ -20,6 +20,7 @@ import net.minecraft.class_4439;
 import net.minecraft.class_4877;
 import net.minecraft.class_500;
 import net.minecraft.class_638;
+import org.apache.commons.lang3.StringUtils;
 import xaero.common.AXaeroMinimap;
 import xaero.common.MinimapLogs;
 import xaero.common.XaeroMinimapSession;
@@ -181,7 +182,10 @@ public class ForgeEventHandler {
             minimapSession.getMinimapProcessor().setFairPlayOnlyMessageReceived(true);
          }
 
-         return this.handleChatMessage(class_1074.method_4662("gui.xaero_waypoint_server_shared", new Object[0]), component);
+         String probableName = StringUtils.substringBetween(textString, "<", ">");
+         return this.handleChatMessage(
+            probableName == null ? class_1074.method_4662("gui.xaero_waypoint_server_shared", new Object[0]) : probableName, component
+         );
       }
    }
 
