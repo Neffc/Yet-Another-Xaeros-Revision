@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.HudMod;
-import xaero.common.core.XaeroMinimapCore;
+import xaero.common.server.core.XaeroMinimapServerCore;
 
 @Mixin({class_1657.class})
 public class MixinPlayerEntity {
@@ -15,7 +15,7 @@ public class MixinPlayerEntity {
       method = {"tick"}
    )
    public void onTickStart(CallbackInfo info) {
-      if (XaeroMinimapCore.isModLoaded()) {
+      if (XaeroMinimapServerCore.isModLoaded()) {
          HudMod.INSTANCE.getCommonEvents().handlePlayerTickStart((class_1657)this);
       }
    }

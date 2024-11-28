@@ -8,12 +8,12 @@ public class XaeroMinimapServerCore {
    public static IXaeroMinimap modMain;
 
    public static void onServerWorldInfo(class_1657 player) {
-      if (modMain != null) {
+      if (isModLoaded()) {
          modMain.getCommonEvents().onPlayerWorldJoin((class_3222)player);
       }
    }
 
    public static boolean isModLoaded() {
-      return modMain != null && modMain.isLoadedServer();
+      return modMain != null && (modMain.isLoadedServer() || modMain.isLoadedClient());
    }
 }
