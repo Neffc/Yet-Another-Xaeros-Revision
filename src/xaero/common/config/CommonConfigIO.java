@@ -21,7 +21,10 @@ public class CommonConfigIO {
 
    public void save(CommonConfig config) {
       try {
-         Files.createDirectories(this.configFilePath.getParent());
+         Path parentFolder = this.configFilePath.getParent();
+         if (parentFolder != null) {
+            Files.createDirectories(parentFolder);
+         }
       } catch (IOException var11) {
          MinimapLogs.LOGGER.error("suppressed exception", var11);
          return;
