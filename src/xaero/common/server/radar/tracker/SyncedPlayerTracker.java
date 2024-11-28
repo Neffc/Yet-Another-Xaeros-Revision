@@ -60,7 +60,6 @@ public class SyncedPlayerTracker {
                      }
                   }
 
-                  tracked = true;
                   boolean alreadySynced = syncedPlayers.contains(otherPlayer.method_5667());
                   if (!tracked) {
                      if (alreadySynced) {
