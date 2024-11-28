@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import xaero.common.AXaeroMinimap;
 import xaero.common.MinimapLogs;
+import xaero.common.effect.Effects;
 import xaero.common.mods.pac.SupportOpenPartiesAndClaims;
 import xaero.minimap.XaeroMinimap;
 import xaero.pvp.BetterPVP;
@@ -122,6 +123,10 @@ public class SupportMods {
          this.iris = true;
          MinimapLogs.LOGGER.info("Xaero's Minimap: Iris found!");
       } catch (Exception var5) {
+      }
+
+      if (this.worldmap() && this.worldmapSupport.shouldAlwaysInitEffects()) {
+         Effects.init();
       }
    }
 }

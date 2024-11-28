@@ -40,7 +40,7 @@ public final class ObjectCategoryIncludeList<E, P, S> extends ObjectCategoryList
       }
 
       public <C extends FilterObjectCategory<E, P, ?, C>> ObjectCategoryIncludeList<E, P, S> build(List<C> subCategories) {
-         return this.build(subCategories, sub -> sub.getIncludeList(this.type), sub -> sub.getExcludeList(this.type));
+         return this.build(subCategories, sub -> sub.getIncludeList(this.type), null);
       }
 
       protected ObjectCategoryIncludeList<E, P, S> buildInternally(Set<S> effectiveSet) {

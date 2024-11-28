@@ -260,8 +260,8 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
    @Override
    public boolean shouldRender(int location) {
       return (location != 1 && location != 0 || this.modMain.getSettings().getShowWaypoints())
-         && !class_310.method_1551().field_1724.method_6059(Effects.NO_WAYPOINTS)
-         && !class_310.method_1551().field_1724.method_6059(Effects.NO_WAYPOINTS_HARMFUL);
+         && !Misc.hasEffect(Effects.NO_WAYPOINTS)
+         && !Misc.hasEffect(Effects.NO_WAYPOINTS_HARMFUL);
    }
 
    @Override

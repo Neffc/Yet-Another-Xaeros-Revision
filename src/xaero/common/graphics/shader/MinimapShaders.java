@@ -12,6 +12,7 @@ public class MinimapShaders {
    public static class_5944 POSITION_COLOR_TEX = null;
    public static class_5944 POSITION_COLOR_TEX_PRE = null;
    public static class_5944 POSITION_COLOR = null;
+   public static class_5944 POSITION_COLOR_NO_ALPHA_TEST = null;
    public static class_5944 POSITION_TEX_NO_ALPHA_TEST = null;
    public static class_5944 POSITION_TEX_NO_ALPHA_TEST_NO_BLEND = null;
    public static PositionTexAlphaTestShader POSITION_TEX_ALPHA_TEST = null;
@@ -29,6 +30,9 @@ public class MinimapShaders {
             POSITION_COLOR_TEX_PRE, new class_5944(resourceManager, "xaerominimap/position_color_tex_pre", class_290.field_20887)
          );
          POSITION_COLOR = reloadShader(POSITION_COLOR, new class_5944(resourceManager, "xaerominimap/position_color", class_290.field_20887));
+         POSITION_COLOR_NO_ALPHA_TEST = reloadShader(
+            POSITION_COLOR_NO_ALPHA_TEST, new class_5944(resourceManager, "xaerominimap/position_color_no_alpha_test", class_290.field_20887)
+         );
          POSITION_TEX_NO_ALPHA_TEST = reloadShader(
             POSITION_TEX_NO_ALPHA_TEST, new class_5944(resourceManager, "xaerominimap/pos_tex_no_alpha_test", class_290.field_1585)
          );

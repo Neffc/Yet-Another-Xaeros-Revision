@@ -24,25 +24,31 @@ public class SupportFramedBlocks {
    public SupportFramedBlocks() {
       try {
          this.framedTileBlockClass = Class.forName("xfacthd.framedblocks.common.tileentity.FramedTileEntity");
-      } catch (ClassNotFoundException var6) {
+      } catch (ClassNotFoundException var8) {
          try {
             this.framedTileBlockClass = Class.forName("xfacthd.framedblocks.api.block.FramedBlockEntity");
-         } catch (ClassNotFoundException var5) {
-            MinimapLogs.LOGGER.info("Failed to init Framed Blocks support!", var5);
+         } catch (ClassNotFoundException var7) {
+            MinimapLogs.LOGGER.info("Failed to init Framed Blocks support!", var7);
             return;
          }
       }
 
       try {
          this.framedTileEntityCamoStateMethod = this.framedTileBlockClass.getDeclaredMethod("getCamoState");
-      } catch (SecurityException | NoSuchMethodException var4) {
+      } catch (SecurityException | NoSuchMethodException var6) {
          try {
-            Class<?> camoContainerClass = Class.forName("xfacthd.framedblocks.api.data.CamoContainer");
+            Class<?> camoContainerClass;
+            try {
+               camoContainerClass = Class.forName("xfacthd.framedblocks.api.data.CamoContainer");
+            } catch (ClassNotFoundException var4) {
+               camoContainerClass = Class.forName("xfacthd.framedblocks.api.camo.CamoContainer");
+            }
+
             this.framedTileEntityCamoMethod = this.framedTileBlockClass.getDeclaredMethod("getCamo");
             this.camoContainerStateMethod = camoContainerClass.getDeclaredMethod("getState");
-         } catch (NoSuchMethodException | SecurityException | ClassNotFoundException var3) {
-            MinimapLogs.LOGGER.info("Failed to init Framed Blocks support!", var4);
-            MinimapLogs.LOGGER.info("Failed to init Framed Blocks support!", var3);
+         } catch (NoSuchMethodException | SecurityException | ClassNotFoundException var5) {
+            MinimapLogs.LOGGER.info("Failed to init Framed Blocks support!", var6);
+            MinimapLogs.LOGGER.info("Failed to init Framed Blocks support!", var5);
          }
       }
 

@@ -9,11 +9,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xaero.common.AXaeroMinimap;
+import xaero.common.core.IXaeroMinimapMinecraftClient;
 
 @Mixin({class_310.class})
-public class MixinMinecraftClient {
+public class MixinMinecraftClient implements IXaeroMinimapMinecraftClient {
    @Shadow
    public class_437 field_1755;
+   @Shadow
+   private static int field_1738;
    @Shadow
    public class_638 field_1687;
 
@@ -59,5 +62,10 @@ public class MixinMinecraftClient {
       if (this.field_1687 != null) {
          AXaeroMinimap.INSTANCE.getEvents().worldUnload(this.field_1687);
       }
+   }
+
+   @Override
+   public int getXaeroMinimap_fps() {
+      return field_1738;
    }
 }

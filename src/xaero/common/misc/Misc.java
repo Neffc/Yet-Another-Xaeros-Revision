@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.class_1041;
+import net.minecraft.class_1291;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
 import net.minecraft.class_1792;
@@ -316,5 +317,13 @@ public class Misc {
       } else {
          return e.method_5781() == null ? baseName.method_27661() : e.method_5781().method_1198(baseName.method_27661());
       }
+   }
+
+   public static boolean hasEffect(class_1657 player, class_1291 effect) {
+      return effect != null && player.method_6059(effect);
+   }
+
+   public static boolean hasEffect(class_1291 effect) {
+      return hasEffect(class_310.method_1551().field_1724, effect);
    }
 }

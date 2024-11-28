@@ -29,6 +29,7 @@ import xaero.common.minimap.region.MinimapTile;
 import xaero.common.minimap.render.MinimapRendererHelper;
 import xaero.common.minimap.render.radar.element.RadarRenderer;
 import xaero.common.minimap.waypoints.WaypointWorld;
+import xaero.common.misc.Misc;
 import xaero.map.MapProcessor;
 import xaero.map.WorldMap;
 import xaero.map.WorldMapSession;
@@ -36,7 +37,6 @@ import xaero.map.graphics.CustomRenderTypes;
 import xaero.map.graphics.shader.MapShaders;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.GuiWorldMapSettings;
-import xaero.map.misc.Misc;
 import xaero.map.region.LeveledRegion;
 import xaero.map.region.MapRegion;
 import xaero.map.region.MapTileChunk;
@@ -142,7 +142,7 @@ public class SupportXaeroWorldmap {
                }
 
                class_1657 player = class_310.method_1551().field_1724;
-               boolean noCaveMaps = player.method_6059(Effects.NO_CAVE_MAPS) || player.method_6059(Effects.NO_CAVE_MAPS_HARMFUL);
+               boolean noCaveMaps = Misc.hasEffect(player, Effects.NO_CAVE_MAPS) || Misc.hasEffect(player, Effects.NO_CAVE_MAPS_HARMFUL);
                boolean playerIsMoving = !wmHasDimensionSwitch
                   && (player.field_6014 != player.method_23317() || player.field_6036 != player.method_23318() || player.field_5969 != player.method_23321());
                boolean shouldRequestLoading = true;
@@ -357,7 +357,7 @@ public class SupportXaeroWorldmap {
                      )
                      && !this.regionBuffer.contains(region)) {
                      region.calculateSortingChunkDistance();
-                     Misc.addToListOfSmallest(10, this.regionBuffer, region);
+                     xaero.map.misc.Misc.addToListOfSmallest(10, this.regionBuffer, region);
                   }
                }
             }
@@ -522,7 +522,7 @@ public class SupportXaeroWorldmap {
    }
 
    public boolean screenShouldSkipWorldRender(class_437 screen) {
-      return Misc.screenShouldSkipWorldRender(screen, false);
+      return xaero.map.misc.Misc.screenShouldSkipWorldRender(screen, false);
    }
 
    public void prepareMapTexturedRect(
@@ -761,5 +761,9 @@ public class SupportXaeroWorldmap {
             return mapDimension == null ? class_310.method_1551().field_1687.method_27983() : mapDimension.getDimId();
          }
       }
+   }
+
+   public boolean shouldAlwaysInitEffects() {
+      return this.compatibilityVersion < 26;
    }
 }

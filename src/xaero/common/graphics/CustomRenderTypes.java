@@ -65,6 +65,7 @@ public class CustomRenderTypes extends class_1921 {
    public static final class_1921 MAP_CHUNK_OVERLAY;
    public static final class_1921 MAP_LINES;
    public static final class_1921 RADAR_NAME_BGS;
+   public static final class_1921 DEPTH_CLEAR;
 
    public static class_1921 entityIconRenderType(class_2960 texture, CustomRenderTypes.EntityIconLayerPhases layerPhases) {
       ImmutableList<class_4668> rendertype$state = new CustomRenderTypes.MultiPhaseBuilder()
@@ -174,6 +175,16 @@ public class CustomRenderTypes extends class_1921 {
          .build();
       MAP_LINES = new CustomRenderTypes.MultiPhaseRenderType(
          "xaero_lines", class_290.field_29337, class_5596.field_27377, 256, false, false, multiPhaseParameters
+      );
+      multiPhaseParameters = new CustomRenderTypes.MultiPhaseBuilder()
+         .transparency(TRANSLUCENT_TRANSPARENCY)
+         .shader(new class_5942(() -> MinimapShaders.POSITION_COLOR_NO_ALPHA_TEST))
+         .target(KEEP_TARGET)
+         .depthTest(field_44814)
+         .writeMaskState(field_21351)
+         .build();
+      DEPTH_CLEAR = new CustomRenderTypes.MultiPhaseRenderType(
+         "xaero_depth_clear", class_290.field_1576, class_5596.field_27382, 256, false, false, multiPhaseParameters
       );
    }
 

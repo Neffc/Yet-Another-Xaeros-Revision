@@ -1,6 +1,5 @@
 package xaero.common.minimap.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.class_4534;
 import com.mojang.blaze3d.platform.GlStateManager.class_4535;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -566,15 +565,11 @@ public abstract class MinimapRenderer {
       int depthClearerX = scaledX - 25;
       int depthClearerY = scaledY - 25;
       int depthClearerW = 18 + mapSize / 2 + 50;
-      GlStateManager._enableDepthTest();
-      GlStateManager._depthFunc(519);
-      GlStateManager._depthMask(true);
-      GlStateManager._colorMask(false, false, false, false);
-      matrixStack.method_46416(0.0F, 0.0F, -999.0F);
-      guiGraphics.method_25294(depthClearerX, depthClearerY, depthClearerX + depthClearerW, depthClearerY + depthClearerW, -16777216);
-      matrixStack.method_46416(0.0F, 0.0F, 999.0F);
-      GlStateManager._colorMask(true, true, true, true);
-      GlStateManager._depthFunc(515);
+      matrixStack.method_46416(0.0F, 0.0F, -9999.0F);
+      guiGraphics.method_51739(
+         CustomRenderTypes.DEPTH_CLEAR, depthClearerX, depthClearerY, depthClearerX + depthClearerW, depthClearerY + depthClearerW, -16777216
+      );
+      matrixStack.method_46416(0.0F, 0.0F, 9999.0F);
       this.mc.method_1531().method_22813(InterfaceRenderer.guiTextures);
       GL11.glTexParameteri(3553, 10240, 9728);
       GL11.glTexParameteri(3553, 10241, 9728);

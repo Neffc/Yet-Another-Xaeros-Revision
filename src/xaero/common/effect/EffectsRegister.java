@@ -5,6 +5,7 @@ import net.minecraft.class_7923;
 
 public class EffectsRegister {
    public void registerEffects() {
+      Effects.init();
       this.registerEffect((MinimapStatusEffect)Effects.NO_MINIMAP);
       this.registerEffect((MinimapStatusEffect)Effects.NO_MINIMAP_HARMFUL);
       this.registerEffect((MinimapStatusEffect)Effects.NO_RADAR);

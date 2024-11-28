@@ -250,7 +250,7 @@ public class ImprovedFramebuffer extends class_6367 {
    }
 
    public void setFramebufferTexture(int textureId) {
-      if (textureId != this.colorAttachment) {
+      if (textureId != this.field_1475) {
          this.field_1475 = textureId;
          if (textureId != 0) {
             framebufferTexture2D(this.type, 36160, 36064, 3553, this.field_1475, 0);

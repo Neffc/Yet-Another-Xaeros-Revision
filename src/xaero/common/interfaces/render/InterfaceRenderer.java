@@ -33,6 +33,8 @@ public class InterfaceRenderer {
    }
 
    public void renderInterfaces(XaeroMinimapSession minimapSession, class_332 guiGraphics, float partial) {
+      guiGraphics.method_51452();
+
       while (GL11.glGetError() != 0) {
       }
 

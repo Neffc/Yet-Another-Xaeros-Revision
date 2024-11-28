@@ -20,6 +20,7 @@ import xaero.common.minimap.mcworld.MinimapClientWorldDataHelper;
 import xaero.common.minimap.radar.category.EntityRadarCategory;
 import xaero.common.minimap.radar.category.EntityRadarCategoryManager;
 import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
+import xaero.common.misc.Misc;
 import xaero.common.settings.ModSettings;
 
 public class MinimapRadar {
@@ -89,8 +90,8 @@ public class MinimapRadar {
          && world != null
          && p != null
          && renderEntity != null
-         && !p.method_6059(Effects.NO_RADAR)
-         && !p.method_6059(Effects.NO_RADAR_HARMFUL)) {
+         && !Misc.hasEffect(p, Effects.NO_RADAR)
+         && !Misc.hasEffect(p, Effects.NO_RADAR_HARMFUL)) {
          if (MinimapClientWorldDataHelper.getWorldData(world).getSyncedRules().allowRadarOnServer) {
             ObjectCategoryRuleResolver categoryRuleResolver = entityCategoryManager.getRuleResolver();
             Iterable<class_1297> worldEntities = world.method_18112();

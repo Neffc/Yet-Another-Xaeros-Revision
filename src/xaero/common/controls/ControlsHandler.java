@@ -20,6 +20,7 @@ import xaero.common.gui.ScreenBase;
 import xaero.common.minimap.MinimapProcessor;
 import xaero.common.minimap.waypoints.WaypointWorld;
 import xaero.common.minimap.waypoints.WaypointsManager;
+import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModOptions;
 import xaero.common.settings.ModSettings;
@@ -91,7 +92,9 @@ public class ControlsHandler {
             this.minimap.instantZoom();
          }
 
-         if (kb == ModSettings.keyToggleMap && !mc.field_1724.method_6059(Effects.NO_MINIMAP) && !mc.field_1724.method_6059(Effects.NO_MINIMAP_HARMFUL)) {
+         if (kb == ModSettings.keyToggleMap && !Misc.hasEffect(mc.field_1724, Effects.NO_MINIMAP) && !Misc.hasEffect(mc.field_1724, Effects.NO_MINIMAP_HARMFUL)
+            )
+          {
             this.modMain.getSettings().toggleBooleanOptionValue(ModOptions.MINIMAP);
          }
 
@@ -129,8 +132,8 @@ public class ControlsHandler {
          }
 
          if (kb == ModSettings.keyInstantWaypoint
-            && !mc.field_1724.method_6059(Effects.NO_WAYPOINTS)
-            && !mc.field_1724.method_6059(Effects.NO_WAYPOINTS_HARMFUL)) {
+            && !Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS)
+            && !Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS_HARMFUL)) {
             this.waypointsManager
                .createTemporaryWaypoints(
                   this.waypointsManager.getCurrentWorld(),

@@ -90,7 +90,7 @@ public class GuiEntityRadarCategoryUIEditorSettingsData<SETTING_DATA extends Gui
          });
          this.baseRuleBuilder.setCurrentValue(EntityRadarCategoryHardRules.IS_NOTHING);
          this.getIncludeListBuilder().getIncludeInSuperToggleDataBuilder().setTooltipSupplier((parent, data) -> {
-            CursorBox tooltip = new CursorBox(class_1074.method_4662("gui.xaero_box_category_include_list_include_in_super", new Object[0]));
+            CursorBox tooltip = new CursorBox(class_1074.method_4662("gui.xaero_box_category_include_list_include_in_super2", new Object[0]));
             return () -> tooltip;
          });
          CursorBox listHelp = new CursorBox("gui.xaero_box_category_list_add");

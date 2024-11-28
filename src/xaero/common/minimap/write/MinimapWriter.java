@@ -1,5 +1,7 @@
 package xaero.common.minimap.write;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.FileNotFoundException;
@@ -182,6 +184,7 @@ public class MinimapWriter {
    private boolean clearBlockColours;
    private final HashMap<String, Integer> textureColours;
    private final HashMap<Integer, Integer> blockColours;
+   private final Object2IntMap<class_2680> blockTintIndices;
    private final CachedFunction<class_2688<?, ?>, Boolean> transparentCache;
    private final CachedFunction<class_2680, Boolean> glowingCache;
    private long lastWrite = -1L;
@@ -294,6 +297,7 @@ public class MinimapWriter {
       this.blockStateShortShapeCache = blockStateShortShapeCache;
       this.fluidToBlock = new CachedFunction<>(class_3610::method_15759);
       this.highlighterRegistry = highlighterRegistry;
+      this.blockTintIndices = new Object2IntOpenHashMap();
    }
 
    public void setupDimensionHighlightHandler(class_5321<class_1937> dimension) {
@@ -510,6 +514,7 @@ public class MinimapWriter {
                this.clearBlockColours = false;
                if (!this.blockColours.isEmpty()) {
                   this.blockColours.clear();
+                  this.blockTintIndices.clear();
                   this.textureColours.clear();
                   this.lastBlockStateForTextureColor = null;
                   this.lastBlockStateForTextureColorResult = -1;
@@ -2040,6 +2045,7 @@ public class MinimapWriter {
          int alpha = 0;
          if (c == null) {
             String name = null;
+            int tintIndex = -1;
 
             try {
                List<class_777> upQuads = null;
@@ -2053,14 +2059,17 @@ public class MinimapWriter {
                class_1058 texture;
                if (upQuads != null && !upQuads.isEmpty() && upQuads.get(0).method_35788() != missingTexture) {
                   texture = upQuads.get(0).method_35788();
+                  tintIndex = upQuads.get(0).method_3359();
                } else {
                   texture = bms.method_3339(state);
+                  tintIndex = 0;
                   if (texture == missingTexture) {
                      for (int i = class_2350.values().length - 1; i >= 0; i--) {
                         if (i != 1) {
                            List<class_777> quads = model.method_4707(state, class_2350.values()[i], this.usedRandom);
                            if (!quads.isEmpty()) {
                               texture = quads.get(0).method_35788();
+                              tintIndex = quads.get(0).method_3359();
                               if (texture != missingTexture) {
                                  break;
                               }
@@ -2148,7 +2157,7 @@ public class MinimapWriter {
                } else {
                   c = cachedColour;
                }
-            } catch (FileNotFoundException var35) {
+            } catch (FileNotFoundException var36) {
                if (convert) {
                   return this.loadBlockColourFromTexture(world, state, b, pos, false);
                }
@@ -2163,7 +2172,7 @@ public class MinimapWriter {
                if (name != null) {
                   this.textureColours.put(name, c);
                }
-            } catch (Exception var36) {
+            } catch (Exception var37) {
                MinimapLogs.LOGGER
                   .info(
                      "Exception when loading "
@@ -2179,15 +2188,16 @@ public class MinimapWriter {
                   this.textureColours.put(name, c);
                }
 
-               if (var36 instanceof SilentException) {
-                  MinimapLogs.LOGGER.info(var36.getMessage());
+               if (var37 instanceof SilentException) {
+                  MinimapLogs.LOGGER.info(var37.getMessage());
                } else {
-                  MinimapLogs.LOGGER.error("suppressed exception", var36);
+                  MinimapLogs.LOGGER.error("suppressed exception", var37);
                }
             }
 
             if (c != null) {
                this.blockColours.put(stateHash, c);
+               this.blockTintIndices.put(state, tintIndex);
             }
          }
 
@@ -2204,7 +2214,7 @@ public class MinimapWriter {
          int grassColor = 16777215;
 
          try {
-            grassColor = class_310.method_1551().method_1505().method_1697(state, this.biomeBlendCalculator, pos, 0);
+            grassColor = class_310.method_1551().method_1505().method_1697(state, this.biomeBlendCalculator, pos, this.blockTintIndices.getInt(state));
          } catch (Throwable var12) {
             MinimapLogs.LOGGER.error("suppressed exception", var12);
          }
@@ -2235,8 +2245,8 @@ public class MinimapWriter {
 
    private int getCaving(boolean manualCaveMode, double playerX, double playerY, double playerZ, class_1937 world) {
       if (!this.modMain.getSettings().getCaveMaps(manualCaveMode)
-         || this.mc.field_1724.method_6059(Effects.NO_CAVE_MAPS)
-         || this.mc.field_1724.method_6059(Effects.NO_CAVE_MAPS_HARMFUL)) {
+         || Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS)
+         || Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS_HARMFUL)) {
          return Integer.MAX_VALUE;
       } else if (this.ignoreWorld(world)) {
          return this.lastCaving;

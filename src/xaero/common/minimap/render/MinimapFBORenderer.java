@@ -209,7 +209,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
       int minZ = playerChunkZ + (int)Math.floor(((double)offsetZ - radiusBlocks) / 64.0);
       int maxX = playerChunkX + (int)Math.floor(((double)(offsetX + 1) + radiusBlocks) / 64.0);
       int maxZ = playerChunkZ + (int)Math.floor(((double)(offsetZ + 1) + radiusBlocks) / 64.0);
-      if (!cave || !this.mc.field_1724.method_6059(Effects.NO_CAVE_MAPS) && !this.mc.field_1724.method_6059(Effects.NO_CAVE_MAPS_HARMFUL)) {
+      if (!cave || !Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS) && !Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS_HARMFUL)) {
          if (useWorldMap) {
             chunkGridAlphaMultiplier = this.modMain.getSupportMods().worldmapSupport.getMinimapBrightness();
             this.modMain

@@ -12,6 +12,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_4587;
 import xaero.common.AXaeroMinimap;
 import xaero.common.XaeroMinimapSession;
+import xaero.common.core.IXaeroMinimapMinecraftClient;
 import xaero.common.effect.Effects;
 import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.graphics.MinimapTexture;
@@ -26,6 +27,7 @@ import xaero.common.minimap.region.MinimapTile;
 import xaero.common.minimap.waypoints.WaypointsManager;
 import xaero.common.minimap.waypoints.render.CompassRenderer;
 import xaero.common.minimap.waypoints.render.WaypointsGuiRenderer;
+import xaero.common.misc.Misc;
 import xaero.common.misc.OptimizedMath;
 import xaero.common.settings.ModSettings;
 
@@ -40,23 +42,6 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       AXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
    ) throws IOException {
       super(modMain, mc, waypointsGuiRenderer, minimapInterface, compassRenderer);
-   }
-
-   public int getDebugFPS(class_310 mc) {
-      String fpsString = mc.field_1770.split(" ")[0];
-
-      int debugFPS;
-      try {
-         debugFPS = Integer.parseInt(fpsString);
-      } catch (NumberFormatException var5) {
-         if (!fpsString.contains("/")) {
-            throw var5;
-         }
-
-         debugFPS = Integer.parseInt(fpsString.split("/")[0]);
-      }
-
-      return debugFPS;
    }
 
    public void updateMapFrameSafeMode(
@@ -83,7 +68,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
             minimap.setToResetImage(false);
          }
 
-         int debugFPS = this.getDebugFPS(this.mc);
+         int debugFPS = ((IXaeroMinimapMinecraftClient)this.mc).getXaeroMinimap_fps();
          boolean motionBlur = debugFPS >= 35;
          int increaseY = motionBlur ? 2 : 1;
          int mapH = mapW;
@@ -96,7 +81,7 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
          double playerZ = minimap.getEntityRadar().getEntityZ(renderEntity, partial);
          WaypointsManager waypointsManager = minimapSession.getWaypointsManager();
          boolean terrainMapVisible = !cave
-            || !this.mc.field_1724.method_6059(Effects.NO_CAVE_MAPS) && !this.mc.field_1724.method_6059(Effects.NO_CAVE_MAPS_HARMFUL);
+            || !Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS) && !Misc.hasEffect(this.mc.field_1724, Effects.NO_CAVE_MAPS_HARMFUL);
 
          for (int currentX = 0; currentX < mapW; currentX++) {
             double currentXZoomed = ((double)currentX + 0.5) / this.zoom;

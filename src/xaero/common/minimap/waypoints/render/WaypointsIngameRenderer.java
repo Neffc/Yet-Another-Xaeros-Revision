@@ -101,7 +101,7 @@ public class WaypointsIngameRenderer {
    public void render(XaeroMinimapSession minimapSession, float partial, MinimapProcessor minimap, Matrix4f waypointsProjection, Matrix4f worldModelView) {
       if (this.modMain.getSettings().getShowIngameWaypoints()) {
          class_310 mc = class_310.method_1551();
-         if (mc.field_1724 == null || mc.field_1724.method_6059(Effects.NO_WAYPOINTS) || mc.field_1724.method_6059(Effects.NO_WAYPOINTS_HARMFUL)) {
+         if (mc.field_1724 == null || Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS) || Misc.hasEffect(mc.field_1724, Effects.NO_WAYPOINTS_HARMFUL)) {
             return;
          }
 

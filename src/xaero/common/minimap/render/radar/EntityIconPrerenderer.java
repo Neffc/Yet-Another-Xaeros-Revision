@@ -786,8 +786,18 @@ public class EntityIconPrerenderer {
       if (this.modelRenderDetectionEntityModelClass == model.getClass()) {
          class_1921 lastRenderType = this.getLastRenderType(this.modelRenderDetectionRenderTypeBuffer);
          if (lastRenderType == null && this.modelRenderDetectionList.isEmpty()) {
-            class_2960 textureLocation = this.modelRenderDetectionEntityRenderer.method_3931(this.modelRenderDetectionEntity);
-            lastRenderType = model.method_23500(textureLocation);
+            class_2960 textureLocation = null;
+
+            try {
+               class_2960 textureLocationUnchecked = this.modelRenderDetectionEntityRenderer.method_3931(this.modelRenderDetectionEntity);
+               textureLocation = textureLocationUnchecked;
+            } catch (Throwable var19) {
+               MinimapLogs.LOGGER.error("Couldn't fetch main entity texture when trying to use an alternative render type for an icon!", var19);
+            }
+
+            if (textureLocation != null) {
+               lastRenderType = model.method_23500(textureLocation);
+            }
          }
 
          if (lastRenderType != null) {
@@ -895,13 +905,23 @@ public class EntityIconPrerenderer {
       class_630 mainPart = null;
       boolean renderedSomething = false;
       ArrayList<class_630> mainRenderedModels = new ArrayList<>();
-      class_2960 mainEntityTexture = entityRenderer.method_3931(entity);
-      if (detectedModels.isEmpty() && mainEntityTexture != null) {
-         detectedModels.add(
-            new ModelRenderDetectionElement(
-               mainEntityModel, mainEntityTexture, null, CustomRenderTypes.getBasicEntityIconLayerPhases(mainEntityTexture), 1.0F, 1.0F, 1.0F, 1.0F
-            )
-         );
+      if (detectedModels.isEmpty()) {
+         class_2960 mainEntityTexture = null;
+
+         try {
+            class_2960 mainEntityTextureUnchecked = entityRenderer.method_3931(entity);
+            mainEntityTexture = mainEntityTextureUnchecked;
+         } catch (Throwable var26) {
+            MinimapLogs.LOGGER.error("Couldn't fetch main entity texture when prerendering an icon with nothing detected!", var26);
+         }
+
+         if (mainEntityTexture != null) {
+            detectedModels.add(
+               new ModelRenderDetectionElement(
+                  mainEntityModel, mainEntityTexture, null, CustomRenderTypes.getBasicEntityIconLayerPhases(mainEntityTexture), 1.0F, 1.0F, 1.0F, 1.0F
+               )
+            );
+         }
       }
 
       boolean allEmpty = true;

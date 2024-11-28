@@ -3,6 +3,7 @@ package xaero.common.category.rule.resolver;
 import java.util.Iterator;
 import java.util.List;
 import xaero.common.category.FilterObjectCategory;
+import xaero.common.category.rule.ExcludeListMode;
 import xaero.common.category.rule.ObjectCategoryExcludeList;
 import xaero.common.category.rule.ObjectCategoryIncludeList;
 
@@ -44,11 +45,14 @@ public final class ObjectCategoryRuleResolver {
 
       if (result) {
          List<ObjectCategoryExcludeList<E, P, ?>> excludeLists = category.getExcludeLists();
+         if (category.getExcludeMode() == ExcludeListMode.ALL_BUT) {
+            result = false;
+         }
 
          for (int ix = 0; ix < excludeLists.size(); ix++) {
             ObjectCategoryExcludeList<E, P, ?> excludeList = excludeLists.get(ix);
-            if (!excludeList.isFollowedBy(element, context)) {
-               result = false;
+            if (result != excludeList.isFollowedBy(element, context)) {
+               result = !result;
                break;
             }
          }

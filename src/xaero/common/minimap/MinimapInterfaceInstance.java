@@ -11,6 +11,7 @@ import xaero.common.graphics.CustomVertexConsumers;
 import xaero.common.gui.IScreenBase;
 import xaero.common.interfaces.InterfaceInstance;
 import xaero.common.minimap.render.MinimapRendererHelper;
+import xaero.common.misc.Misc;
 
 public class MinimapInterfaceInstance extends InterfaceInstance {
    private XaeroMinimapSession minimapSession;
@@ -37,8 +38,8 @@ public class MinimapInterfaceInstance extends InterfaceInstance {
    @Override
    public void render(class_332 guiGraphics, int width, int height, double scale, float partial, CustomVertexConsumers cvc) {
       class_310 mc = class_310.method_1551();
-      if (!mc.field_1724.method_6059(Effects.NO_MINIMAP)
-         && !mc.field_1724.method_6059(Effects.NO_MINIMAP_HARMFUL)
+      if (!Misc.hasEffect(mc.field_1724, Effects.NO_MINIMAP)
+         && !Misc.hasEffect(mc.field_1724, Effects.NO_MINIMAP_HARMFUL)
          && !this.minimapSession.getMinimapProcessor().getNoMinimapMessageReceived()) {
          if ((
                !this.modMain.getSettings().hideMinimapUnderScreen

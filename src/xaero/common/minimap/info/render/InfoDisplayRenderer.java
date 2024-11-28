@@ -52,6 +52,7 @@ public final class InfoDisplayRenderer {
       boolean under = scaledY + size / 2 < scaledHeight / 2;
       int stringY = scaledY + (under ? size : -9);
       int bgOpacityMask = settings.infoDisplayBackgroundOpacity * 255 / 100 << 24;
+      matrixStack.method_46416(0.0F, 0.0F, -1.0F);
 
       while (iterator.hasNext()) {
          InfoDisplay<?> infoDisplay = iterator.next();
@@ -88,6 +89,7 @@ public final class InfoDisplayRenderer {
          compiledLines.clear();
       }
 
+      matrixStack.method_46416(0.0F, 0.0F, 1.0F);
       renderTypeBuffer.method_22993();
    }
 }
