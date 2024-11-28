@@ -460,6 +460,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    @Override
    public void method_25426() {
       super.method_25426();
+      this.ignoreEditBoxChanges = true;
       this.screenTitle = this.adding
          ? class_1074.method_4662("gui.xaero_new_waypoint", new Object[0])
          : class_1074.method_4662("gui.xaero_edit_waypoint", new Object[0]);
