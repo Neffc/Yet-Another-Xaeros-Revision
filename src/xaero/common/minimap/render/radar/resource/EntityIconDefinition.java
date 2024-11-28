@@ -24,11 +24,14 @@ public class EntityIconDefinition {
    private HashMap<String, EntityIconModelConfig> variantModelConfigs;
    private HashMap<String, class_2960> variantSprites;
    @Expose
-   private String variantIdBuilderMethod;
-   private Method variantIdBuilderMethodReflect;
+   private String variantMethod;
+   private Method variantMethodReflect;
    @Expose
    private String variantIdMethod;
    private Method variantIdMethodReflect;
+   @Expose
+   private String variantIdBuilderMethod;
+   private Method variantIdBuilderMethodReflect;
 
    public class_2960 getVariantType(String variantId) {
       return this.variantTypes == null ? MODEL_TYPE : this.variantTypes.get(variantId);
@@ -43,6 +46,12 @@ public class EntityIconDefinition {
    }
 
    public void onConstruct(class_2960 entityId) {
+      if (this.variantMethod != null) {
+         this.variantMethodReflect = this.convertStringToMethod(
+            this.variantMethod, entityId.toString(), "variant", null, class_2960.class, class_897.class, class_1297.class
+         );
+      }
+
       if (this.variantIdBuilderMethod != null) {
          this.variantIdBuilderMethodReflect = this.convertStringToMethod(
             this.variantIdBuilderMethod, entityId.toString(), "variant ID builder", void.class, StringBuilder.class, class_897.class, class_1297.class
@@ -147,6 +156,18 @@ public class EntityIconDefinition {
       }
    }
 
+   public String getVariantMethodString() {
+      return this.variantMethod;
+   }
+
+   public Method getVariantMethod() {
+      return this.variantMethodReflect;
+   }
+
+   public void setVariantMethod(Method variantMethod) {
+      this.variantMethodReflect = variantMethod;
+   }
+
    public String getVariantIdBuilderMethodString() {
       return this.variantIdBuilderMethod;
    }
@@ -169,7 +190,7 @@ public class EntityIconDefinition {
          try {
             Class<?> c = Class.forName(classPath);
             result = c.getDeclaredMethod(methodName, parameterTypes);
-            if (result.getReturnType() != returnType) {
+            if (returnType != null && result.getReturnType() != returnType) {
                MinimapLogs.LOGGER
                   .info(String.format("The return type of the %s method for %s is not %s. Can't use it.", methodDisplayName, entityId, returnType));
                result = null;

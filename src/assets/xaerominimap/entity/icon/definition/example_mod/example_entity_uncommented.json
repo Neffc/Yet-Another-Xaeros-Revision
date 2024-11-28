@@ -1,5 +1,4 @@
 {
-	"variantIdBuilderMethod" : "xaero.common.minimap.render.radar.EntityIconDefinitions.buildVariantIdString", 
 
 	"variants" : {
 		"example_mod:textures/entity/example_entity/example_entity.png%HAPPY%YELLOW%5" : "model:1",
@@ -44,5 +43,8 @@
 		{
 			"renderingFullModel" : true
 		}
-	]
+	],
+
+	"variantMethod" : "xaero.common.minimap.render.radar.EntityIconDefinitions.getVariant"
+
 }

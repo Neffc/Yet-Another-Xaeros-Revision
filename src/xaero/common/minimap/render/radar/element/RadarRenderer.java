@@ -170,7 +170,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       boolean name = context.name;
       XaeroIcon entityHeadTexture = icon
          ? this.entityIconManager
-            .getEntityHeadTexture(guiGraphics, e, framebuffer, helper, (float)context.iconScale, context.debugEntityIcons, context.debugEntityVariantIds)
+            .getEntityIcon(guiGraphics, e, framebuffer, helper, (float)context.iconScale, context.debugEntityIcons, context.debugEntityVariantIds)
          : null;
       if (entityHeadTexture == EntityIconManager.DOT) {
          entityHeadTexture = null;

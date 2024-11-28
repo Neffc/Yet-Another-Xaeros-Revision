@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import xaero.common.MinimapLogs;
 
@@ -19,6 +20,13 @@ public class CommonConfigIO {
    }
 
    public void save(CommonConfig config) {
+      try {
+         Files.createDirectories(this.configFilePath.getParent());
+      } catch (IOException var11) {
+         MinimapLogs.LOGGER.error("suppressed exception", var11);
+         return;
+      }
+
       try (
          BufferedOutputStream bufferedOutput = new BufferedOutputStream(new FileOutputStream(this.configFilePath.toFile()));
          PrintWriter writer = new PrintWriter(bufferedOutput);

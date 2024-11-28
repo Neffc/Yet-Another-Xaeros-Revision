@@ -1,20 +1,17 @@
 package xaero.common.minimap.render.radar;
 
-import com.google.common.collect.Maps;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import net.minecraft.class_1297;
 import net.minecraft.class_1299;
 import net.minecraft.class_1309;
+import net.minecraft.class_1321;
 import net.minecraft.class_1439;
-import net.minecraft.class_1451;
 import net.minecraft.class_1452;
 import net.minecraft.class_1474;
-import net.minecraft.class_1493;
 import net.minecraft.class_1498;
 import net.minecraft.class_1501;
-import net.minecraft.class_156;
 import net.minecraft.class_1621;
 import net.minecraft.class_2960;
 import net.minecraft.class_3850;
@@ -28,7 +25,6 @@ import net.minecraft.class_4791;
 import net.minecraft.class_4985;
 import net.minecraft.class_4997;
 import net.minecraft.class_4999;
-import net.minecraft.class_5148;
 import net.minecraft.class_549;
 import net.minecraft.class_553;
 import net.minecraft.class_555;
@@ -76,24 +72,23 @@ import net.minecraft.class_959;
 import net.minecraft.class_963;
 import net.minecraft.class_969;
 import net.minecraft.class_971;
-import net.minecraft.class_1439.class_4621;
 import net.minecraft.class_895.class_625;
 import xaero.common.MinimapLogs;
 import xaero.common.minimap.render.radar.custom.EntityIconCustomRenderer;
+import xaero.common.minimap.render.radar.variant.HorseVariant;
+import xaero.common.minimap.render.radar.variant.IronGolemVariant;
+import xaero.common.minimap.render.radar.variant.LlamaVariant;
+import xaero.common.minimap.render.radar.variant.SaddleVariant;
+import xaero.common.minimap.render.radar.variant.TamableVariant;
+import xaero.common.minimap.render.radar.variant.TropicalFishVariant;
+import xaero.common.minimap.render.radar.variant.VillagerVariant;
 import xaero.common.misc.OptimizedMath;
 
 public class EntityIconDefinitions {
-   public static final Map<class_5148, class_2960> HORSE_MARKINGS = (Map<class_5148, class_2960>)class_156.method_654(
-      Maps.newEnumMap(class_5148.class), map -> {
-         map.put(class_5148.field_23808, (class_2960)null);
-         map.put(class_5148.field_23809, new class_2960("textures/entity/horse/horse_markings_white.png"));
-         map.put(class_5148.field_23810, new class_2960("textures/entity/horse/horse_markings_whitefield.png"));
-         map.put(class_5148.field_23811, new class_2960("textures/entity/horse/horse_markings_whitedots.png"));
-         map.put(class_5148.field_23812, new class_2960("textures/entity/horse/horse_markings_blackdots.png"));
-      }
-   );
    static float slimeSquishBU;
-   private static StringBuilder VARIANT_STRING_BUILDER = new StringBuilder();
+   public static final Method BUILD_VARIANT_ID_STRING_METHOD;
+   public static final Method GET_VARIANT_ID_STRING_METHOD;
+   private static StringBuilder VARIANT_STRING_BUILDER;
 
    public static List<String> getMainModelPartFields(class_897<?> renderer, class_583<?> model, class_1297 entity) {
       List<String> result = new ArrayList<>();
@@ -294,59 +289,51 @@ public class EntityIconDefinitions {
       return null;
    }
 
+   public static <E extends class_1297> Object getVariant(class_2960 entityTexture, class_897<? super E> entityRenderer, E entity) {
+      if (entityRenderer instanceof class_910) {
+         return new HorseVariant(entityTexture, ((class_1498)entity).method_27078());
+      } else if (entityRenderer instanceof class_963 || entityRenderer instanceof class_971) {
+         class_3850 villagerdata = ((class_3851)entity).method_7231();
+         class_3854 villagertype = villagerdata.method_16919();
+         class_3852 villagerprofession = villagerdata.method_16924();
+         int villagerprofessionlevel = villagerdata.method_16925();
+         return new VillagerVariant(entityTexture, ((class_1309)entity).method_6109(), villagertype, villagerprofession, villagerprofessionlevel);
+      } else if (entityRenderer instanceof class_929 || entityRenderer instanceof class_969) {
+         return new TamableVariant(entityTexture, ((class_1321)entity).method_6181());
+      } else if (entityRenderer instanceof class_913) {
+         return new IronGolemVariant(entityTexture, ((class_1439)entity).method_23347());
+      } else if (entityRenderer instanceof class_921) {
+         class_1501 llama = (class_1501)entity;
+         return new LlamaVariant(entityTexture, llama.method_6807(), llama.method_6800());
+      } else if (entityRenderer instanceof class_932) {
+         return new SaddleVariant(entityTexture, ((class_1452)entity).method_6725());
+      } else if (entityRenderer instanceof class_4999) {
+         return new SaddleVariant(entityTexture, ((class_4985)entity).method_6725());
+      } else if (entityRenderer instanceof class_959) {
+         class_1474 fish = (class_1474)entity;
+         return new TropicalFishVariant(entityTexture, fish.method_47862(), fish.method_6658(), fish.method_6655());
+      } else {
+         return entityTexture;
+      }
+   }
+
    public static void buildVariantIdString(StringBuilder stringBuilder, class_897 entityRenderer, class_1297 entity) {
       class_2960 entityTexture = null;
 
       try {
          class_2960 entityTextureUnchecked = entityRenderer.method_3931(entity);
          entityTexture = entityTextureUnchecked;
-      } catch (Throwable var8) {
+      } catch (Throwable var5) {
          MinimapLogs.LOGGER.error("Exception while fetching entity texture to build its variant ID for " + class_1299.method_5890(entity.method_5864()));
          MinimapLogs.LOGGER
             .error(
                "The exception is most likely on another mod's end and suppressing it here could lead to more issues. Please report to appropriate mod devs.",
-               var8
+               var5
             );
       }
 
       if (entityTexture != null) {
-         stringBuilder.append(entityTexture);
-         if (entityRenderer instanceof class_910) {
-            stringBuilder.append("%").append(HORSE_MARKINGS.get(((class_1498)entity).method_27078()));
-         } else if (entityRenderer instanceof class_963 || entityRenderer instanceof class_971) {
-            class_3850 villagerdata = ((class_3851)entity).method_7231();
-            class_3854 villagertype = villagerdata.method_16919();
-            class_3852 villagerprofession = villagerdata.method_16924();
-            int villagerprofessionlevel = villagerdata.method_16925();
-            stringBuilder.append("%")
-               .append(((class_1309)entity).method_6109())
-               .append("%")
-               .append(villagertype)
-               .append("%")
-               .append(villagerprofession)
-               .append("%")
-               .append(villagerprofessionlevel);
-         } else if (entityRenderer instanceof class_929) {
-            stringBuilder.append("%").append(((class_1451)entity).method_6181());
-         } else if (entityRenderer instanceof class_969) {
-            stringBuilder.append("%").append(((class_1493)entity).method_6181());
-         } else if (entityRenderer instanceof class_913) {
-            class_1439 ironGolem = (class_1439)entity;
-            class_4621 cracks = ironGolem.method_23347();
-            stringBuilder.append("%").append(cracks);
-         } else if (entityRenderer instanceof class_921) {
-            class_1501 llama = (class_1501)entity;
-            stringBuilder.append("%").append(llama.method_6807()).append("%").append(llama.method_6800());
-         } else if (entityRenderer instanceof class_932) {
-            class_1452 pig = (class_1452)entity;
-            stringBuilder.append("%").append(pig.method_6725());
-         } else if (entityRenderer instanceof class_4999) {
-            class_4985 strider = (class_4985)entity;
-            stringBuilder.append("%").append(strider.method_6725());
-         } else if (entityRenderer instanceof class_959) {
-            class_1474 fish = (class_1474)entity;
-            stringBuilder.append("%").append(fish.method_47862()).append("%").append(fish.method_6658()).append("%").append(fish.method_6655());
-         }
+         stringBuilder.append(getVariant(entityTexture, entityRenderer, entity));
       }
    }
 
@@ -355,5 +342,17 @@ public class EntityIconDefinitions {
       stringBuilder.setLength(0);
       buildVariantIdString(stringBuilder, entityRenderer, entity);
       return stringBuilder.toString();
+   }
+
+   static {
+      try {
+         BUILD_VARIANT_ID_STRING_METHOD = EntityIconDefinitions.class
+            .getDeclaredMethod("buildVariantIdString", StringBuilder.class, class_897.class, class_1297.class);
+         GET_VARIANT_ID_STRING_METHOD = EntityIconDefinitions.class.getDeclaredMethod("getVariantString", class_897.class, class_1297.class);
+      } catch (NoSuchMethodException var1) {
+         throw new RuntimeException(var1);
+      }
+
+      VARIANT_STRING_BUILDER = new StringBuilder();
    }
 }

@@ -7,14 +7,15 @@ import xaero.common.platform.Services;
 
 public class CommonConfigInit {
    public void init(IXaeroMinimap modMain, String configFileName) {
-      Path configDestinationPath;
-      if (Services.PLATFORM.isDedicatedServer()) {
-         configDestinationPath = Services.PLATFORM.getGameDir();
-      } else {
-         configDestinationPath = Services.PLATFORM.getConfigDir();
+      Path configDestinationPath = Services.PLATFORM.getConfigDir();
+      Path configPath = configDestinationPath.resolve(configFileName);
+      if (Services.PLATFORM.isDedicatedServer() && !Files.exists(configPath)) {
+         Path oldConfigPath = Services.PLATFORM.getGameDir().resolve(configFileName);
+         if (Files.exists(oldConfigPath)) {
+            configPath = oldConfigPath;
+         }
       }
 
-      Path configPath = configDestinationPath.resolve(configFileName);
       CommonConfigIO io = new CommonConfigIO(configPath);
       modMain.setCommonConfigIO(io);
       if (Files.exists(configPath)) {

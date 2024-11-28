@@ -276,7 +276,7 @@ public class EntityIconPrerenderer {
 
    public XaeroIcon prerender(
       class_332 guiGraphics,
-      String cacheKey,
+      Object variant,
       class_897 entityRenderer,
       class_1297 entity,
       class_276 defaultFramebuffer,
@@ -503,7 +503,8 @@ public class EntityIconPrerenderer {
                RenderSystem.blendFuncSeparate(770, 771, 1, 771);
             }
          } catch (Throwable var23) {
-            MinimapLogs.LOGGER.error(String.format("Exception rendering to a entity icon atlas for %s!", cacheKey), var23);
+            MinimapLogs.LOGGER
+               .error(String.format("Exception rendering to a entity icon atlas for %s %s!", class_1299.method_5890(entity.method_5864()), variant), var23);
          }
 
          GlStateManager._enableBlend();
