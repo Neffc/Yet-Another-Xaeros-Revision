@@ -34,6 +34,7 @@ public abstract class MinimapElementRendererHandler {
       double renderX,
       double renderY,
       double renderZ,
+      double playerDimDiv,
       double ps,
       double pc,
       double zoom,
@@ -62,6 +63,7 @@ public abstract class MinimapElementRendererHandler {
             renderX,
             renderY,
             renderZ,
+            playerDimDiv,
             ps,
             pc,
             zoom,
@@ -94,6 +96,7 @@ public abstract class MinimapElementRendererHandler {
       double renderX,
       double renderY,
       double renderZ,
+      double playerDimDiv,
       double ps,
       double pc,
       double zoom,
@@ -134,6 +137,7 @@ public abstract class MinimapElementRendererHandler {
                   renderX,
                   renderY,
                   renderZ,
+                  playerDimDiv,
                   ps,
                   pc,
                   zoom,
@@ -177,13 +181,14 @@ public abstract class MinimapElementRendererHandler {
       double var15,
       double var17,
       double var19,
-      boolean var21,
-      float var22,
-      int var23,
-      double var24,
-      E var26,
-      MinimapElementReader<E, RRC> var27,
-      RRC var28
+      double var21,
+      boolean var23,
+      float var24,
+      int var25,
+      double var26,
+      E var28,
+      MinimapElementReader<E, RRC> var29,
+      RRC var30
    );
 
    protected abstract void beforeRender(class_4587 var1);

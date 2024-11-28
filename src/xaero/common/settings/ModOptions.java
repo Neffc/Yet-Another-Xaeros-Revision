@@ -228,7 +228,7 @@ public class ModOptions {
          false
       );
       DOTS_STYLE = new ModOptions("gui.xaero_dots_style", 0, ModSettings.DOTS_STYLES.length - 1, false);
-      DOT_NAME_SCALE = new ModOptions("gui.xaero_dot_name_scale", 1.0, 3.0, 1.0F, false);
+      DOT_NAME_SCALE = new ModOptions("gui.xaero_dot_name_scale", 1.0, 3.0, 0.5F, false);
       HEADS_SCALE = new ModOptions(
          "gui.xaero_entity_heads_scale",
          (double)EntityRadarCategorySettings.ICON_SCALE.getUiFirstOption(),

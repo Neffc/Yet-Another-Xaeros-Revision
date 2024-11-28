@@ -51,6 +51,8 @@ public abstract class MinimapRenderer {
    protected double zoom = 1.0;
    private class_2339 mutableBlockPos;
    protected final CompassRenderer compassRenderer;
+   private double lastMapDimensionScale = 1.0;
+   private double lastPlayerDimDiv = 1.0;
 
    public MinimapRenderer(
       AXaeroMinimap modMain, class_310 mc, WaypointsGuiRenderer waypointsGuiRenderer, MinimapInterface minimapInterface, CompassRenderer compassRenderer
@@ -77,20 +79,24 @@ public abstract class MinimapRenderer {
       XaeroMinimapSession var1,
       class_332 var2,
       MinimapProcessor var3,
-      int var4,
-      int var5,
-      float var6,
-      float var7,
-      int var8,
-      boolean var9,
-      boolean var10,
-      int var11,
-      double var12,
-      double var14,
-      boolean var16,
+      double var4,
+      double var6,
+      double var8,
+      double var10,
+      int var12,
+      int var13,
+      float var14,
+      float var15,
+      int var16,
       boolean var17,
-      ModSettings var18,
-      CustomVertexConsumers var19
+      boolean var18,
+      int var19,
+      double var20,
+      double var22,
+      boolean var24,
+      boolean var25,
+      ModSettings var26,
+      CustomVertexConsumers var27
    );
 
    public void renderMinimap(
@@ -143,11 +149,36 @@ public abstract class MinimapRenderer {
       );
       boolean cave = minimap.isCaveModeDisplayed();
       boolean circleShape = shape == 1;
+      double playerX = minimap.getEntityRadar().getEntityX(this.mc.method_1560(), partial);
+      double playerY = minimap.getEntityRadar().getEntityY(this.mc.method_1560(), partial);
+      double playerZ = minimap.getEntityRadar().getEntityZ(this.mc.method_1560(), partial);
+      double renderX = playerX;
+      double renderZ = playerZ;
+      double mapDimensionScale = this.mc.field_1687.method_8597().comp_646();
+      double playerDimDiv = 1.0;
+      if (useWorldMap) {
+         double playerCoordinateScale = mapDimensionScale;
+         mapDimensionScale = this.modMain.getSupportMods().worldmapSupport.getMapDimensionScale();
+         if (mapDimensionScale == 0.0) {
+            mapDimensionScale = this.lastMapDimensionScale;
+         }
+
+         playerDimDiv = mapDimensionScale / playerCoordinateScale;
+         renderX = playerX / playerDimDiv;
+         renderZ = playerZ / playerDimDiv;
+         this.lastMapDimensionScale = mapDimensionScale;
+      }
+
+      this.lastPlayerDimDiv = playerDimDiv;
       matrixStack.method_22903();
       this.renderChunks(
          minimapSession,
          guiGraphics,
          minimap,
+         renderX,
+         renderZ,
+         playerDimDiv,
+         mapDimensionScale,
          mapSize,
          bufferSize,
          sizeFix,
@@ -372,9 +403,6 @@ public abstract class MinimapRenderer {
       matrixStack.method_46416((float)halfFrame, (float)halfFrame, 0.0F);
       int specW = halfFrame + (int)(3.0F * minimapScale);
       boolean safeMode = this instanceof MinimapSafeModeRenderer;
-      double playerX = minimap.getEntityRadar().getEntityX(this.mc.method_1560(), partial);
-      double playerY = minimap.getEntityRadar().getEntityY(this.mc.method_1560(), partial);
-      double playerZ = minimap.getEntityRadar().getEntityZ(this.mc.method_1560(), partial);
       class_4598 renderTypeBuffers = this.modMain.getInterfaceRenderer().getCustomVertexConsumers().getBetterPVPRenderTypeBuffers();
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers = minimapSession.getMultiTextureRenderTypeRenderers();
       double scaledZoom = this.zoom * (double)minimapScale / 2.0;
@@ -388,9 +416,10 @@ public abstract class MinimapRenderer {
             guiGraphics,
             this.mc.method_1560(),
             this.mc.field_1724,
-            playerX,
+            renderX,
             playerY,
-            playerZ,
+            renderZ,
+            playerDimDiv,
             ps,
             pc,
             scaledZoom,
@@ -664,5 +693,9 @@ public abstract class MinimapRenderer {
 
    public MinimapRendererHelper getHelper() {
       return this.helper;
+   }
+
+   public double getLastPlayerDimDiv() {
+      return this.lastPlayerDimDiv;
    }
 }

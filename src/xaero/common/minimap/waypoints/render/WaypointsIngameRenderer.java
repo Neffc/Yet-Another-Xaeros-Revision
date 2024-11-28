@@ -130,7 +130,8 @@ public class WaypointsIngameRenderer {
          double actualEntityZ = entity.method_23321();
          double smoothEntityY = minimap.getEntityRadar().getEntityY(entity, partial);
          class_243 cameraPos = activeRender.method_19326();
-         Waypoint.RENDER_SORTING_POS = cameraPos;
+         double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
+         Waypoint.RENDER_SORTING_POS = new class_243(cameraPos.field_1352 * dimDiv, cameraPos.field_1351, cameraPos.field_1350 * dimDiv);
          double d3 = cameraPos.method_10216();
          double d4 = cameraPos.method_10214();
          double d5 = cameraPos.method_10215();
@@ -147,7 +148,6 @@ public class WaypointsIngameRenderer {
          float cameraAnglePitch = activeRender.method_19329();
          Vector3f lookVector = activeRender.method_19335().get(new Vector3f());
          double clampDepth = this.modMain.getSettings().getWaypointsClampDepth(fov, screenHeight);
-         double dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
          List<Waypoint> sortingList = this.sortingList;
          sortingList.clear();
          if (waypointsManager.getWaypoints() != null) {

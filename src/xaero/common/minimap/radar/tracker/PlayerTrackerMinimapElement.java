@@ -1,7 +1,8 @@
 package xaero.common.minimap.radar.tracker;
 
 import java.util.UUID;
-import net.minecraft.class_2960;
+import net.minecraft.class_1937;
+import net.minecraft.class_5321;
 import xaero.common.minimap.radar.tracker.system.IPlayerTrackerSystem;
 
 public class PlayerTrackerMinimapElement<P> {
@@ -30,7 +31,7 @@ public class PlayerTrackerMinimapElement<P> {
       return this.system.getReader().getZ(this.player);
    }
 
-   public class_2960 getDimension() {
+   public class_5321<class_1937> getDimension() {
       return this.system.getReader().getDimension(this.player);
    }
 

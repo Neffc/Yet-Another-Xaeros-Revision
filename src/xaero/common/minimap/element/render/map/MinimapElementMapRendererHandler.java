@@ -29,6 +29,7 @@ public final class MinimapElementMapRendererHandler extends MinimapElementRender
       double renderX,
       double renderY,
       double renderZ,
+      double playerDimDiv,
       double ps,
       double pc,
       double zoom,
@@ -50,6 +51,7 @@ public final class MinimapElementMapRendererHandler extends MinimapElementRender
          renderX,
          renderY,
          renderZ,
+         playerDimDiv,
          ps,
          pc,
          zoom,
@@ -77,6 +79,7 @@ public final class MinimapElementMapRendererHandler extends MinimapElementRender
       double renderX,
       double renderY,
       double renderZ,
+      double playerDimDiv,
       double ps,
       double pc,
       double zoom,
@@ -89,8 +92,8 @@ public final class MinimapElementMapRendererHandler extends MinimapElementRender
       RRC context
    ) {
       class_4587 matrixStack = guiGraphics.method_51448();
-      double offx = elementReader.getRenderX(element, context, partialTicks) - renderX;
-      double offz = elementReader.getRenderZ(element, context, partialTicks) - renderZ;
+      double offx = elementReader.getRenderX(element, context, partialTicks) / playerDimDiv - renderX;
+      double offz = elementReader.getRenderZ(element, context, partialTicks) / playerDimDiv - renderZ;
       matrixStack.method_22903();
       double zoomedOffX = offx * zoom;
       double zoomedOffZ = offz * zoom;

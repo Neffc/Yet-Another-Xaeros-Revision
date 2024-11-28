@@ -5,6 +5,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.class_2487;
 import net.minecraft.class_2540;
 import net.minecraft.class_2960;
+import net.minecraft.class_5321;
+import net.minecraft.class_7924;
 import xaero.common.XaeroMinimapSession;
 import xaero.common.message.MinimapMessage;
 import xaero.common.message.client.ClientMessageConsumer;
@@ -59,7 +61,9 @@ public class ClientboundTrackedPlayerPacket extends MinimapMessage<ClientboundTr
             if (t.remove) {
                minimapSession.getMinimapProcessor().getClientSyncedTrackedPlayerManager().remove(t.id);
             } else {
-               minimapSession.getMinimapProcessor().getClientSyncedTrackedPlayerManager().update(t.id, t.x, t.y, t.z, t.dimension);
+               minimapSession.getMinimapProcessor()
+                  .getClientSyncedTrackedPlayerManager()
+                  .update(t.id, t.x, t.y, t.z, class_5321.method_29179(class_7924.field_41223, t.dimension));
             }
          }
       }

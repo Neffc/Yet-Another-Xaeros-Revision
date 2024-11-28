@@ -85,11 +85,12 @@ public class EntityIconManager {
             try {
                variantIdBuilderMethod.invoke(null, entityStringBuilder, entityRenderer, entity);
                variantIdAppended = true;
-            } catch (Exception var23) {
+            } catch (Throwable var23) {
+               MinimapLogs.LOGGER
+                  .error("Exception while using the variant builder ID method " + iconDefinition.getVariantIdBuilderMethodString() + " defined for " + entityId);
                MinimapLogs.LOGGER
                   .error(
-                     "Exception while using the variant builder ID method " + iconDefinition.getVariantIdBuilderMethodString() + " defined for " + entityId,
-                     var23
+                     "If the exception is on another mod's end, suppressing it here could lead to more issues. Please report to appropriate mod devs.", var23
                   );
                iconDefinition.setVariantIdBuilderMethod(null);
             }
@@ -100,9 +101,14 @@ public class EntityIconManager {
                   String entityVariantString = (String)variantOldIdMethod.invoke(null, entityRenderer, entity);
                   entityStringBuilder.append(entityVariantString);
                   variantIdAppended = true;
-               } catch (Exception var22) {
+               } catch (Throwable var22) {
                   MinimapLogs.LOGGER
-                     .error("Exception while using the variant ID method " + iconDefinition.getOldVariantIdMethodString() + " defined for " + entityId, var22);
+                     .error("Exception while using the variant ID method " + iconDefinition.getOldVariantIdMethodString() + " defined for " + entityId);
+                  MinimapLogs.LOGGER
+                     .error(
+                        "If the exception is on another mod's end, suppressing it here could lead to more issues. Please report to appropriate mod devs.",
+                        var22
+                     );
                   iconDefinition.setOldVariantIdMethod(null);
                }
             }
@@ -141,10 +147,6 @@ public class EntityIconManager {
       String cacheKey = entityStringBuilder.toString();
       XaeroIcon cachedValue = this.cachedTextures.get(cacheKey);
       if (cachedValue == null) {
-         if (debugEntityVariantIds) {
-            class_310.method_1551().field_1705.method_1743().method_1812(class_2561.method_43470(entityVariantString));
-         }
-
          String variantMapKey = entityVariantString;
          class_2960 iconType;
          if (iconDefinition != null) {
@@ -154,7 +156,11 @@ public class EntityIconManager {
                iconType = iconDefinition.getVariantType(variantMapKey);
             }
          } else {
-            iconType = EntityIconDefinition.MODEL_TYPE;
+            iconType = entity instanceof class_1309 ? EntityIconDefinition.MODEL_TYPE : EntityIconDefinition.DOT_TYPE;
+         }
+
+         if (debugEntityVariantIds && (this.canPrerender || iconType == EntityIconDefinition.DOT_TYPE)) {
+            class_310.method_1551().field_1705.method_1743().method_1812(class_2561.method_43470(entityVariantString));
          }
 
          if (iconType == EntityIconDefinition.MODEL_TYPE) {

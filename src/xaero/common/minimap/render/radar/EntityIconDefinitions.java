@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.class_1297;
+import net.minecraft.class_1299;
 import net.minecraft.class_1309;
 import net.minecraft.class_1439;
 import net.minecraft.class_1451;
@@ -77,6 +78,7 @@ import net.minecraft.class_969;
 import net.minecraft.class_971;
 import net.minecraft.class_1439.class_4621;
 import net.minecraft.class_895.class_625;
+import xaero.common.MinimapLogs;
 import xaero.common.minimap.render.radar.custom.EntityIconCustomRenderer;
 import xaero.common.misc.OptimizedMath;
 
@@ -271,7 +273,20 @@ public class EntityIconDefinitions {
    }
 
    public static void buildVariantIdString(StringBuilder stringBuilder, class_897 entityRenderer, class_1297 entity) {
-      class_2960 entityTexture = entityRenderer.method_3931(entity);
+      class_2960 entityTexture = null;
+
+      try {
+         class_2960 entityTextureUnchecked = entityRenderer.method_3931(entity);
+         entityTexture = entityTextureUnchecked;
+      } catch (Throwable var8) {
+         MinimapLogs.LOGGER.error("Exception while fetching entity texture to build its variant ID for " + class_1299.method_5890(entity.method_5864()));
+         MinimapLogs.LOGGER
+            .error(
+               "The exception is most likely on another mod's end and suppressing it here could lead to more issues. Please report to appropriate mod devs.",
+               var8
+            );
+      }
+
       if (entityTexture != null) {
          stringBuilder.append(entityTexture);
          if (entityRenderer instanceof class_910) {

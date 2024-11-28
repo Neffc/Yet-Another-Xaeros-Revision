@@ -22,7 +22,7 @@ public class Waypoint implements Comparable<Waypoint> {
    private int yaw = 0;
    private boolean temporary;
    private boolean yIncluded;
-   public static class_243 RENDER_SORTING_POS;
+   public static class_243 RENDER_SORTING_POS = new class_243(0.0, 0.0, 0.0);
    private final long createdAt;
    private boolean oneoffDestination;
 

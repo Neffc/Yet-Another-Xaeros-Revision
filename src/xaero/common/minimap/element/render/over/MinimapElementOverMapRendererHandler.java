@@ -36,6 +36,7 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
       double renderX,
       double renderY,
       double renderZ,
+      double playerDimDiv,
       double ps,
       double pc,
       double zoom,
@@ -67,6 +68,7 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
          renderX,
          renderY,
          renderZ,
+         playerDimDiv,
          ps,
          pc,
          zoom,
@@ -94,6 +96,7 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
       double renderX,
       double renderY,
       double renderZ,
+      double playerDimDiv,
       double ps,
       double pc,
       double zoom,
@@ -106,8 +109,8 @@ public class MinimapElementOverMapRendererHandler extends MinimapElementRenderer
       RRC context
    ) {
       class_4587 matrixStack = guiGraphics.method_51448();
-      double offx = elementReader.getRenderX(element, context, partialTicks) - renderX;
-      double offy = elementReader.getRenderZ(element, context, partialTicks) - renderZ;
+      double offx = elementReader.getRenderX(element, context, partialTicks) / playerDimDiv - renderX;
+      double offy = elementReader.getRenderZ(element, context, partialTicks) / playerDimDiv - renderZ;
       matrixStack.method_22903();
       boolean outOfBounds = translatePosition(
          matrixStack, this.specW, this.specH, this.halfViewW, this.halfViewH, ps, pc, offx, offy, zoom, this.circle, this.partialTranslate

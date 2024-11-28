@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.IntConsumer;
+import net.minecraft.class_1297;
 import net.minecraft.class_1657;
 import net.minecraft.class_1937;
+import net.minecraft.class_2378;
+import net.minecraft.class_2874;
 import net.minecraft.class_310;
 import net.minecraft.class_437;
 import net.minecraft.class_4587;
@@ -42,7 +45,8 @@ import xaero.map.settings.ModOptions;
 import xaero.map.world.MapDimension;
 
 public class SupportXaeroWorldmap {
-   public static int WORLDMAP_COMPATIBILITY_VERSION = 19;
+   public static int WORLDMAP_COMPATIBILITY_VERSION = 20;
+   public static final String MINIMAP_MW = "minimap";
    public int compatibilityVersion;
    private static final HashMap<MapTileChunk, Long> seedsUsed = new HashMap<>();
    public static final int black = -16777216;
@@ -79,6 +83,7 @@ public class SupportXaeroWorldmap {
       int maxViewZ,
       boolean zooming,
       double zoom,
+      double mapDimensionScale,
       class_4588 overlayBufferBuilder,
       MultiTextureRenderTypeRendererProvider multiTextureRenderTypeRenderers
    ) {
@@ -117,10 +122,20 @@ public class SupportXaeroWorldmap {
                boolean reloadEverything = WorldMap.settings.reloadEverything;
                int globalReloadVersion = WorldMap.settings.reloadVersion;
                boolean slimeChunks = this.modMain.getSettings().getSlimeChunks(minimapSession.getWaypointsManager());
-               mapProcessor.updateCaveStart();
+               boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
+               if (wmHasDimensionSwitch) {
+                  mapProcessor.initMinimapRender(xFloored, zFloored);
+               }
+
+               if (!wmHasDimensionSwitch) {
+                  mapProcessor.updateCaveStart();
+               }
+
                int renderedCaveLayer = mapProcessor.getCurrentCaveLayer();
-               int globalCaveStart = mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart();
-               int globalCaveDepth = WorldMap.settings.caveModeDepth;
+               int globalCaveStart = !wmHasDimensionSwitch
+                  ? mapProcessor.getMapWorld().getCurrentDimension().getLayeredMapRegions().getLayer(renderedCaveLayer).getCaveStart()
+                  : 0;
+               int globalCaveDepth = !wmHasDimensionSwitch ? WorldMap.settings.caveModeDepth : 0;
                float brightness = this.getMinimapBrightness();
                if (renderedCaveLayer != this.lastRenderedCaveLayer) {
                   this.previousRenderedCaveLayer = this.lastRenderedCaveLayer;
@@ -128,37 +143,41 @@ public class SupportXaeroWorldmap {
 
                class_1657 player = class_310.method_1551().field_1724;
                boolean noCaveMaps = player.method_6059(Effects.NO_CAVE_MAPS) || player.method_6059(Effects.NO_CAVE_MAPS_HARMFUL);
-               boolean playerIsMoving = player.field_6014 != player.method_23317()
-                  || player.field_6036 != player.method_23318()
-                  || player.field_5969 != player.method_23321();
+               boolean playerIsMoving = !wmHasDimensionSwitch
+                  && (player.field_6014 != player.method_23317() || player.field_6036 != player.method_23318() || player.field_5969 != player.method_23321());
                boolean shouldRequestLoading = true;
                Object nextToLoadObj = null;
                shouldRequestLoading = false;
-               LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
-               nextToLoadObj = nextToLoad;
-               if (nextToLoad == null) {
-                  shouldRequestLoading = true;
-               } else if (wmHasFullReload) {
-                  shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
-               } else {
-                  synchronized (nextToLoad) {
-                     if (!nextToLoad.reloadHasBeenRequested()
-                        && !nextToLoad.hasRemovableSourceData()
-                        && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
-                        shouldRequestLoading = true;
+               if (!wmHasDimensionSwitch) {
+                  LeveledRegion<?> nextToLoad = mapProcessor.getMapSaveLoad().getNextToLoadByViewing();
+                  nextToLoadObj = nextToLoad;
+                  if (nextToLoad != null) {
+                     if (wmHasFullReload) {
+                        shouldRequestLoading = nextToLoad.shouldAllowAnotherRegionToLoad();
+                     } else {
+                        synchronized (nextToLoad) {
+                           if (!nextToLoad.reloadHasBeenRequested()
+                              && !nextToLoad.hasRemovableSourceData()
+                              && (!(nextToLoad instanceof MapRegion) || !((MapRegion)nextToLoad).isRefreshing())) {
+                              shouldRequestLoading = true;
+                           }
+                        }
                      }
+                  } else {
+                     shouldRequestLoading = true;
                   }
+
+                  this.regionBuffer.clear();
+                  int comparisonChunkX = (player.method_24515().method_10263() >> 4) - 16;
+                  int comparisonChunkZ = (player.method_24515().method_10260() >> 4) - 16;
+                  LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
                }
 
-               this.regionBuffer.clear();
-               int comparisonChunkX = (player.method_24515().method_10263() >> 4) - 16;
-               int comparisonChunkZ = (player.method_24515().method_10260() >> 4) - 16;
-               LeveledRegion.setComparison(comparisonChunkX, comparisonChunkZ, 0, comparisonChunkX, comparisonChunkZ);
                MultiTextureRenderTypeRenderer mapWithLightRenderer = null;
                MultiTextureRenderTypeRenderer mapNoLightRenderer = null;
                Runnable finalizer = null;
-               IntConsumer binder;
                IntConsumer shaderBinder;
+               IntConsumer binder;
                if (zooming) {
                   binder = t -> {
                      MultiTextureRenderTypeRendererProvider.defaultTextureBind(t);
@@ -220,34 +239,38 @@ public class SupportXaeroWorldmap {
                GL14.glBlendFuncSeparate(770, 771, 1, 0);
                RenderSystem.disableBlend();
                this.lastRenderedCaveLayer = renderedCaveLayer;
-               int toRequest = 1;
-               int counter = 0;
+               if (wmHasDimensionSwitch) {
+                  mapProcessor.finalizeMinimapRender();
+               } else {
+                  int toRequest = 1;
+                  int counter = 0;
 
-               for (int i = 0; i < this.regionBuffer.size() && counter < toRequest; i++) {
-                  MapRegion region = this.regionBuffer.get(i);
-                  if (region != nextToLoadObj || this.regionBuffer.size() <= 1) {
-                     synchronized (region) {
-                        if ((!wmHasFullReload || region.canRequestReload_unsynced())
-                           && (
-                              wmHasFullReload
-                                 || !region.reloadHasBeenRequested()
-                                    && !region.recacheHasBeenRequested()
-                                    && (!(region instanceof MapRegion) || !region.isRefreshing())
-                                    && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
-                           )) {
-                           if (region.getLoadState() == 2) {
-                              region.requestRefresh(mapProcessor);
-                           } else {
-                              mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
-                           }
+                  for (int i = 0; i < this.regionBuffer.size() && counter < toRequest; i++) {
+                     MapRegion region = this.regionBuffer.get(i);
+                     if (region != nextToLoadObj || this.regionBuffer.size() <= 1) {
+                        synchronized (region) {
+                           if ((!wmHasFullReload || region.canRequestReload_unsynced())
+                              && (
+                                 wmHasFullReload
+                                    || !region.reloadHasBeenRequested()
+                                       && !region.recacheHasBeenRequested()
+                                       && (!(region instanceof MapRegion) || !region.isRefreshing())
+                                       && (region.getLoadState() == 0 || region.getLoadState() == 4 || region.getLoadState() == 2 && region.isBeingWritten())
+                              )) {
+                              if (region.getLoadState() == 2) {
+                                 region.requestRefresh(mapProcessor);
+                              } else {
+                                 mapProcessor.getMapSaveLoad().requestLoad(region, "Minimap sorted", false);
+                              }
 
-                           if (counter == 0) {
-                              mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
-                           }
+                              if (counter == 0) {
+                                 mapProcessor.getMapSaveLoad().setNextToLoadByViewing(region);
+                              }
 
-                           counter++;
-                           if (region.getLoadState() == 4) {
-                              break;
+                              counter++;
+                              if (region.getLoadState() == 4) {
+                                 break;
+                              }
                            }
                         }
                      }
@@ -294,11 +317,19 @@ public class SupportXaeroWorldmap {
       MapRegion prevRegion = null;
       Matrix4f matrix = matrixStack.method_23760().method_23761();
       boolean wmHasFullReload = this.compatibilityVersion >= 23;
+      boolean wmHasDimensionSwitch = this.hasDimensionSwitching();
 
       for (int i = minX; i <= maxX; i++) {
          for (int j = minZ; j <= maxZ; j++) {
-            MapRegion region = mapProcessor.getMapRegion(renderedCaveLayer, i >> 3, j >> 3, mapProcessor.regionExists(renderedCaveLayer, i >> 3, j >> 3));
-            if (region != null && region != prevRegion) {
+            MapRegion region;
+            if (wmHasDimensionSwitch) {
+               region = mapProcessor.getMinimapMapRegion(i >> 3, j >> 3);
+               mapProcessor.beforeMinimapRegionRender(region);
+            } else {
+               region = mapProcessor.getMapRegion(renderedCaveLayer, i >> 3, j >> 3, mapProcessor.regionExists(renderedCaveLayer, i >> 3, j >> 3));
+            }
+
+            if (!wmHasDimensionSwitch && region != null && region != prevRegion) {
                synchronized (region) {
                   int regionHashCode = region.getCacheHashCode();
                   int regionReloadVersion = region.getReloadVersion();
@@ -336,7 +367,13 @@ public class SupportXaeroWorldmap {
                MapTileChunk chunk = region == null ? null : region.getChunk(i & 7, j & 7);
                boolean chunkIsVisible = chunk != null && chunk.getLeafTexture().getGlColorTexture() != -1;
                if (!chunkIsVisible && (!noCaveMaps || this.previousRenderedCaveLayer == Integer.MAX_VALUE)) {
-                  MapRegion previousLayerRegion = mapProcessor.getMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
+                  MapRegion previousLayerRegion;
+                  if (wmHasDimensionSwitch) {
+                     previousLayerRegion = mapProcessor.getLeafMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
+                  } else {
+                     previousLayerRegion = mapProcessor.getMapRegion(this.previousRenderedCaveLayer, i >> 3, j >> 3, false);
+                  }
+
                   if (previousLayerRegion != null) {
                      MapTileChunk previousLayerChunk = previousLayerRegion.getChunk(i & 7, j & 7);
                      if (previousLayerChunk != null && previousLayerChunk.getLeafTexture().getGlColorTexture() != -1) {
@@ -642,5 +679,87 @@ public class SupportXaeroWorldmap {
 
    public boolean supportsPacPlayerRadarFilter() {
       return this.compatibilityVersion >= 21;
+   }
+
+   public boolean hasDimensionSwitching() {
+      return this.compatibilityVersion >= 24;
+   }
+
+   public boolean caveLayersAreUsable() {
+      boolean result = this.hasEnabledCaveLayers();
+      if (result && this.hasDimensionSwitching()) {
+         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
+         if (worldmapSession == null) {
+            return result;
+         }
+
+         class_1297 player = class_310.method_1551().method_1560();
+         if (player == null) {
+            return result;
+         }
+
+         MapProcessor mapProcessor = worldmapSession.getMapProcessor();
+         MapDimension mapDimension = mapProcessor.getMapWorld().getCurrentDimension();
+         if (mapDimension == null) {
+            return result;
+         }
+
+         if (mapDimension.getDimId() != player.method_37908().method_27983()) {
+            return false;
+         }
+      }
+
+      return result;
+   }
+
+   public boolean shouldPreventAutoCaveMode(class_1937 world) {
+      if (!this.hasDimensionSwitching()) {
+         return false;
+      } else {
+         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
+         if (worldmapSession == null) {
+            return false;
+         } else {
+            MapProcessor mapProcessor = worldmapSession.getMapProcessor();
+            MapDimension mapDimension = mapProcessor.getMapWorld().getCurrentDimension();
+            return mapDimension == null ? false : mapDimension.getDimId() != world.method_27983();
+         }
+      }
+   }
+
+   public double getMapDimensionScale() {
+      if (!this.hasDimensionSwitching()) {
+         return class_310.method_1551().field_1687.method_8597().comp_646();
+      } else {
+         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
+         if (worldmapSession == null) {
+            return class_310.method_1551().field_1687.method_8597().comp_646();
+         } else {
+            MapProcessor mapProcessor = worldmapSession.getMapProcessor();
+            synchronized (mapProcessor.renderThreadPauseSync) {
+               if (mapProcessor.isRenderingPaused()) {
+                  return 0.0;
+               } else {
+                  class_2378<class_2874> dimTypes = mapProcessor.getWorldDimensionTypeRegistry();
+                  return dimTypes == null ? 0.0 : mapProcessor.getMapWorld().getCurrentDimension().calculateDimScale(dimTypes);
+               }
+            }
+         }
+      }
+   }
+
+   public class_5321<class_1937> getMapDimension() {
+      if (!this.hasDimensionSwitching()) {
+         return class_310.method_1551().field_1687.method_27983();
+      } else {
+         WorldMapSession worldmapSession = WorldMapSession.getCurrentSession();
+         if (worldmapSession == null) {
+            return class_310.method_1551().field_1687.method_27983();
+         } else {
+            MapProcessor mapProcessor = worldmapSession.getMapProcessor();
+            MapDimension mapDimension = mapProcessor.getMapWorld().getCurrentDimension();
+            return mapDimension == null ? class_310.method_1551().field_1687.method_27983() : mapDimension.getDimId();
+         }
+      }
    }
 }

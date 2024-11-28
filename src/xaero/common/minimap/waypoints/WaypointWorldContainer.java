@@ -21,14 +21,16 @@ public class WaypointWorldContainer {
    public HashMap<String, WaypointWorldContainer> subContainers;
    public HashMap<String, WaypointWorld> worlds;
    private HashMap<String, String> multiworldNames;
+   private final WaypointWorldRootContainer rootContainer;
 
-   public WaypointWorldContainer(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key) {
+   public WaypointWorldContainer(AXaeroMinimap modMain, XaeroMinimapSession minimapSession, String key, WaypointWorldRootContainer rootContainer) {
       this.modMain = modMain;
       this.minimapSession = minimapSession;
       this.key = key;
       this.worlds = new HashMap<>();
       this.subContainers = new HashMap<>();
       this.multiworldNames = new HashMap<>();
+      this.rootContainer = rootContainer;
    }
 
    public void setKey(String key) {
@@ -43,7 +45,7 @@ public class WaypointWorldContainer {
    public WaypointWorldContainer addSubContainer(String subID) {
       WaypointWorldContainer c = this.subContainers.get(subID);
       if (c == null) {
-         this.subContainers.put(subID, c = new WaypointWorldContainer(this.modMain, this.minimapSession, this.key + "/" + subID));
+         this.subContainers.put(subID, c = new WaypointWorldContainer(this.modMain, this.minimapSession, this.key + "/" + subID, this.getRootContainer()));
       }
 
       return c;
@@ -66,7 +68,10 @@ public class WaypointWorldContainer {
       if (world == null) {
          WaypointWorld defaultWorld = this.worlds.get("waypoints");
          if (defaultWorld == null) {
-            world = new WaypointWorld(this, multiworldId);
+            class_5321<class_1937> dimId = this.getRootContainer() == this
+               ? null
+               : this.minimapSession.getWaypointsManager().getDimensionKeyForDirectoryName(this.getSubId());
+            world = new WaypointWorld(this, multiworldId, dimId);
             this.worlds.put(multiworldId, world);
          } else {
             this.worlds.put(multiworldId, defaultWorld);
@@ -75,7 +80,9 @@ public class WaypointWorldContainer {
                File defaultFile = this.modMain.getSettings().getWaypointsFile(defaultWorld);
                defaultWorld.setId(multiworldId);
                File fixedFile = this.modMain.getSettings().getWaypointsFile(defaultWorld);
-               Files.move(defaultFile.toPath(), fixedFile.toPath());
+               if (Files.exists(defaultFile.toPath())) {
+                  Files.move(defaultFile.toPath(), fixedFile.toPath());
+               }
             } catch (IOException var6) {
                MinimapLogs.LOGGER.error("suppressed exception", var6);
             }
@@ -247,9 +254,7 @@ public class WaypointWorldContainer {
    }
 
    public WaypointWorldRootContainer getRootContainer() {
-      return !this.key.contains("/")
-         ? (WaypointWorldRootContainer)this
-         : (WaypointWorldRootContainer)this.minimapSession.getWaypointsManager().getWorldContainer(this.key.substring(0, this.key.indexOf("/")));
+      return this.rootContainer;
    }
 
    public void renameOldContainer(String containerID) {

@@ -33,13 +33,13 @@ public class GuiDefaultTpCommand extends ScreenBase {
       this.commandFormatTextField = new class_342(
          this.field_22793, this.field_22789 / 2 - 100, this.field_22790 / 7 + 50, 200, 20, class_2561.method_43471("gui.xaero_teleport_default_command")
       );
-      this.commandFormatTextField.method_1852(this.commandFormat);
       this.commandFormatTextField.method_1880(128);
+      this.commandFormatTextField.method_1852(this.commandFormat);
       this.rotationCommandFormatTextField = new class_342(
          this.field_22793, this.field_22789 / 2 - 100, this.field_22790 / 7 + 98, 200, 20, class_2561.method_43471("gui.xaero_teleport_default_command")
       );
-      this.rotationCommandFormatTextField.method_1852(this.rotationCommandFormat);
       this.rotationCommandFormatTextField.method_1880(128);
+      this.rotationCommandFormatTextField.method_1852(this.rotationCommandFormat);
       this.method_25429(this.commandFormatTextField);
       this.method_25429(this.rotationCommandFormatTextField);
       this.method_37063(

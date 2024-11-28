@@ -1605,6 +1605,7 @@ public class ModSettings {
    }
 
    public void loadWaypointsFromAllSources(WaypointsManager waypointsManager, class_634 connection) throws IOException {
+      waypointsManager.onLoad(connection);
       waypointsManager.getWaypointMap().clear();
       BufferedReader reader = null;
       boolean saveWaypoints = false;
@@ -1640,8 +1641,6 @@ public class ModSettings {
          this.saveAllWaypoints(waypointsManager);
          this.saveSettings();
       }
-
-      waypointsManager.onLoad(connection);
    }
 
    public void loadDefaultSettings() throws IOException {
@@ -2075,7 +2074,7 @@ public class ModSettings {
    public boolean usesWorldMapScreenValue(ModOptions par1EnumOptions) {
       return this.modMain.getSupportMods().shouldUseWorldMapChunks()
          && par1EnumOptions == ModOptions.MANUAL_CAVE_MODE_START
-         && this.modMain.getSupportMods().worldmapSupport.hasEnabledCaveLayers();
+         && this.modMain.getSupportMods().worldmapSupport.caveLayersAreUsable();
    }
 
    protected String getEnumFloatSliderText(String s, String f, ModOptions par1EnumOptions) {

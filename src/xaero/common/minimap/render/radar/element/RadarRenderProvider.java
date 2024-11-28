@@ -2,7 +2,6 @@ package xaero.common.minimap.render.radar.element;
 
 import java.util.Iterator;
 import net.minecraft.class_1297;
-import net.minecraft.class_1309;
 import net.minecraft.class_1657;
 import net.minecraft.class_310;
 import xaero.common.XaeroMinimapSession;
@@ -14,7 +13,7 @@ import xaero.common.minimap.radar.category.setting.EntityRadarCategorySettings;
 import xaero.common.settings.ModSettings;
 
 public final class RadarRenderProvider extends MinimapElementRenderProvider<class_1297, RadarRenderContext> {
-   private double maxDistance;
+   private double maxDistanceSquared;
    private Iterator<MinimapRadarList> entityLists;
    private MinimapRadarList currentList;
    private MinimapRadarList listForContext;
@@ -27,7 +26,10 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
       context.minimapRadar = minimap.getEntityRadar();
       context.reversedOrder = ModSettings.keyReverseEntityRadar.method_1434();
       this.playerListDown = class_310.method_1551().field_1690.field_1907.method_1434() || ModSettings.keyAlternativeListPlayers.method_1434();
-      this.maxDistance = context.minimapRadar.getMaxDistance(minimap, minimapSession.getModMain().getSettings().minimapShape == 1);
+      double playerDimDiv = minimapSession.getModMain().getInterfaces().getMinimapInterface().getMinimapFBORenderer().getLastPlayerDimDiv();
+      this.maxDistanceSquared = context.minimapRadar.getMaxDistance(minimap, minimapSession.getModMain().getSettings().minimapShape == 1)
+         * playerDimDiv
+         * playerDimDiv;
       this.entityLists = context.minimapRadar.getRadarListsIterator();
       this.currentList = null;
       this.listForContext = null;
@@ -87,19 +89,19 @@ public final class RadarRenderProvider extends MinimapElementRenderProvider<clas
          if (location == 0) {
             double offx = result.method_23317() - context.renderEntity.method_23317();
             double offx2 = offx * offx;
-            if (offx2 > this.maxDistance) {
+            if (offx2 > this.maxDistanceSquared) {
                return null;
             }
 
             double offy = result.method_23321() - context.renderEntity.method_23321();
             double offy2 = offy * offy;
-            if (offy2 > this.maxDistance) {
+            if (offy2 > this.maxDistanceSquared) {
                return null;
             }
          }
 
          boolean name = context.namesForList;
-         boolean icon = context.iconsForList && result instanceof class_1309;
+         boolean icon = context.iconsForList;
          if (!name && !(result instanceof class_1657)) {
             name = context.alwaysNameTags && result.method_16914();
          }

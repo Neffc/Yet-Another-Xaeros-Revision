@@ -1,7 +1,8 @@
 package xaero.common.minimap.radar.tracker.system;
 
 import java.util.UUID;
-import net.minecraft.class_2960;
+import net.minecraft.class_1937;
+import net.minecraft.class_5321;
 
 public interface ITrackedPlayerReader<P> {
    UUID getId(P var1);
@@ -12,5 +13,5 @@ public interface ITrackedPlayerReader<P> {
 
    double getZ(P var1);
 
-   class_2960 getDimension(P var1);
+   class_5321<class_1937> getDimension(P var1);
 }

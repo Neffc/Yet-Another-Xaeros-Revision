@@ -330,6 +330,10 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
       XaeroMinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
+      double playerX,
+      double playerZ,
+      double playerDimDiv,
+      double mapDimensionScale,
       int mapSize,
       int bufferSize,
       float sizeFix,
@@ -368,8 +372,8 @@ public class MinimapSafeModeRenderer extends MinimapRenderer {
          this.mapTexture.loadIfNeeded();
          this.getHelper().bindTextureBuffer(this.mapTexture.buffer, bufferSize, bufferSize, this.mapTexture.method_4624());
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float)(this.modMain.getSettings().minimapOpacity / 100.0));
-      } catch (Throwable var22) {
-         this.minimapInterface.setCrashedWith(var22);
+      } catch (Throwable var30) {
+         this.minimapInterface.setCrashedWith(var30);
       }
    }
 

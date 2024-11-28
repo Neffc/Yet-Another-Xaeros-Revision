@@ -6,11 +6,11 @@ import xaero.common.minimap.element.render.MinimapElementReader;
 
 public class PlayerTrackerMinimapElementReader extends MinimapElementReader<PlayerTrackerMinimapElement<?>, PlayerTrackerMinimapElementRenderContext> {
    public boolean isHidden(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context) {
-      return !class_310.method_1551().field_1687.method_27983().method_29177().equals(element.getDimension());
+      return class_310.method_1551().field_1687.method_27983() != element.getDimension() && context.mapDimId != element.getDimension();
    }
 
    public double getRenderX(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
-      return element.getX();
+      return class_310.method_1551().field_1687.method_27983() != element.getDimension() ? element.getX() * context.mapDimDiv : element.getX();
    }
 
    public double getRenderY(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
@@ -18,7 +18,7 @@ public class PlayerTrackerMinimapElementReader extends MinimapElementReader<Play
    }
 
    public double getRenderZ(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {
-      return element.getZ();
+      return class_310.method_1551().field_1687.method_27983() != element.getDimension() ? element.getZ() * context.mapDimDiv : element.getZ();
    }
 
    public int getInteractionBoxLeft(PlayerTrackerMinimapElement<?> element, PlayerTrackerMinimapElementRenderContext context, float partialTicks) {

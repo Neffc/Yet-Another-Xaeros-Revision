@@ -9,6 +9,7 @@ import net.minecraft.class_1041;
 import net.minecraft.class_1074;
 import net.minecraft.class_1297;
 import net.minecraft.class_1657;
+import net.minecraft.class_243;
 import net.minecraft.class_276;
 import net.minecraft.class_310;
 import net.minecraft.class_327;
@@ -75,13 +76,13 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       if ((this.context.deleteReachedDeathpoints || w.getWaypointType() != 1 && w.getWaypointType() != 2)
          && w.isOneoffDestination()
          && System.currentTimeMillis() - w.getCreatedAt() > 5000L) {
-         double correctOffX = renderX - (double)w.getX(this.context.dimDiv);
-         double correctOffY = renderY - (double)w.getY();
+         double correctOffX = renderEntity.method_23317() - (double)w.getX(this.context.dimDiv);
+         double correctOffY = renderEntity.method_23318() - (double)w.getY();
          if (!w.isYIncluded()) {
             correctOffY = 0.0;
          }
 
-         double correctOffZ = renderZ - (double)w.getZ(this.context.dimDiv);
+         double correctOffZ = renderEntity.method_23321() - (double)w.getZ(this.context.dimDiv);
          double correctDistance = Math.sqrt(correctOffX * correctOffX + correctOffY * correctOffY + correctOffZ * correctOffZ);
          if (correctDistance < 4.0) {
             this.waypointReachDeleter.add(w);
@@ -115,7 +116,6 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       this.context.waypointBackgroundConsumer = renderTypeBuffers.getBuffer(CustomRenderTypes.COLORED_WAYPOINTS_BGS);
       this.context.deleteReachedDeathpoints = modMain.getSettings().deleteReachedDeathpoints;
       this.context.scale = modMain.getSettings().waypointOnMapScale;
-      Waypoint.RENDER_SORTING_POS = class_310.method_1551().field_1773.method_19418().method_19326();
       this.updateWaypointCollection(renderX, renderY, renderZ, modMain);
    }
 
@@ -162,14 +162,16 @@ public final class WaypointsGuiRenderer extends MinimapElementRenderer<Waypoint,
       }
 
       this.waypointReachDeleter.begin();
-      this.context.dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentContainerID());
+      this.context.dimDiv = waypointsManager.getDimensionDivision(waypointsManager.getCurrentWorld());
+      class_243 cameraPos = class_310.method_1551().field_1773.method_19418().method_19326();
+      Waypoint.RENDER_SORTING_POS = new class_243(cameraPos.field_1352 * this.context.dimDiv, cameraPos.field_1351, cameraPos.field_1350 * this.context.dimDiv);
       ModSettings settings = modMain.getSettings();
       this.context
          .filterParams
          .setParams(
-            renderX,
-            renderY,
-            renderZ,
+            cameraPos.field_1352,
+            cameraPos.field_1351,
+            cameraPos.field_1350,
             null,
             this.context.dimDiv,
             settings.getDeathpoints(),

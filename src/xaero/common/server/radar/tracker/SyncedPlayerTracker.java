@@ -89,7 +89,8 @@ public class SyncedPlayerTracker {
       this.modMain
          .getMessageHandler()
          .sendToPlayer(
-            player, new ClientboundTrackedPlayerPacket(false, tracked.getId(), tracked.getX(), tracked.getY(), tracked.getZ(), tracked.getDimension())
+            player,
+            new ClientboundTrackedPlayerPacket(false, tracked.getId(), tracked.getX(), tracked.getY(), tracked.getZ(), tracked.getDimensionKey().method_29177())
          );
    }
 }

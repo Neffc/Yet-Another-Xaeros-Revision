@@ -9,6 +9,7 @@ import java.util.function.Function;
 import net.minecraft.class_1074;
 import net.minecraft.class_2561;
 import net.minecraft.class_2583;
+import net.minecraft.class_310;
 import net.minecraft.class_332;
 import net.minecraft.class_342;
 import net.minecraft.class_364;
@@ -86,6 +87,8 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
    private int forcedPlayerX;
    private int forcedPlayerY;
    private int forcedPlayerZ;
+   private double forcedPlayerScale;
+   private WaypointWorld forcedCoordSrcWorld;
    private boolean ignoreEditBoxChanges = true;
    private boolean canBeLabyMod = true;
 
@@ -114,7 +117,9 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       boolean hasForcedPlayerPos,
       int forcedPlayerX,
       int forcedPlayerY,
-      int forcedPlayerZ
+      int forcedPlayerZ,
+      double forcedPlayerScale,
+      WaypointWorld forcedCoordSrcWorld
    ) {
       this(
          modMain,
@@ -129,7 +134,9 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
          hasForcedPlayerPos,
          forcedPlayerX,
          forcedPlayerY,
-         forcedPlayerZ
+         forcedPlayerZ,
+         forcedPlayerScale,
+         forcedCoordSrcWorld
       );
    }
 
@@ -172,13 +179,17 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       boolean hasForcedPlayerPos,
       int forcedPlayerX,
       int forcedPlayerY,
-      int forcedPlayerZ
+      int forcedPlayerZ,
+      double forcedPlayerScale,
+      WaypointWorld forcedCoordSrcWorld
    ) {
       super(modMain, par1GuiScreen, escapeScreen, class_2561.method_43470(""));
       this.hasForcedPlayerPos = hasForcedPlayerPos;
       this.forcedPlayerX = forcedPlayerX;
       this.forcedPlayerY = forcedPlayerY;
       this.forcedPlayerZ = forcedPlayerZ;
+      this.forcedPlayerScale = forcedPlayerScale;
+      this.forcedCoordSrcWorld = forcedCoordSrcWorld;
       this.waypointsEdited = waypointsEdited;
       this.waypointsManager = waypointsManager;
       this.fromSet = waypointSet;
@@ -232,6 +243,72 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       this.canSkipWorldRender = true;
    }
 
+   public GuiAddWaypoint(
+      AXaeroMinimap modMain,
+      WaypointsManager waypointsManager,
+      class_437 par1GuiScreen,
+      class_437 escapeScreen,
+      ArrayList<Waypoint> waypointsEdited,
+      String defaultParentContainer,
+      WaypointWorld defaultWorld,
+      String waypointSet,
+      boolean adding,
+      boolean hasForcedPlayerPos,
+      int forcedPlayerX,
+      int forcedPlayerY,
+      int forcedPlayerZ
+   ) {
+      this(
+         modMain,
+         waypointsManager,
+         par1GuiScreen,
+         escapeScreen,
+         waypointsEdited,
+         defaultParentContainer,
+         defaultWorld,
+         waypointSet,
+         adding,
+         hasForcedPlayerPos,
+         forcedPlayerX,
+         forcedPlayerY,
+         forcedPlayerZ,
+         class_310.method_1551().field_1687.method_8597().comp_646(),
+         null
+      );
+   }
+
+   public GuiAddWaypoint(
+      AXaeroMinimap modMain,
+      WaypointsManager waypointsManager,
+      class_437 par1GuiScreen,
+      class_437 escapeScreen,
+      Waypoint point,
+      String defaultParentContainer,
+      WaypointWorld defaultWorld,
+      String waypointSet,
+      boolean hasForcedPlayerPos,
+      int forcedPlayerX,
+      int forcedPlayerY,
+      int forcedPlayerZ
+   ) {
+      this(
+         modMain,
+         waypointsManager,
+         par1GuiScreen,
+         escapeScreen,
+         point,
+         defaultParentContainer,
+         defaultWorld,
+         waypointSet,
+         hasForcedPlayerPos,
+         forcedPlayerX,
+         forcedPlayerY,
+         forcedPlayerZ,
+         class_310.method_1551().field_1687.method_8597().comp_646(),
+         null
+      );
+   }
+
    private void fillFormWaypoint(WaypointEditForm form, Waypoint w) {
       form.name = w.getLocalizedName();
       form.xText = w.getX() + "";
@@ -247,24 +324,33 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
       }
    }
 
-   private int getAutomaticX(double dimDiv) {
+   private double getDimDiv(double waypointDimScale) {
+      double playerDimScale = this.hasForcedPlayerPos ? this.forcedPlayerScale : this.field_22787.field_1719.method_37908().method_8597().comp_646();
+      return playerDimScale / waypointDimScale;
+   }
+
+   private int getAutomaticX(double waypointDimScale) {
       int playerX = this.hasForcedPlayerPos ? this.forcedPlayerX : OptimizedMath.myFloor(this.field_22787.field_1719.method_23317());
-      return OptimizedMath.myFloor((double)playerX * dimDiv);
+      return OptimizedMath.myFloor((double)playerX * this.getDimDiv(waypointDimScale));
    }
 
-   private int getAutomaticY() {
-      int playerY = this.hasForcedPlayerPos ? this.forcedPlayerY : OptimizedMath.myFloor(this.field_22787.field_1719.method_23318() + 0.0625);
-      return OptimizedMath.myFloor((double)playerY);
+   private String getAutomaticYInput(WaypointWorld destinationWorld) {
+      if (!this.hasForcedPlayerPos || this.forcedPlayerY != 32767 && (this.forcedCoordSrcWorld == null || this.forcedCoordSrcWorld == destinationWorld)) {
+         int playerY = this.hasForcedPlayerPos ? this.forcedPlayerY : OptimizedMath.myFloor(this.field_22787.field_1719.method_23318() + 0.0625);
+         return OptimizedMath.myFloor((double)playerY) + "";
+      } else {
+         return "~";
+      }
    }
 
-   private int getAutomaticZ(double dimDiv) {
+   private int getAutomaticZ(double waypointDimScale) {
       int playerZ = this.hasForcedPlayerPos ? this.forcedPlayerZ : OptimizedMath.myFloor(this.field_22787.field_1719.method_23321());
-      return OptimizedMath.myFloor((double)playerZ * dimDiv);
+      return OptimizedMath.myFloor((double)playerZ * this.getDimDiv(waypointDimScale));
    }
 
    private void fillFormAutomatic(WaypointEditForm form) {
       form.xText = "";
-      form.yText = this.forcedPlayerY == 32767 ? "~" : "";
+      form.yText = "";
       form.zText = "";
       form.color = (int)(Math.random() * (double)(ModSettings.ENCHANT_COLORS.length - 1)) + 1;
       form.autoInitial = true;
@@ -506,7 +592,9 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             }
 
             boolean creatingAWaypoint = this.adding && this.waypointsEdited.size() < this.editForms.size();
-            double dimDiv = this.waypointsManager.getDimensionDivision(this.worlds.getCurrentKeys()[0]);
+            String[] destinationWorldKeys = this.worlds.getCurrentKeys();
+            WaypointWorld destinationWorld = this.waypointsManager.getWorld(destinationWorldKeys[0], destinationWorldKeys[1]);
+            double waypointDimScale = this.waypointsManager.getDimCoordinateScale(destinationWorld);
             int initialEditedWaypointsSize = this.waypointsEdited.size();
 
             for (int i = 0; i < this.editForms.size(); i++) {
@@ -519,13 +607,17 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
                String nameString = waypointForm.name;
                String xString = waypointForm.xText;
                String yString = waypointForm.yText;
+               if (yString.equals("-") || yString.isEmpty()) {
+                  yString = this.getAutomaticYInput(destinationWorld);
+               }
+
                String zString = waypointForm.zText;
                String initialString = waypointForm.initial;
                int colorInt = waypointForm.color;
                boolean yIncluded = !yString.equals("~");
-               int x = !xString.equals("-") && !xString.isEmpty() ? Integer.parseInt(xString) : this.getAutomaticX(dimDiv);
-               int y = !yString.equals("-") && !yString.isEmpty() ? (!yIncluded ? 0 : Integer.parseInt(yString)) : this.getAutomaticY();
-               int z = !zString.equals("-") && !zString.isEmpty() ? Integer.parseInt(zString) : this.getAutomaticZ(dimDiv);
+               int x = !xString.equals("-") && !xString.isEmpty() ? Integer.parseInt(xString) : this.getAutomaticX(waypointDimScale);
+               int y = !yIncluded ? 0 : Integer.parseInt(yString);
+               int z = !zString.equals("-") && !zString.isEmpty() ? Integer.parseInt(zString) : this.getAutomaticZ(waypointDimScale);
                Waypoint w;
                if (shouldCreate) {
                   w = new Waypoint(x, y, z, nameString, initialString, colorInt - 1, 0, false, yIncluded);
@@ -567,9 +659,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
 
             WaypointWorld sourceWorld = this.defaultWorld;
             WaypointSet sourceSet = sourceWorld.getSets().get(this.fromSet);
-            String[] destinationWorldKeys = this.worlds.getCurrentKeys();
             String destinationSetKey = this.sets.getCurrentSetKey();
-            WaypointWorld destinationWorld = this.waypointsManager.getWorld(destinationWorldKeys[0], destinationWorldKeys[1]);
             WaypointSet destinationSet = destinationWorld.getSets().get(destinationSetKey);
             if (this.adding || sourceSet != destinationSet) {
                if (!this.modMain.getSettings().waypointsBottom) {
@@ -588,8 +678,8 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
                if (destinationWorld != sourceWorld) {
                   this.modMain.getSettings().saveWaypoints(destinationWorld);
                }
-            } catch (IOException var23) {
-               MinimapLogs.LOGGER.error("suppressed exception", var23);
+            } catch (IOException var25) {
+               MinimapLogs.LOGGER.error("suppressed exception", var25);
             }
 
             this.goBack();
@@ -1037,13 +1127,15 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
             this.nameTextField.method_1883(0);
          }
 
-         double dimDiv = this.waypointsManager.getDimensionDivision(this.worlds.getCurrentKeys()[0]);
+         String[] destinationWorldKeys = this.worlds.getCurrentKeys();
+         WaypointWorld destinationWorld = this.waypointsManager.getWorld(destinationWorldKeys[0], destinationWorldKeys[1]);
+         double waypointDimScale = this.waypointsManager.getDimCoordinateScale(destinationWorld);
          if (current.keepXText) {
             if (!this.xTextField.method_25370()) {
                Misc.setFieldText(this.xTextField, this.xPlaceholder, -11184811);
             }
          } else if (current.xText.isEmpty()) {
-            Misc.setFieldText(this.xTextField, this.getAutomaticX(dimDiv) + "", -11184811);
+            Misc.setFieldText(this.xTextField, this.getAutomaticX(waypointDimScale) + "", -11184811);
             this.xTextField.method_1883(0);
          }
 
@@ -1052,7 +1144,11 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
                Misc.setFieldText(this.yTextField, this.yPlaceholder, -11184811);
             }
          } else if (current.yText.isEmpty()) {
-            Misc.setFieldText(this.yTextField, this.getAutomaticY() + "", -11184811);
+            Misc.setFieldText(
+               this.yTextField,
+               StringConcatFactory.makeConcatWithConstants<"makeConcatWithConstants","\u0001">(this.getAutomaticYInput(destinationWorld)),
+               -11184811
+            );
             this.yTextField.method_1883(0);
          }
 
@@ -1061,7 +1157,7 @@ public class GuiAddWaypoint extends ScreenBase implements IDropDownWidgetCallbac
                Misc.setFieldText(this.zTextField, this.zPlaceholder, -11184811);
             }
          } else if (current.zText.isEmpty()) {
-            Misc.setFieldText(this.zTextField, this.getAutomaticZ(dimDiv) + "", -11184811);
+            Misc.setFieldText(this.zTextField, this.getAutomaticZ(waypointDimScale) + "", -11184811);
             this.zTextField.method_1883(0);
          }
 

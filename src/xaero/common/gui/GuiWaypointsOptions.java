@@ -116,7 +116,6 @@ public class GuiWaypointsOptions extends ScreenBase {
          )
       );
       this.connectButton.field_22763 = this.waypointsManager.isMultiplayer(this.rootContainer.getKey())
-         && this.waypointWorld.getContainer() != this.automaticWaypointWorld.getContainer()
          && this.rootContainer == this.automaticWaypointWorld.getContainer().getRootContainer();
       this.method_37063(
          new MyBigButton(

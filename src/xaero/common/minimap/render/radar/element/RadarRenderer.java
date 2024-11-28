@@ -177,14 +177,11 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
          icon = false;
       }
 
-      if (entityHeadTexture == EntityIconManager.FAILED) {
-         entityHeadTexture = null;
-      }
-
       float offh = (float)(renderEntity.method_23318() - e.method_23318());
       matrixStack.method_22904(partialX, partialY, 0.0);
+      boolean usableIcon = entityHeadTexture != null && entityHeadTexture != EntityIconManager.FAILED;
       double dotsScale;
-      if (entityHeadTexture != null) {
+      if (usableIcon) {
          dotsScale = context.iconScale;
          double clampedScale = Math.max(1.0, dotsScale * (double)optionalScale);
          matrixStack.method_22905((float)clampedScale, (float)clampedScale, 1.0F);
@@ -230,7 +227,7 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
 
          matrixStack.method_22905(optionalScale, optionalScale, 1.0F);
          int dotSize = context.dotSize;
-         if (icon && context.displayNameWhenIconFails) {
+         if (icon && context.displayNameWhenIconFails && entityHeadTexture == EntityIconManager.FAILED) {
             name = true;
          }
 
@@ -313,10 +310,13 @@ public final class RadarRenderer extends MinimapElementRenderer<class_1297, Rada
       if (name || displayY > 0) {
          matrixStack.method_22903();
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-         matrixStack.method_22904((double)nameOffsetX, (double)nameOffsetY, optionalDepth);
-         int offsetY = entityHeadTexture != null ? 11 : 5;
+         matrixStack.method_22904((double)nameOffsetX, (double)nameOffsetY, optionalDepth + 0.1F);
+         int offsetY = usableIcon ? 11 : 5;
          matrixStack.method_46416(0.0F, (float)Math.round((double)offsetY * dotsScale * (double)optionalScale), 0.0F);
-         optionalScale = (float)Math.ceil((double)optionalScale);
+         if (optionalScale < 1.0F) {
+            optionalScale = 1.0F;
+         }
+
          double dotNameScale = context.nameScale * (double)optionalScale;
          matrixStack.method_22905((float)dotNameScale, (float)dotNameScale, 1.0F);
          String yValueString = null;

@@ -2246,6 +2246,8 @@ public class MinimapWriter {
             if (customCaveStart != Integer.MAX_VALUE) {
                return customCaveStart;
             }
+         } else if (this.modMain.getSupportMods().worldmap() && this.modMain.getSupportMods().worldmapSupport.shouldPreventAutoCaveMode(world)) {
+            return Integer.MAX_VALUE;
          }
 
          int worldBottomY = world.method_31607();
@@ -2267,7 +2269,7 @@ public class MinimapWriter {
             int potentialResult = defaultCaveStart;
 
             for (int o = 0; o < roofDiameter; o++) {
-               label115:
+               label122:
                for (int p = 0; p < roofDiameter; p++) {
                   int currentX = startX + o;
                   int currentZ = startZ + p;
@@ -2334,7 +2336,7 @@ public class MinimapWriter {
                         if (o == p && o == roofRadius) {
                            potentialResult = Math.min(ix, defaultCaveStart);
                         }
-                        continue label115;
+                        continue label122;
                      }
                   }
 

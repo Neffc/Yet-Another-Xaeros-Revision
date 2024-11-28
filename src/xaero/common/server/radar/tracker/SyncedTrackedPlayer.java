@@ -2,16 +2,18 @@ package xaero.common.server.radar.tracker;
 
 import java.util.UUID;
 import net.minecraft.class_1657;
+import net.minecraft.class_1937;
 import net.minecraft.class_2960;
+import net.minecraft.class_5321;
 
 public class SyncedTrackedPlayer {
    private final UUID id;
    private double x;
    private double y;
    private double z;
-   private class_2960 dimension;
+   private class_5321<class_1937> dimension;
 
-   public SyncedTrackedPlayer(UUID id, double x, double y, double z, class_2960 dimension) {
+   public SyncedTrackedPlayer(UUID id, double x, double y, double z, class_5321<class_1937> dimension) {
       this.id = id;
       this.x = x;
       this.y = y;
@@ -26,7 +28,7 @@ public class SyncedTrackedPlayer {
       return this;
    }
 
-   public SyncedTrackedPlayer setDimension(class_2960 dimension) {
+   public SyncedTrackedPlayer setDimension(class_5321<class_1937> dimension) {
       this.dimension = dimension;
       return this;
    }
@@ -47,7 +49,12 @@ public class SyncedTrackedPlayer {
       return this.z;
    }
 
+   @Deprecated
    public class_2960 getDimension() {
+      return this.dimension.method_29177();
+   }
+
+   public class_5321<class_1937> getDimensionKey() {
       return this.dimension;
    }
 
@@ -59,10 +66,10 @@ public class SyncedTrackedPlayer {
    }
 
    public void update(class_1657 player) {
-      this.setPos(player.method_23317(), player.method_23318(), player.method_23321()).setDimension(player.method_37908().method_27983().method_29177());
+      this.setPos(player.method_23317(), player.method_23318(), player.method_23321()).setDimension(player.method_37908().method_27983());
    }
 
    public void copyFrom(SyncedTrackedPlayer trackedPlayer) {
-      this.setPos(trackedPlayer.getX(), trackedPlayer.getY(), trackedPlayer.getZ()).setDimension(trackedPlayer.getDimension());
+      this.setPos(trackedPlayer.getX(), trackedPlayer.getY(), trackedPlayer.getZ()).setDimension(trackedPlayer.getDimensionKey());
    }
 }

@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import net.minecraft.class_1937;
+import net.minecraft.class_5321;
 
 public class WaypointWorld {
    private String id;
@@ -16,8 +18,9 @@ public class WaypointWorld {
    private String current = "gui.xaero_default";
    private WaypointWorldContainer container;
    private List<String> toRemoveOnSave;
+   private final class_5321<class_1937> dimId;
 
-   public WaypointWorld(WaypointWorldContainer container, String id) {
+   public WaypointWorld(WaypointWorldContainer container, String id, class_5321<class_1937> dimId) {
       this.container = container;
       this.id = id;
       this.sets = new HashMap<>();
@@ -25,6 +28,7 @@ public class WaypointWorld {
       this.serverWaypointsDisabled = new HashMap<>();
       this.addSet("gui.xaero_default");
       this.toRemoveOnSave = new ArrayList<>();
+      this.dimId = dimId;
    }
 
    public WaypointSet getCurrentSet() {
@@ -103,5 +107,9 @@ public class WaypointWorld {
 
    public boolean hasSomethingToRemoveOnSave() {
       return !this.toRemoveOnSave.isEmpty();
+   }
+
+   public class_5321<class_1937> getDimId() {
+      return this.dimId;
    }
 }

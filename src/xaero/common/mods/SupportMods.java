@@ -33,7 +33,7 @@ public class SupportMods {
    }
 
    public boolean shouldUseWorldMapCaveChunks() {
-      return this.shouldUseWorldMapChunks() && this.worldmapSupport.hasEnabledCaveLayers();
+      return this.shouldUseWorldMapChunks() && this.worldmapSupport.caveLayersAreUsable();
    }
 
    public boolean framedBlocks() {

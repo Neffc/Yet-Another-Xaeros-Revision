@@ -12,7 +12,7 @@ public class SupportServerMods {
 
    public void check(AXaeroMinimap modMain) {
       try {
-         Class.forName("dev.ftb.mods.ftbteams.FTBTeamsAPI");
+         Class.forName("dev.ftb.mods.ftbteams.api.FTBTeamsAPI");
          this.ftbTeams = new SupportFTBTeamsServer();
       } catch (ClassNotFoundException var6) {
       }

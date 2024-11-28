@@ -1,6 +1,9 @@
 package xaero.common.minimap.waypoints;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -60,23 +63,37 @@ public class WaypointsManager {
       this.mc = class_310.method_1551();
    }
 
-   public void onLoad(class_634 connection) {
-      this.mainContainerID = this.getMainContainer(connection);
+   public void onLoad(class_634 connection) throws IOException {
+      this.mainContainerID = this.getMainContainer(false, connection);
+      this.fixIPv6Folder(connection);
    }
 
+   @Deprecated
    public double getDimensionDivision(String worldContainerID) {
-      if (worldContainerID != null && class_310.method_1551().field_1687 != null) {
-         String dimPart = worldContainerID.substring(worldContainerID.lastIndexOf(47) + 1);
-         class_5321<class_1937> dimKey = this.getDimensionKeyForDirectoryName(dimPart);
-         if (dimKey != class_1937.field_25180 && dimKey != class_1937.field_25179 && dimKey != class_1937.field_25181) {
-            return 1.0;
-         } else {
-            double currentDimDiv = class_310.method_1551().field_1687.method_8597().comp_646();
-            double selectedDimDiv = dimKey == class_1937.field_25180 ? 8.0 : 1.0;
-            return currentDimDiv / selectedDimDiv;
-         }
-      } else {
+      if (worldContainerID == null) {
          return 1.0;
+      } else {
+         WaypointWorldContainer container = this.getWorldContainerNullable(worldContainerID);
+         return container == null ? 1.0 : this.getDimensionDivision(container.getFirstWorld());
+      }
+   }
+
+   public double getDimensionDivision(WaypointWorld waypointWorld) {
+      if (class_310.method_1551().field_1687 == null) {
+         return 1.0;
+      } else {
+         double selectedDimDiv = this.getDimCoordinateScale(waypointWorld);
+         return class_310.method_1551().field_1687.method_8597().comp_646() / selectedDimDiv;
+      }
+   }
+
+   public double getDimCoordinateScale(WaypointWorld waypointWorld) {
+      if (waypointWorld == null) {
+         return 1.0;
+      } else {
+         WaypointWorldRootContainer rootContainer = waypointWorld.getContainer().getRootContainer();
+         class_5321<class_1937> dimKey = waypointWorld.getDimId();
+         return dimKey == null ? 1.0 : rootContainer.getDimensionScale(dimKey);
       }
    }
 
@@ -126,7 +143,7 @@ public class WaypointsManager {
       }
    }
 
-   private String getMainContainer(class_634 connection) {
+   private String getMainContainer(boolean preIP6Fix, class_634 connection) {
       String potentialContainerID;
       if (this.mc.method_1576() != null) {
          potentialContainerID = this.mc
@@ -142,8 +159,15 @@ public class WaypointsManager {
          potentialContainerID = "Realms_" + this.modMain.getEvents().latestRealm.field_22605 + "." + this.modMain.getEvents().latestRealm.field_22599;
       } else if (connection.method_45734() != null) {
          String serverIP = this.modMain.getSettings().differentiateByServerAddress ? connection.method_45734().field_3761 : "Any Address";
-         if (serverIP.contains(":")) {
-            serverIP = serverIP.substring(0, serverIP.indexOf(":"));
+         int portDivider;
+         if (!preIP6Fix && serverIP.indexOf(":") != serverIP.lastIndexOf(":")) {
+            portDivider = serverIP.lastIndexOf("]:") + 1;
+         } else {
+            portDivider = serverIP.indexOf(":");
+         }
+
+         if (portDivider > 0) {
+            serverIP = serverIP.substring(0, portDivider);
          }
 
          while (serverIP.endsWith(".")) {
@@ -197,7 +221,7 @@ public class WaypointsManager {
                actualMultiworldId = "mw$" + autoIdBase;
             }
 
-            if (useWorldmap && !worldmapMultiworldId.equals("minimap")) {
+            if (useWorldmap && worldmapMultiworldId != "minimap") {
                actualMultiworldId = worldmapMultiworldId;
             }
 
@@ -405,6 +429,7 @@ public class WaypointsManager {
 
             WaypointWorldContainer rootContainer = this.getWorldContainer(this.mainContainerID);
             rootContainer.renameOldContainer(this.containerID);
+            ((WaypointWorldRootContainer)rootContainer).updateDimensionType(this.mc.field_1687);
          }
       }
    }
@@ -483,7 +508,7 @@ public class WaypointsManager {
          }
 
          List<Waypoint> list = waypoints.getList();
-         double dimDiv = this.getDimensionDivision(wpw.getContainer().getKey());
+         double dimDiv = this.getDimensionDivision(wpw);
          if (this.modMain.getSettings().getDeathpoints()) {
             Waypoint deathpoint = new Waypoint(
                OptimizedMath.myFloor((double)OptimizedMath.myFloor(p.method_23317()) * dimDiv),
@@ -511,9 +536,10 @@ public class WaypointsManager {
       this.createTemporaryWaypoints(waypointWorld, x, y, z, true);
    }
 
-   public void createTemporaryWaypoints(WaypointWorld waypointWorld, int x, int y, int z, boolean yIncluded) {
+   public void createTemporaryWaypoints(WaypointWorld waypointWorld, int x, int y, int z, boolean yIncluded, double dimScale) {
       if (this.modMain.getSettings().waypointsGUI(this) && waypointWorld != null) {
-         double dimDiv = this.getDimensionDivision(waypointWorld.getContainer().key);
+         double waypointDestDimScale = this.getDimCoordinateScale(waypointWorld);
+         double dimDiv = dimScale / waypointDestDimScale;
          x = OptimizedMath.myFloor((double)x * dimDiv);
          z = OptimizedMath.myFloor((double)z * dimDiv);
          Waypoint instant = new Waypoint(x, y, z, "Waypoint", "X", (int)(Math.random() * (double)ModSettings.ENCHANT_COLORS.length), 0, true, yIncluded);
@@ -523,6 +549,10 @@ public class WaypointsManager {
             waypointWorld.getCurrentSet().getList().add(instant);
          }
       }
+   }
+
+   public void createTemporaryWaypoints(WaypointWorld waypointWorld, int x, int y, int z, boolean yIncluded) {
+      this.createTemporaryWaypoints(waypointWorld, x, y, z, yIncluded, class_310.method_1551().field_1687.method_8597().comp_646());
    }
 
    public boolean canTeleport(boolean displayingTeleportableWorld, WaypointWorld displayedWorld) {
@@ -560,7 +590,8 @@ public class WaypointsManager {
          boolean reachableDimension = true;
          boolean crossDimension = false;
          WaypointWorldRootContainer rootContainer = displayedWorld.getContainer().getRootContainer();
-         if (displayingTeleportableWorld && displayedWorld != this.getAutoWorld()) {
+         WaypointWorld autoWorld = this.getAutoWorld();
+         if (displayingTeleportableWorld && displayedWorld != autoWorld) {
             if (!this.isTeleportationSafe(displayedWorld)) {
                class_5250 messageComponent = class_2561.method_43470(class_1074.method_4662("gui.xaero_teleport_not_connected", new Object[0]));
                messageComponent.method_10862(messageComponent.method_10866().method_10977(class_124.field_1061));
@@ -568,26 +599,28 @@ public class WaypointsManager {
                return;
             }
 
-            crossDimension = true;
-            String[] containerKeySplit = displayedWorld.getContainer().getKey().split("/");
-            if (containerKeySplit.length > 1) {
-               String dimensionKey = containerKeySplit[1];
-               if (!dimensionKey.startsWith("dim%")) {
-                  this.mc.field_1705.method_1743().method_1812(class_2561.method_43471("gui.xaero_visit_needed"));
-                  return;
-               }
+            if (autoWorld == null || autoWorld.getContainer() != displayedWorld.getContainer()) {
+               crossDimension = true;
+               String[] containerKeySplit = displayedWorld.getContainer().getKey().split("/");
+               if (containerKeySplit.length > 1) {
+                  String dimensionKey = containerKeySplit[1];
+                  if (!dimensionKey.startsWith("dim%")) {
+                     this.mc.field_1705.method_1743().method_1812(class_2561.method_43471("gui.xaero_visit_needed"));
+                     return;
+                  }
 
-               class_5321<class_1937> dimensionId = this.getDimensionKeyForDirectoryName(dimensionKey);
-               if (dimensionId != null) {
-                  this.setCustomContainerID(null);
-                  this.setCustomWorldID(null);
-                  this.updateWaypoints();
-                  tpCommand = "/execute in " + dimensionId.method_29177().toString() + " run ";
+                  class_5321<class_1937> dimensionId = this.getDimensionKeyForDirectoryName(dimensionKey);
+                  if (dimensionId != null) {
+                     this.setCustomContainerID(null);
+                     this.setCustomWorldID(null);
+                     this.updateWaypoints();
+                     tpCommand = "/execute in " + dimensionId.method_29177().toString() + " run ";
+                  } else {
+                     reachableDimension = false;
+                  }
                } else {
                   reachableDimension = false;
                }
-            } else {
-               reachableDimension = false;
             }
          }
 
@@ -616,7 +649,7 @@ public class WaypointsManager {
             } else {
                int x = selected.getX();
                int z = selected.getZ();
-               double dimDiv = this.getDimensionDivision(displayedWorld.getContainer().getKey());
+               double dimDiv = this.getDimensionDivision(displayedWorld);
                if (!crossDimension && dimDiv != 1.0) {
                   x = (int)Math.floor((double)x / dimDiv);
                   z = (int)Math.floor((double)z / dimDiv);
@@ -677,14 +710,22 @@ public class WaypointsManager {
       return rootContainer.getKey().equals(this.getAutoRootContainerID())
          && (
             autoWorld == displayedWorld
-               || this.modMain.getSettings().crossDimensionalTp && autoWorld != null && autoWorld.getContainer() != displayedWorld.getContainer()
+               || autoWorld != null
+                  && (
+                     autoWorld.getContainer() == displayedWorld.getContainer()
+                        || this.modMain.getSettings().crossDimensionalTp && autoWorld.getContainer() != displayedWorld.getContainer()
+                  )
          );
    }
 
    public boolean isTeleportationSafe(WaypointWorld displayedWorld) {
-      WaypointWorld autoWorld = this.getAutoWorld();
-      WaypointWorldRootContainer rootContainer = displayedWorld.getContainer().getRootContainer();
-      return rootContainer.getSubWorldConnections().isConnected(autoWorld, displayedWorld);
+      if (!class_310.method_1551().field_1761.method_2908()) {
+         return true;
+      } else {
+         WaypointWorld autoWorld = this.getAutoWorld();
+         WaypointWorldRootContainer rootContainer = displayedWorld.getContainer().getRootContainer();
+         return rootContainer.getSubWorldConnections().isConnected(autoWorld, displayedWorld);
+      }
    }
 
    public WaypointSet getWaypoints() {
@@ -750,5 +791,20 @@ public class WaypointsManager {
       MinimapClientWorldData worldData = MinimapClientWorldDataHelper.getCurrentWorldData();
       worldData.serverLevelId = id;
       MinimapLogs.LOGGER.info("Minimap updated server level id: " + id + " for world " + class_310.method_1551().field_1687.method_27983());
+   }
+
+   private void fixIPv6Folder(class_634 connection) throws IOException {
+      if (this.mainContainerID.startsWith("Multiplayer_")) {
+         String preIP6FixMainContainerID = this.getMainContainer(true, connection);
+         if (!this.mainContainerID.equals(preIP6FixMainContainerID)) {
+            Path preFixFolder = new File(this.modMain.getWaypointsFolder(), preIP6FixMainContainerID).toPath();
+            if (Files.exists(preFixFolder)) {
+               Path fixedFolder = new File(this.modMain.getWaypointsFolder(), this.mainContainerID).toPath();
+               if (!Files.exists(fixedFolder)) {
+                  Files.move(preFixFolder, fixedFolder);
+               }
+            }
+         }
+      }
    }
 }

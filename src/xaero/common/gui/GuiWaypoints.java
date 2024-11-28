@@ -550,7 +550,7 @@ public class GuiWaypoints extends ScreenBase implements IDropDownWidgetCallback 
       if (sortType == WaypointsSort.NONE) {
          this.waypointsSorted = this.displayedWorld.getCurrentSet().getList();
       } else {
-         distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld.getContainer().getKey());
+         distanceDivided = this.waypointsManager.getDimensionDivision(this.displayedWorld);
          ArrayList<KeySortableByOther<Waypoint>> sortableKeys = new ArrayList<>();
          class_4184 camera = this.field_22787.field_1773.method_19418();
 

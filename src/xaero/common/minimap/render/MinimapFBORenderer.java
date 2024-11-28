@@ -62,8 +62,8 @@ public class MinimapFBORenderer extends MinimapRenderer {
          this.scalingFramebuffer = new ImprovedFramebuffer(512, 512, false);
          this.rotationFramebuffer = new ImprovedFramebuffer(512, 512, true);
          this.rotationFramebuffer.method_1232(9729);
-         this.loadedFBO = this.scalingFramebuffer.field_1476 != -1 && this.rotationFramebuffer.field_1476 != -1;
          this.entityIconManager = new EntityIconManager(this.modMain, new EntityIconPrerenderer(this.modMain));
+         this.loadedFBO = this.scalingFramebuffer.field_1476 != -1 && this.rotationFramebuffer.field_1476 != -1;
          this.minimapElementMapRendererHandler = MinimapElementMapRendererHandler.Builder.begin().build();
          this.radarRenderer = RadarRenderer.Builder.begin()
             .setModMain(this.modMain)
@@ -85,6 +85,10 @@ public class MinimapFBORenderer extends MinimapRenderer {
       XaeroMinimapSession minimapSession,
       class_332 guiGraphics,
       MinimapProcessor minimap,
+      double playerX,
+      double playerZ,
+      double playerDimDiv,
+      double mapDimensionScale,
       int mapSize,
       int bufferSize,
       float sizeFix,
@@ -107,6 +111,10 @@ public class MinimapFBORenderer extends MinimapRenderer {
             minimap,
             this.mc.field_1724,
             this.mc.method_1560(),
+            playerX,
+            playerZ,
+            playerDimDiv,
+            mapDimensionScale,
             bufferSize,
             mapSize,
             sizeFix,
@@ -135,6 +143,10 @@ public class MinimapFBORenderer extends MinimapRenderer {
       MinimapProcessor minimap,
       class_1657 player,
       class_1297 renderEntity,
+      double playerX,
+      double playerZ,
+      double playerDimDiv,
+      double mapDimensionScale,
       int bufferSize,
       int viewW,
       float sizeFix,
@@ -155,8 +167,6 @@ public class MinimapFBORenderer extends MinimapRenderer {
       double maxVisibleLength = !lockedNorth && shape != 1 ? (double)viewW * Math.sqrt(2.0) : (double)viewW;
       double halfMaxVisibleLength = maxVisibleLength / 2.0;
       double radiusBlocks = maxVisibleLength / 2.0 / this.zoom;
-      double playerX = minimap.getEntityRadar().getEntityX(renderEntity, partial);
-      double playerZ = minimap.getEntityRadar().getEntityZ(renderEntity, partial);
       int xFloored = OptimizedMath.myFloor(playerX);
       int zFloored = OptimizedMath.myFloor(playerZ);
       int playerChunkX = xFloored >> 6;
@@ -174,12 +184,12 @@ public class MinimapFBORenderer extends MinimapRenderer {
       shaderMatrixStack.method_22903();
       shaderMatrixStack.method_34426();
       before = System.currentTimeMillis();
-      double xInsidePixel = minimap.getEntityRadar().getEntityX(renderEntity, partial) - (double)xFloored;
+      double xInsidePixel = playerX - (double)xFloored;
       if (xInsidePixel < 0.0) {
          xInsidePixel++;
       }
 
-      double zInsidePixel = minimap.getEntityRadar().getEntityZ(renderEntity, partial) - (double)zFloored;
+      double zInsidePixel = playerZ - (double)zFloored;
       if (zInsidePixel < 0.0) {
          zInsidePixel++;
       }
@@ -217,6 +227,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
                   maxZ,
                   zooming,
                   this.zoom,
+                  mapDimensionScale,
                   overlayBufferBuilder,
                   multiTextureRenderTypeRenderers
                );
@@ -399,6 +410,7 @@ public class MinimapFBORenderer extends MinimapRenderer {
             playerX,
             renderEntity.method_23318(),
             playerZ,
+            playerDimDiv,
             ps,
             pc,
             this.zoom,

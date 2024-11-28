@@ -362,7 +362,7 @@ public class EntityIconPrerenderer {
          }
 
          renderedSomething = this.renderIcon(
-            matrixStack, renderTypeBuffer, entityRenderer, entityModel, this.modelRenderDetectionList, (class_1309)entity, modelConfig, defaultModelConfig
+            matrixStack, renderTypeBuffer, entityRenderer, entityModel, this.modelRenderDetectionList, entity, modelConfig, defaultModelConfig
          );
          if (livingEntity != null) {
             this.livingEntityRotationResetter.restore(livingEntity);

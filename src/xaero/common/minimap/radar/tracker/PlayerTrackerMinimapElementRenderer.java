@@ -63,6 +63,13 @@ public final class PlayerTrackerMinimapElementRenderer extends MinimapElementRen
       this.context.uniqueTextureUIObjectRenderer = rendererProvider.getRenderer(
          t -> RenderSystem.setShaderTexture(0, t), MultiTextureRenderTypeRendererProvider::defaultTextureBind, CustomRenderTypes.GUI_NEAREST
       );
+      if (modMain.getSupportMods().worldmap()) {
+         this.context.mapDimId = modMain.getSupportMods().worldmapSupport.getMapDimension();
+         this.context.mapDimDiv = modMain.getInterfaces().getMinimapInterface().getMinimapFBORenderer().getLastPlayerDimDiv();
+      } else {
+         this.context.mapDimId = class_310.method_1551().field_1687.method_27983();
+         this.context.mapDimDiv = 1.0;
+      }
    }
 
    @Override
